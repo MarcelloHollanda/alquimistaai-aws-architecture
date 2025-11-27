@@ -139,9 +139,8 @@ const operationalDashboardStack = new OperationalDashboardStack(app, `Operationa
   envName,
   auroraSecretArn: fibonacciStack.dbSecret.secretArn,
   auroraClusterArn: fibonacciStack.dbCluster.clusterArn,
-  userPool: fibonacciStack.userPool,
-  cognitoAuthorizer: fibonacciStack.cognitoAuthorizer,
-  platformApi: alquimistaStack.platformApi,
+  // Props removidas para evitar dependência cíclica:
+  // - userPool, cognitoAuthorizer, platformApi
 });
 
 // Stack de Frontend (S3 + CloudFront + WAF)
@@ -176,7 +175,7 @@ nigredoStack.addDependency(fibonacciStack);
 nigredoStack.addDependency(wafStack); // Nigredo precisa dos Web ACLs do WAF
 alquimistaStack.addDependency(fibonacciStack);
 operationalDashboardStack.addDependency(fibonacciStack); // Operational Dashboard precisa do Aurora
-operationalDashboardStack.addDependency(alquimistaStack); // Operational Dashboard precisa do Platform API
+// REMOVIDO: operationalDashboardStack.addDependency(alquimistaStack) - causava ciclo
 observabilityStack.addDependency(fibonacciStack);
 observabilityStack.addDependency(nigredoStack);
 frontendStack.addDependency(wafStack); // Frontend precisa do WAF (prod)

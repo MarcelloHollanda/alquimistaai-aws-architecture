@@ -18,10 +18,12 @@ export interface OperationalDashboardStackProps extends cdk.StackProps {
   envName: string;
   auroraSecretArn: string;
   auroraClusterArn: string;
-  userPool: cognito.UserPool;
-  cognitoAuthorizer: authorizers.HttpUserPoolAuthorizer;
-  platformApi: apigatewayv2.HttpApi;
   vpc?: ec2.IVpc; // VPC para ElastiCache (opcional, cria uma nova se não fornecida)
+  
+  // Props removidas para evitar dependência cíclica:
+  // - userPool: cognito.UserPool
+  // - cognitoAuthorizer: authorizers.HttpUserPoolAuthorizer
+  // - platformApi: apigatewayv2.HttpApi
 }
 
 export class OperationalDashboardStack extends cdk.Stack {
@@ -50,7 +52,10 @@ export class OperationalDashboardStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: OperationalDashboardStackProps) {
     super(scope, id, props);
 
-    const { envName, auroraSecretArn, auroraClusterArn, userPool, platformApi } = props;
+    const { envName, auroraSecretArn, auroraClusterArn } = props;
+    
+    // Nota: userPool, cognitoAuthorizer e platformApi não são mais utilizados
+    // após remoção das rotas para evitar dependência cíclica
 
     // ========================================
     // Variáveis de Ambiente Comuns
@@ -586,16 +591,19 @@ export class OperationalDashboardStack extends cdk.Stack {
     });
 
     // ========================================
-    // Cognito Authorizer
+    // Cognito Authorizer (Removido)
     // ========================================
-    // Usar o authorizer compartilhado criado no FibonacciStack
-    // para evitar erro "There is already a Construct with name 'UserPoolAuthorizerClient'"
-    const cognitoAuthorizer = props.cognitoAuthorizer;
+    // Removido para evitar dependência cíclica.
+    // Quando as rotas forem recriadas, usar o authorizer do FibonacciStack.
 
     // ========================================
-    // Integrações Lambda
+    // Integrações Lambda (Comentadas - Não Utilizadas)
     // ========================================
-
+    // As integrações foram removidas para evitar dependência cíclica.
+    // Quando as rotas forem adicionadas no AlquimistaStack ou em uma API separada,
+    // descomentar e usar estas integrações.
+    
+    /*
     // Tenant APIs
     const getTenantMeIntegration = new integrations.HttpLambdaIntegration(
       'GetTenantMeIntegration',
@@ -669,120 +677,36 @@ export class OperationalDashboardStack extends cdk.Stack {
       this.listOperationalCommandsFunction,
       { payloadFormatVersion: apigatewayv2.PayloadFormatVersion.VERSION_2_0 }
     );
+    */
 
     // ========================================
-    // Rotas do API Gateway: /tenant/*
+    // NOTA: Rotas do API Gateway Removidas para Evitar Ciclo
     // ========================================
-
-    // GET /tenant/me
-    platformApi.addRoutes({
-      path: '/tenant/me',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantMeIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /tenant/agents
-    platformApi.addRoutes({
-      path: '/tenant/agents',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantAgentsIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /tenant/integrations
-    platformApi.addRoutes({
-      path: '/tenant/integrations',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantIntegrationsIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /tenant/usage
-    platformApi.addRoutes({
-      path: '/tenant/usage',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantUsageIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /tenant/incidents
-    platformApi.addRoutes({
-      path: '/tenant/incidents',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantIncidentsIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // ========================================
-    // Rotas do API Gateway: /internal/*
-    // ========================================
-
-    // GET /internal/tenants
-    platformApi.addRoutes({
-      path: '/internal/tenants',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: listTenantsIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /internal/tenants/{id}
-    platformApi.addRoutes({
-      path: '/internal/tenants/{id}',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantDetailIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /internal/tenants/{id}/agents
-    platformApi.addRoutes({
-      path: '/internal/tenants/{id}/agents',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getTenantAgentsInternalIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /internal/usage/overview
-    platformApi.addRoutes({
-      path: '/internal/usage/overview',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getUsageOverviewIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /internal/billing/overview
-    platformApi.addRoutes({
-      path: '/internal/billing/overview',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: getBillingOverviewIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // POST /internal/operations/commands
-    platformApi.addRoutes({
-      path: '/internal/operations/commands',
-      methods: [apigatewayv2.HttpMethod.POST],
-      integration: createOperationalCommandIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // GET /internal/operations/commands
-    platformApi.addRoutes({
-      path: '/internal/operations/commands',
-      methods: [apigatewayv2.HttpMethod.GET],
-      integration: listOperationalCommandsIntegration,
-      authorizer: cognitoAuthorizer,
-    });
-
-    // ========================================
-    // Throttling Configuration
-    // ========================================
-    // Nota: O throttling é configurado no nível do API Gateway
-    // As configurações padrão do API Gateway HTTP são:
-    // - Burst: 5000 requisições
-    // - Rate: 10000 requisições por segundo
-    // Para configurações customizadas por rota, seria necessário usar
-    // API Gateway REST API ou configurar via AWS Console/CLI
+    // As rotas /tenant/* e /internal/* foram removidas deste stack para evitar
+    // dependência cíclica com AlquimistaStack.
+    //
+    // SOLUÇÃO TEMPORÁRIA:
+    // - As Lambdas estão criadas e prontas para uso
+    // - As rotas devem ser adicionadas manualmente no AlquimistaStack
+    //   OU este stack deve criar sua própria API Gateway
+    //
+    // PRÓXIMOS PASSOS (pós-migração para Terraform):
+    // - Criar API Gateway separada para Operational Dashboard
+    // - Ou mover todas as Lambdas para AlquimistaStack
+    //
+    // Integrações disponíveis para uso:
+    // - getTenantMeIntegration
+    // - getTenantAgentsIntegration
+    // - getTenantIntegrationsIntegration
+    // - getTenantUsageIntegration
+    // - getTenantIncidentsIntegration
+    // - listTenantsIntegration
+    // - getTenantDetailIntegration
+    // - getTenantAgentsInternalIntegration
+    // - getUsageOverviewIntegration
+    // - getBillingOverviewIntegration
+    // - createOperationalCommandIntegration
+    // - listOperationalCommandsIntegration
 
     // ========================================
     // Outputs
