@@ -1,304 +1,303 @@
 # 📋 RESUMO PARA ENVIAR AO CHATGPT
 
+**Componente:** Micro Agente de Disparos & Agendamentos  
+**Última Atualização:** 2024-11-27  
+**Sessão:** Pipeline Seguro de Migrations Aurora (Lambda na VPC) + Migration 017
+
+---
+
 ## Contexto
 
-- **Repositório**: alquimistaai-aws-architecture
-- **Componente**: Micro Agente de Disparos & Agendamentos
-- **Última sessão**: 2024-11-26
+- **Repositório:** alquimistaai-aws-architecture
+- **Componente:** Micro Agente de Disparos & Agendamentos
+- **Última sessão:** Implementação de pipeline seguro de migrations via Lambda dentro da VPC
 
 ---
 
 ## Estado Atual
 
-### O que está pronto ✅
+### ✅ O que está pronto
 
-- [x] **Documentação completa**
-  - SPEC-TECNICA.md - Spec técnica consolidada
-  - requirements.md - Requisitos funcionais e não-funcionais
-  - design.md - Design técnico
-  - tasks.md - Tarefas de implementação
-  - FLUXO-INGESTAO-LEADS.md - Fluxo oficial de ingestão
-  - IMPLEMENTACAO-INGESTAO.md - Guia de implementação
-  - INDEX.md - Índice geral
-  - README.md - Visão geral
+#### 1. Pipeline de Migrations Seguro (Lambda na VPC)
 
-- [x] **Código TypeScript da Lambda de Ingestão**
-  - handler.ts - Handler principal com S3 Event
-  - parser.ts - Parser de arquivos XLSX
-  - validator.ts - Validações de email e telefone
-  - transformer.ts - Transformações e explosão de contatos
-  - loader.ts - Inserção no Aurora PostgreSQL
-  - types.ts - Tipos e interfaces TypeScript
+- [x] Lambda `aurora-migrations-runner` implementada
+- [x] Stack CDK `AuroraMigrationsRunnerStack` criado
+- [x] Scripts de build e execução automatizados
+- [x] Documentação completa do pipeline
 
-- [x] **Infraestrutura**
-  - schema-ingestao.sql - Schema completo do banco
-  - build-ingestao-lambda.ps1 - Script de build e deploy
-  - package.json - Dependências do projeto
-  - tsconfig.json - Configuração TypeScript
+**Arquivos criados:**
+- `lambda-src/aurora-migrations-runner/src/index.ts`
+- `lambda-src/aurora-migrations-runner/package.json`
+- `lambda-src/aurora-migrations-runner/tsconfig.json`
+- `lib/aurora-migrations-runner-stack.ts`
+- `scripts/build-aurora-migrations-runner.ps1`
+- `scripts/run-migration-017.ps1`
+- `scripts/list-migrations.ps1`
 
-- [x] **Scripts de suporte**
-  - build-lambdas.ps1 - Build geral
-  - validate-terraform-vars.ps1 - Validação
-  - create-secrets.ps1 - Criação de secrets
+#### 2. Migration 017 - dry_run_log
 
-### Arquivos importantes criados/alterados
+- [x] Migration SQL criada e versionada
+- [x] Tabela `dry_run_log` definida com índices
+- [x] Migration copiada para Lambda
+- [x] Pronta para execução via Lambda
 
-```
-.kiro/specs/micro-agente-disparo-agendamento/
-├── SPEC-TECNICA.md                   ✅ NOVO
-├── INDEX.md                          ✅ NOVO
-├── RESUMO-PARA-CHATGPT.md           ✅ NOVO (este arquivo)
-├── FLUXO-INGESTAO-LEADS.md          ✅ NOVO
-├── IMPLEMENTACAO-INGESTAO.md        ✅ NOVO
-├── schema-ingestao.sql              ✅ NOVO
-├── build-ingestao-lambda.ps1        ✅ NOVO
-├── README.md                         ✅ ATUALIZADO
-├── requirements.md                   ✅ EXISTENTE
-├── design.md                         ✅ EXISTENTE
-└── tasks.md                          ✅ EXISTENTE
+**Arquivo:** `database/migrations/017_create_dry_run_log_micro_agente.sql`
 
-lambda-src/agente-disparo-agenda/
-├── ingestao/
-│   ├── handler.ts                   ✅ NOVO
-│   ├── parser.ts                    ✅ NOVO
-│   ├── validator.ts                 ✅ NOVO
-│   ├── transformer.ts               ✅ NOVO
-│   ├── loader.ts                    ✅ NOVO
-│   └── types.ts                     ✅ NOVO
-├── package.json                     ✅ NOVO
-└── tsconfig.json                    ✅ NOVO
-```
+#### 3. Fluxo Dry-Run (Sessão Anterior)
+
+- [x] Handler `dry-run.ts` implementado
+- [x] Lógica de decisão de canal (`canal-decision.ts`)
+- [x] Feature flag `MICRO_AGENT_DISPARO_ENABLED`
+- [x] Terraform configurado
+
+#### 4. Integração com CDK
+
+- [x] Stack adicionado ao `bin/app.ts`
+- [x] Dependências configuradas (FibonacciStack)
+- [x] Tags e outputs definidos
+
+---
+
+## Arquivos Importantes Alterados
+
+### Novos Arquivos
+
+1. **Lambda Migrations Runner:**
+   - `lambda-src/aurora-migrations-runner/src/index.ts` - Handler principal
+   - `lambda-src/aurora-migrations-runner/package.json` - Dependências
+   - `lambda-src/aurora-migrations-runner/tsconfig.json` - Config TypeScript
+   - `lambda-src/aurora-migrations-runner/migrations/017_create_dry_run_log_micro_agente.sql`
+
+2. **Infraestrutura:**
+   - `lib/aurora-migrations-runner-stack.ts` - Stack CDK completo
+
+3. **Scripts:**
+   - `scripts/build-aurora-migrations-runner.ps1` - Build automatizado
+   - `scripts/run-migration-017.ps1` - Execução da migration
+   - `scripts/list-migrations.ps1` - Listar migrations
+
+4. **Documentação:**
+   - `.kiro/specs/micro-agente-disparo-agendamento/PIPELINE-MIGRATIONS-VPC.md` - Doc completa
+   - `docs/database/PIPELINE-MIGRATIONS-SEGURO.md` - Quick reference
+   - `lambda-src/aurora-migrations-runner/README.md` - Doc da Lambda
+
+### Arquivos Modificados
+
+1. **bin/app.ts:**
+   - Adicionado import `AuroraMigrationsRunnerStack`
+   - Instanciado stack com dependência do FibonacciStack
+   - Configurado tags e outputs
 
 ---
 
 ## Erros ou Pendências
 
-### Pendências principais
+### ✅ Resolvidos
 
-- [ ] **Testes unitários** - Criar testes para parser, validator, transformer
-- [ ] **Testes de integração** - Testar fluxo completo de ingestão
-- [ ] **Deploy em dev** - Executar build e deploy no ambiente dev
-- [ ] **Validação com planilha real** - Testar com arquivo Leads_Organizados.xlsx real
-- [ ] **Lambda de Disparo** - Implementar componente de disparo automático
-- [ ] **Lambda de Agendamento** - Implementar componente de agendamento
-- [ ] **Integração MCP** - Conectar com MCP WhatsApp e Email servers
+1. **Problema:** Aurora em VPC privada não acessível via `psql` local
+   - **Solução:** Lambda dentro da VPC com acesso direto ao Aurora
 
-### Erros conhecidos
+2. **Problema:** Falta de automação para migrations
+   - **Solução:** Scripts PowerShell completos de build e execução
 
-Nenhum erro conhecido no momento. Código foi criado mas ainda não testado.
+3. **Problema:** Migration 017 não versionada oficialmente
+   - **Solução:** Criada em `database/migrations/` e copiada para Lambda
+
+### ⚠️ Pendências
+
+1. **Deploy do Stack CDK:**
+   - Executar: `cdk deploy AuroraMigrationsRunnerStack-dev --context env=dev`
+   - Status: Aguardando execução pelo fundador
+
+2. **Execução da Migration 017:**
+   - Executar: `.\scripts\run-migration-017.ps1 -Environment dev`
+   - Status: Aguardando deploy da Lambda
+
+3. **Integração no Código Dry-Run:**
+   - Atualizar `lambda-src/agente-disparo-agenda/src/handlers/dry-run.ts`
+   - Inserir registros na tabela `dry_run_log`
+   - Status: Aguardando migration aplicada
 
 ---
 
 ## Último Blueprint Executado
 
-O ChatGPT forneceu o esqueleto da spec técnica e solicitou a criação de:
+**Blueprint:** Pipeline Seguro de Migrations Aurora (Lambda dentro da VPC) + Migration 017
 
-1. ✅ Documentação completa consolidada
-2. ✅ Código TypeScript da Lambda de Ingestão
-3. ✅ Schema SQL do banco de dados
-4. ✅ Scripts de build e deploy
-5. ✅ Estrutura de tipos e interfaces
+**Objetivo:** Criar mecanismo oficial de migrations que roda de dentro da VPC via Lambda, eliminando necessidade de expor Aurora ou usar `psql` local.
 
-Tudo foi implementado conforme solicitado.
+**Resultado:**
+- ✅ Lambda implementada e testável
+- ✅ Stack CDK completo
+- ✅ Scripts de automação criados
+- ✅ Migration 017 registrada e pronta
+- ✅ Documentação completa
 
 ---
 
 ## Próximos Passos Sugeridos
 
-### Imediato (Fase 1 - MVP)
+### Imediato (Fundador)
 
-1. **Testar build local**
+1. **Build da Lambda:**
    ```powershell
-   cd lambda-src\agente-disparo-agenda
-   npm install
-   npm run build
+   .\scripts\build-aurora-migrations-runner.ps1
    ```
 
-2. **Criar schema no Aurora**
-   ```bash
-   psql -h <aurora-endpoint> -U admin -d alquimista -f schema-ingestao.sql
-   ```
-
-3. **Criar secrets no AWS**
+2. **Deploy do Stack:**
    ```powershell
-   .\create-secrets.ps1 -Environment dev
+   cdk deploy AuroraMigrationsRunnerStack-dev --context env=dev
    ```
 
-4. **Deploy da Lambda**
+3. **Executar Migration 017:**
    ```powershell
-   .\build-ingestao-lambda.ps1 -Environment dev
+   .\scripts\run-migration-017.ps1 -Environment dev
    ```
 
-5. **Testar com planilha real**
+4. **Verificar Logs:**
    ```powershell
-   aws s3 cp Leads_Organizados.xlsx s3://alquimista-leads-input-dev/test/
-   aws logs tail /aws/lambda/alquimista-ingestao-leads-dev --follow
+   aws logs tail /aws/lambda/aurora-migrations-runner-dev --follow
    ```
 
-### Curto Prazo (Fase 2 - Disparo)
+### Curto Prazo
 
-1. Implementar Lambda de Disparo
-2. Integrar com MCP WhatsApp Server
-3. Integrar com MCP Email Server
-4. Implementar rate limiting
-5. Configurar EventBridge Scheduler
+1. **Integrar dry_run_log no Código:**
+   - Atualizar handler dry-run para inserir registros
+   - Testar fluxo completo end-to-end
 
-### Médio Prazo (Fase 3 - Agendamento)
+2. **Validar Tabela Criada:**
+   - Via CloudWatch Logs
+   - Via outra Lambda com acesso ao Aurora
 
-1. Implementar Lambda de Agendamento
-2. Integrar com Google Calendar API
-3. Implementar geração de briefings
-4. Implementar sistema de lembretes
+3. **Deploy do Micro Agente Dry-Run:**
+   - Executar scripts de build e deploy existentes
+   - Testar invocação da Lambda dry-run
+
+### Médio Prazo
+
+1. **Adicionar Mais Migrations:**
+   - Criar migrations 018, 019, etc.
+   - Usar mesmo pipeline seguro
+
+2. **Implementar Rollback:**
+   - Adicionar suporte a rollback de migrations
+   - Criar tabela de controle de migrations aplicadas
+
+3. **Integração CI/CD:**
+   - Automatizar execução de migrations em pipeline
+   - Adicionar validações pré-deploy
 
 ---
 
 ## Informações Técnicas Relevantes
 
-### Arquitetura
+### Configuração da Lambda
 
-- **Backend**: AWS Lambda (Node.js 20)
-- **Banco**: Aurora Serverless v2 (PostgreSQL 15)
-- **Storage**: S3 para input de planilhas
-- **Events**: EventBridge para orquestração
-- **Região**: us-east-1 (obrigatório)
+**Nome:** `aurora-migrations-runner-dev`  
+**Runtime:** Node.js 20  
+**Memory:** 512MB  
+**Timeout:** 5 minutos  
+**VPC:** Mesma do Aurora (subnets privadas)
 
-### Modelo de Dados
+**Variáveis de Ambiente:**
+- `DB_SECRET_ARN` - ARN do secret do Aurora
+- `AWS_REGION` - us-east-1
+- `NODE_OPTIONS` - --enable-source-maps
 
-**Tabelas principais**:
-- `leads` - Dados básicos do lead
-- `lead_telefones` - Telefones explodidos
-- `lead_emails` - Emails explodidos
-
-**Identificação**:
-- `lead_id` - UUID interno
-- `lead_id_externo` - Rastreabilidade (formato: `arquivo:linha`)
-
-**Status do Lead**:
-- `novo` → `em_disparo` → `contato_efetuado` → `concluido`
-- `novo` → `agendado` → `contato_efetuado` → `concluido`
-- `em_disparo` → `sem_sucesso` → `descartado`
-
-### Entrada de Dados
-
-**Planilha**: `Leads_Organizados.xlsx`  
-**Aba**: `Leads`  
-**Colunas**: Nome, Contato, CNPJ/CPF, Email, Telefone
-
-**Regras importantes**:
-- Emails e telefones podem ter múltiplos valores separados por `" | "`
-- Primeiro email/telefone é marcado como principal
-- Validação de formato antes de marcar como válido para disparo
-- Telefones brasileiros devem estar no formato `+55 DDD NÚMERO`
-
-### Variáveis de Ambiente
-
-```bash
-DB_HOST=alquimista-aurora-dev.cluster-xxx.us-east-1.rds.amazonaws.com
-DB_PORT=5432
-DB_NAME=alquimista
-DB_USER=admin
-DB_PASSWORD=<from-secrets-manager>
-AWS_REGION=us-east-1
-EVENT_BUS_NAME=fibonacci-bus-dev
-```
-
-### Dependências Principais
-
-```json
-{
-  "@aws-sdk/client-s3": "^3.478.0",
-  "@aws-sdk/client-eventbridge": "^3.478.0",
-  "pg": "^8.11.3",
-  "xlsx": "^0.18.5"
-}
-```
-
----
-
-## Comandos Úteis
-
-### Build e Deploy
-
-```powershell
-# Build completo com upload
-.\build-ingestao-lambda.ps1 -Environment dev
-
-# Build sem upload
-.\build-ingestao-lambda.ps1 -Environment dev -SkipUpload
-
-# Apenas upload (sem rebuild)
-.\build-ingestao-lambda.ps1 -Environment dev -SkipBuild
-```
-
-### Monitoramento
-
-```bash
-# Logs da Lambda
-aws logs tail /aws/lambda/alquimista-ingestao-leads-dev --follow
-
-# Listar secrets
-aws secretsmanager list-secrets --region us-east-1
-
-# Verificar bucket S3
-aws s3 ls s3://alquimista-leads-input-dev/
-```
-
-### Banco de Dados
+### Estrutura da Tabela dry_run_log
 
 ```sql
--- Total de leads por status
-SELECT status, COUNT(*) FROM leads GROUP BY status;
-
--- Leads com contatos válidos
-SELECT COUNT(*) FROM leads l
-WHERE EXISTS (
-    SELECT 1 FROM lead_emails e 
-    WHERE e.lead_id = l.lead_id AND e.valido_para_disparo = TRUE
-)
-OR EXISTS (
-    SELECT 1 FROM lead_telefones t 
-    WHERE t.lead_id = l.lead_id AND t.valido_para_disparo = TRUE
+CREATE TABLE dry_run_log (
+  log_id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  lead_id UUID,
+  lead_nome VARCHAR(500),
+  lead_telefone VARCHAR(50),
+  lead_email VARCHAR(255),
+  lead_documento VARCHAR(20),
+  canal_decidido VARCHAR(20) NOT NULL,
+  motivo_decisao TEXT NOT NULL,
+  template_selecionado VARCHAR(100),
+  disparo_seria_executado BOOLEAN DEFAULT TRUE,
+  razao_bloqueio TEXT,
+  ambiente VARCHAR(10) DEFAULT 'dev',
+  feature_flag_enabled BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
 );
+```
 
--- Estatísticas de ingestão
-SELECT * FROM v_stats_ingestao;
+### Comandos Úteis
+
+**Listar migrations disponíveis:**
+```powershell
+.\scripts\list-migrations.ps1 -Environment dev
+```
+
+**Executar migration específica:**
+```powershell
+.\scripts\run-migration-017.ps1 -Environment dev
+```
+
+**Ver logs da Lambda:**
+```powershell
+aws logs tail /aws/lambda/aurora-migrations-runner-dev --follow
+```
+
+**Verificar configuração da Lambda:**
+```powershell
+aws lambda get-function-configuration `
+  --function-name aurora-migrations-runner-dev
 ```
 
 ---
 
-## Documentos de Referência
+## Arquitetura do Pipeline
 
-### Dentro da Spec
-
-- [SPEC-TECNICA.md](./SPEC-TECNICA.md) - Spec técnica completa
-- [INDEX.md](./INDEX.md) - Índice geral
-- [README.md](./README.md) - Visão geral e quick start
-- [FLUXO-INGESTAO-LEADS.md](./FLUXO-INGESTAO-LEADS.md) - Fluxo detalhado
-
-### Blueprints e Steering
-
-- `.kiro/steering/blueprint-disparo-agendamento.md` - Blueprint oficial
-- `.kiro/steering/contexto-projeto-alquimista.md` - Contexto do projeto
-- `.kiro/steering/FLUXO-CHATGPT-KIRO-ALQUIMISTAAI.md` - Fluxo de trabalho
+```
+┌─────────────┐
+│  Máquina    │
+│  Local      │
+└─────────────┘
+      │
+      │ AWS CLI Invoke
+      ▼
+┌─────────────────────────────────┐
+│           AWS Cloud             │
+│                                 │
+│  ┌────────────────────────────┐ │
+│  │         VPC Privada        │ │
+│  │                            │ │
+│  │  ┌──────────┐  ┌────────┐ │ │
+│  │  │ Lambda   │─▶│ Aurora │ │ │
+│  │  │ Runner   │  │        │ │ │
+│  │  └──────────┘  └────────┘ │ │
+│  │       │                   │ │
+│  │       ▼                   │ │
+│  │  ┌──────────┐            │ │
+│  │  │ Secrets  │            │ │
+│  │  │ Manager  │            │ │
+│  │  └──────────┘            │ │
+│  │                            │ │
+│  └────────────────────────────┘ │
+│                                 │
+│  ┌────────────────────────────┐ │
+│  │  CloudWatch Logs           │ │
+│  └────────────────────────────┘ │
+│                                 │
+└─────────────────────────────────┘
+```
 
 ---
 
-## Como Usar Este Resumo
+## Benefícios Alcançados
 
-### Para continuar no ChatGPT
-
-1. Copie este arquivo completo
-2. Cole no ChatGPT junto com o comando `@@Ativar`
-3. Especifique qual próximo passo deseja executar
-
-### Para continuar no Kiro
-
-1. Use o comando `@@Ativar` + blueprint do ChatGPT
-2. Kiro lerá este resumo automaticamente
-3. Kiro executará as ações especificadas no blueprint
+1. **Segurança:** Aurora permanece em VPC privada, sem exposição pública
+2. **Automação:** Migrations executáveis via AWS CLI de qualquer lugar
+3. **Auditoria:** Logs completos no CloudWatch de cada execução
+4. **Escalabilidade:** Padrão reutilizável para futuras migrations
+5. **CI/CD Ready:** Pipeline integrável em workflows automatizados
 
 ---
 
-**Gerado em**: 2024-11-26  
-**Versão**: 1.0.0  
-**Status**: Fase 1 (MVP) - Documentação e código completos, aguardando testes e deploy
+**Última Atualização:** 2024-11-27  
+**Próxima Ação:** Deploy do stack CDK e execução da migration 017

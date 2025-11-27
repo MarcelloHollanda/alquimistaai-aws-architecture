@@ -10,6 +10,7 @@ import { WAFStack } from '../lib/waf-stack';
 import { ObservabilityDashboardStack } from '../lib/observability-dashboard-stack';
 import { FrontendStack } from '../lib/frontend-stack';
 import { OperationalDashboardStack } from '../lib/operational-dashboard-stack';
+import { AuroraMigrationsRunnerStack } from '../lib/aurora-migrations-runner-stack';
 
 const app = new cdk.App();
 
@@ -157,6 +158,17 @@ const frontendStack = new FrontendStack(app, `FrontendStack-${envName}`, {
   nigredoApiUrl: `https://${nigredoStack.httpApi.apiEndpoint}`,
 });
 
+// Stack de Aurora Migrations Runner (Lambda dentro da VPC)
+const auroraMigrationsRunnerStack = new AuroraMigrationsRunnerStack(app, `AuroraMigrationsRunnerStack-${envName}`, {
+  env,
+  tags: { ...commonTags, component: 'aurora-migrations-runner' },
+  description: 'Aurora Migrations Runner - Lambda para executar migrations SQL dentro da VPC',
+  envName,
+  vpc: fibonacciStack.vpc,
+  dbCluster: fibonacciStack.dbCluster,
+  dbSecret: fibonacciStack.dbSecret,
+});
+
 // Adicionar dependências entre stacks
 wafStack.addDependency(securityStack); // WAF precisa do SNS Topic de segurança
 fibonacciStack.addDependency(wafStack); // Fibonacci precisa dos Web ACLs do WAF
@@ -170,5 +182,6 @@ observabilityStack.addDependency(nigredoStack);
 frontendStack.addDependency(wafStack); // Frontend precisa do WAF (prod)
 frontendStack.addDependency(fibonacciStack); // Frontend precisa das URLs das APIs
 frontendStack.addDependency(nigredoStack);
+auroraMigrationsRunnerStack.addDependency(fibonacciStack); // Migrations Runner precisa do Aurora e VPC
 
 app.synth();
