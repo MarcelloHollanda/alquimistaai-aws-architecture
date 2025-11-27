@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fibonacci · Núcleo Orquestrador</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="images/logo-alquimistaai-glow.png"
+           alt="AlquimistaAI — Transmutando dados em ouro"
+           class="brand-logo" />
+      <div>
+        <div class="brand-text-main">Fibonacci · Núcleo Orquestrador</div>
+        <div class="brand-text-sub">Painel dos agentes da AlquimistaAI</div>
+      </div>
+    </div>
+    <button class="nav-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">AlquimistaAI</a>
+      <a href="produtos.html" class="nav-link">Agentes & Planos</a>
+      <a href="fibonacci.html" class="nav-link">Fibonacci</a>
+      <a href="#" class="nav-cta">Entrar</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <span class="badge">Console em desenvolvimento · backend já na AWS</span>
+      <h1 class="section-title">Núcleo central de orquestração de agentes</h1>
+      <p class="section-sub">
+        O Fibonacci governa usuários, subnúcleos, integrações, custos, logs e os 32
+        agentes especialistas da AlquimistaAI. Enquanto esta página é a interface
+        comercial, o console técnico já roda em Lambda + API Gateway + Aurora.
+      </p>
+
+      <ul style="font-size:14px; color:var(--text-muted); padding-left:18px;">
+        <li>Backend serverless na AWS (us-east-1) com banco Aurora Serverless v2.</li>
+        <li>Orquestração de agentes, subnúcleos e canais em um único núcleo.</li>
+        <li>Logs, métricas e trilhas para auditoria e LGPD.</li>
+        <li>Pronto para multi-tenant e comercialização como SaaS.</li>
+      </ul>
+
+      <div style="margin-top:16px;">
+        <a
+          href="http://alquimistaai-fibonacci-frontend-prod.s3-website-us-east-1.amazonaws.com"
+          class="btn"
+        >
+          Abrir console Fibonacci (versão atual)
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Visão geral do painel</h2>
+      <p class="section-sub">
+        A interface seguirá a lógica dos apps modernos de SaaS (como no Lovable):
+        navegação lateral, cards de KPIs e telas dedicadas para agentes, canais
+        e relatórios.
+      </p>
+
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <strong>Dashboard ao vivo</strong>
+          <p>KPIs de uso, custos, filas e canais ativos em tempo quase real.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Agentes & subnúcleos</strong>
+          <p>Lista e status de Hermes, Sophia, Atlas, Oracle, Nigredo e outros.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Eventos & logs</strong>
+          <p>Timeline de eventos com trace_id, canal, agente e tempo de resposta.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Subnúcleos orquestrados</h2>
+      <p class="section-sub">
+        Cada subnúcleo é um conjunto de agentes especializados em um eixo da operação.
+      </p>
+
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <strong>Hermes · Conteúdo & Lançamentos</strong>
+          <p>Roteiros, posts, e-mails e campanhas recorrentes.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Sophia · Atendimento & Experiência</strong>
+          <p>Suporte, onboarding, FAQ e experiência do cliente.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Atlas · Operações & Rotinas</strong>
+          <p>Agenda, checklists, tarefas internas e documentos.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Oracle · Insights & Estratégia</strong>
+          <p>Relatórios, previsões, segmentações e análises de funil.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Nigredo · Prospecção & Vendas</strong>
+          <p>Leads, cadências, reativações e oportunidades de upsell.</p>
+        </div>
+        <div class="benefit-item">
+          <strong>Treasurer & Guardian</strong>
+          <p>Finanças, cobrança light, LGPD, risco e compliance.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Fluxo padrão (exemplo Nigredo)</h2>
+      <p class="section-sub">
+        Exemplo simplificado de fluxo de prospecção coordenado pelo Fibonacci.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Recebimento</div>
+          <div>Leads chegam via CSV, formulários, CRM ou APIs.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">Estratégia</div>
+          <div>Segmentação, roteiros, testes A/B e regras de janela de envio.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Disparo & Conversas</div>
+          <div>Mensagens em canais como WhatsApp e e-mail, com handoff humano.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-title">Relatórios</div>
+          <div>Taxas, agendamentos, pipeline e insights de objeções.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    Fibonacci · Núcleo central do ecossistema AlquimistaAI.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

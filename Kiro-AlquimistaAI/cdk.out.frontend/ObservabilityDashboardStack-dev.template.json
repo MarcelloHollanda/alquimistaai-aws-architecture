@@ -1,0 +1,298 @@
+{
+ "Description": "Observability Dashboards - CloudWatch Dashboards para monitoramento consolidado",
+ "Resources": {
+  "OverviewDashboard4DD322D9": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"periodOverride\":\"auto\",\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Fibonacci - API Gateway Latency\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+       },
+       "\",{\"color\":\"#2ca02c\",\"label\":\"p50\",\"stat\":\"p50\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+       },
+       "\",{\"color\":\"#ff7f0e\",\"label\":\"p90\",\"stat\":\"p90\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+       },
+       "\",{\"color\":\"#d62728\",\"label\":\"p99\",\"stat\":\"p99\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Latency (ms)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Fibonacci - API Gateway Errors\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"4XXError\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+       },
+       "\",{\"color\":\"#ff7f0e\",\"label\":\"4xx Errors\",\"stat\":\"Sum\"}],[\"AWS/ApiGateway\",\"5XXError\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+       },
+       "\",{\"color\":\"#d62728\",\"label\":\"5xx Errors\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Error Count\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Fibonacci - API Gateway Throughput\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Count\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+       },
+       "\",{\"color\":\"#1f77b4\",\"label\":\"Requests/min\",\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Requests\"}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Fibonacci - Lambda Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefApiHandler5E7490E896301149"
+       },
+       "\",{\"color\":\"#1f77b4\",\"label\":\"Invocations\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Count\"}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":8,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Fibonacci - Lambda Errors\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefApiHandler5E7490E896301149"
+       },
+       "\",{\"color\":\"#d62728\",\"label\":\"Errors\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Error Count\"}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":16,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Fibonacci - Lambda Duration\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefApiHandler5E7490E896301149"
+       },
+       "\",{\"color\":\"#2ca02c\",\"label\":\"Average\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefApiHandler5E7490E896301149"
+       },
+       "\",{\"color\":\"#ff7f0e\",\"label\":\"p95\",\"stat\":\"p95\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Duration (ms)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":18,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Nigredo - API Gateway Latency\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefNigredoHttpApiD078601F909F2013"
+       },
+       "\",{\"color\":\"#2ca02c\",\"label\":\"p50\",\"stat\":\"p50\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefNigredoHttpApiD078601F909F2013"
+       },
+       "\",{\"color\":\"#ff7f0e\",\"label\":\"p90\",\"stat\":\"p90\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefNigredoHttpApiD078601F909F2013"
+       },
+       "\",{\"color\":\"#d62728\",\"label\":\"p99\",\"stat\":\"p99\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Latency (ms)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":18,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Nigredo - API Gateway Errors\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"4XXError\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefNigredoHttpApiD078601F909F2013"
+       },
+       "\",{\"color\":\"#ff7f0e\",\"label\":\"4xx Errors\",\"stat\":\"Sum\"}],[\"AWS/ApiGateway\",\"5XXError\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefNigredoHttpApiD078601F909F2013"
+       },
+       "\",{\"color\":\"#d62728\",\"label\":\"5xx Errors\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Error Count\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":24,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Nigredo - API Gateway Throughput\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Count\",\"ApiId\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefNigredoHttpApiD078601F909F2013"
+       },
+       "\",{\"color\":\"#9467bd\",\"label\":\"Requests/min\",\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Requests\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Nigredo - Lambda Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefRecebimentoLambda94C8BF585831F297"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefEstrategiaLambda99BF03B77F9BA11A"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefDisparoLambda0A5F8F52367B5B47"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefAtendimentoLambda97A1D18304472377"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefSentimentoLambda423C822492201CA1"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefAgendamentoLambda083CE1CFA3AD922F"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Invocations\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":36,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Nigredo - Lambda Errors\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefRecebimentoLambda94C8BF585831F297"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefEstrategiaLambda99BF03B77F9BA11A"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefDisparoLambda0A5F8F52367B5B47"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefAtendimentoLambda97A1D18304472377"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefSentimentoLambda423C822492201CA1"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefAgendamentoLambda083CE1CFA3AD922F"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Errors\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":42,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Nigredo - Lambda Duration (p95)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefRecebimentoLambda94C8BF585831F297"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefEstrategiaLambda99BF03B77F9BA11A"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefDisparoLambda0A5F8F52367B5B47"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefAtendimentoLambda97A1D18304472377"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefSentimentoLambda423C822492201CA1"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Fn::ImportValue": "NigredoStack-dev:ExportsOutputRefAgendamentoLambda083CE1CFA3AD922F"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"p95\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Duration (ms)\"}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":0,\"y\":48,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Aurora - CPU Utilization\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/RDS\",\"CPUUtilization\",\"DBClusterIdentifier\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefAuroraCluster23D869C0CA1C7DB5"
+       },
+       "\",{\"color\":\"#1f77b4\",\"label\":\"CPU %\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100,\"label\":\"CPU %\"}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":8,\"y\":48,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Aurora - Database Connections\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/RDS\",\"DatabaseConnections\",\"DBClusterIdentifier\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefAuroraCluster23D869C0CA1C7DB5"
+       },
+       "\",{\"color\":\"#ff7f0e\",\"label\":\"Connections\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Connections\"}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":16,\"y\":48,\"properties\":{\"view\":\"timeSeries\",\"title\":\"[DEV] Aurora - Free Storage Space\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/RDS\",\"FreeLocalStorage\",\"DBClusterIdentifier\",\"",
+       {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefAuroraCluster23D869C0CA1C7DB5"
+       },
+       "\",{\"color\":\"#2ca02c\",\"label\":\"Free Storage (bytes)\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Bytes\"}}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "AlquimistaAI-Dev-Overview"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ObservabilityDashboardStack-dev/OverviewDashboard/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z3HOwqEMBAA0LPYJ6OJ3kB7YfcAMiaK8ZMszsQU4t1FFqweT4PWJRQZJpLGLnJ1PZxfRrMITNSZNUSbkM0EZ4M09QF3K+rRv7metZF/kS/hgx1gpvzQFSgFKpvJOblHz24b4PP3BuWz881zAAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ObservabilityDashboardStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "DashboardName": {
+   "Description": "Dashboard de observabilidade para ambiente dev",
+   "Value": {
+    "Ref": "OverviewDashboard4DD322D9"
+   },
+   "Export": {
+    "Name": "ObservabilityDashboardName-dev"
+   }
+  },
+  "DashboardUrl": {
+   "Description": "URL do dashboard no console CloudWatch",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=",
+      {
+       "Ref": "OverviewDashboard4DD322D9"
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

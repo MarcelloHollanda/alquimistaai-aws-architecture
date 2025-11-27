@@ -1,0 +1,377 @@
+name: CI/CD AlquimistaAI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente para deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-and-validate:
+    name: Build e Validação
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Instalar dependências
+        run: npm ci
+      
+      - name: Build TypeScript
+        run: npm run build
+      
+      - name: Instalar dependências do frontend
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Instalar navegadores Playwright
+        working-directory: ./frontend
+        run: npx playwright install --with-deps chromium
+      
+      - name: Executar testes E2E do frontend
+        working-directory: ./frontend
+        run: npm run test:e2e:ci
+        continue-on-error: true
+      
+      - name: Upload de relatório de testes E2E
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30
+      
+      - name: Validar sistema (PowerShell)
+        shell: pwsh
+        run: ./scripts/validate-system-complete.ps1
+      
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsAlquimistaAICICD
+          aws-region: us-east-1
+          role-session-name: GitHubActions-${{ github.run_id }}
+      
+      - name: Validar Migrations Aurora (Pré-Deploy)
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Validando estado das migrations no Aurora..." -ForegroundColor Cyan
+          
+          # Nota: Este passo valida a estrutura das migrations localmente
+          # A validação completa com conexão ao banco será feita pós-deploy
+          
+          if (Test-Path "database/migrations") {
+            Write-Host "✅ Diretório de migrations encontrado" -ForegroundColor Green
+            $migrations = Get-ChildItem "database/migrations/*.sql" | Sort-Object Name
+            Write-Host "📊 Total de migrations: $($migrations.Count)" -ForegroundColor Cyan
+            
+            # Verificar se migrations seguem padrão de nomenclatura
+            foreach ($migration in $migrations) {
+              if ($migration.Name -match '^\d{3}_.*\.sql$') {
+                Write-Host "  ✅ $($migration.Name)" -ForegroundColor Green
+              } else {
+                Write-Host "  ⚠️  $($migration.Name) - Nome não segue padrão" -ForegroundColor Yellow
+              }
+            }
+          } else {
+            Write-Host "⚠️  Diretório de migrations não encontrado" -ForegroundColor Yellow
+          }
+          
+          Write-Host ""
+          Write-Host "✅ Validação de migrations pré-deploy concluída" -ForegroundColor Green
+        continue-on-error: false
+      
+      - name: CDK Synth - Fibonacci Stack
+        run: npx cdk synth FibonacciStack --context env=dev
+      
+      - name: CDK Synth - Nigredo Stack
+        run: npx cdk synth NigredoStack --context env=dev
+      
+      - name: CDK Synth - Alquimista Stack
+        run: npx cdk synth AlquimistaStack --context env=dev
+      
+      - name: Comentar resultado no PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Build e validação concluídos com sucesso!\n\n- TypeScript compilado\n- Sistema validado\n- Migrations validadas\n- CDK synth executado para todas as stacks'
+            })
+
+  deploy-dev:
+    name: Deploy Automático - DEV
+    needs: build-and-validate
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Instalar dependências
+        run: npm ci
+      
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsAlquimistaAICICD
+          aws-region: us-east-1
+          role-session-name: GitHubActions-Deploy-Dev-${{ github.run_id }}
+      
+      - name: Deploy CDK - Ambiente DEV
+        shell: pwsh
+        run: |
+          Write-Host "🚀 Iniciando deploy em DEV..." -ForegroundColor Cyan
+          Write-Host "Branch: ${{ github.ref }}" -ForegroundColor Yellow
+          Write-Host "Commit: ${{ github.sha }}" -ForegroundColor Yellow
+          Write-Host "Autor: ${{ github.actor }}" -ForegroundColor Yellow
+          Write-Host ""
+          
+          # Deploy de todas as stacks em dev
+          npx cdk deploy --all --context env=dev --require-approval never
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Deploy em DEV concluído com sucesso!" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Falha no deploy em DEV" -ForegroundColor Red
+            exit 1
+          }
+      
+      - name: Verificar deploy
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Verificando recursos deployados..." -ForegroundColor Cyan
+          aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE --query "StackSummaries[?contains(StackName, 'dev')].{Name:StackName, Status:StackStatus}" --output table
+  
+  smoke-tests-dev:
+    name: Smoke Tests - DEV
+    needs: deploy-dev
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Instalar dependências
+        run: npm ci
+      
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsAlquimistaAICICD
+          aws-region: us-east-1
+          role-session-name: GitHubActions-SmokeTests-Dev-${{ github.run_id }}
+      
+      - name: Executar Smoke Tests
+        shell: pwsh
+        run: |
+          Write-Host "🧪 Executando smoke tests em DEV..." -ForegroundColor Cyan
+          Write-Host ""
+          
+          # Executar smoke tests
+          .\scripts\smoke-tests-api-dev.ps1 -Environment dev -Verbose
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host ""
+            Write-Host "✅ Smoke tests passaram com sucesso!" -ForegroundColor Green
+          } else {
+            Write-Host ""
+            Write-Host "❌ Smoke tests falharam!" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "⚠️  ATENÇÃO: O deploy foi concluído, mas os testes de validação falharam." -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "📋 Próximos passos:" -ForegroundColor Cyan
+            Write-Host "  1. Verifique os logs acima para identificar o problema" -ForegroundColor White
+            Write-Host "  2. Consulte: docs/ROLLBACK-OPERACIONAL-AWS.md" -ForegroundColor White
+            Write-Host "  3. Execute: .\scripts\manual-rollback-guided.ps1 -Environment dev" -ForegroundColor White
+            Write-Host ""
+            exit 1
+          }
+        continue-on-error: false
+
+  deploy-prod:
+    name: Deploy Manual - PROD
+    needs: build-and-validate
+    runs-on: windows-latest
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    
+    environment:
+      name: prod
+      url: https://alquimista.ai
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Instalar dependências
+        run: npm ci
+      
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsAlquimistaAICICD
+          aws-region: us-east-1
+          role-session-name: GitHubActions-Deploy-Prod-${{ github.run_id }}
+      
+      - name: CDK Diff - Visualizar mudanças
+        shell: pwsh
+        run: |
+          Write-Host "📊 Visualizando mudanças em PROD..." -ForegroundColor Cyan
+          npx cdk diff --context env=prod
+      
+      - name: Deploy CDK - Ambiente PROD
+        shell: pwsh
+        run: |
+          Write-Host "🚀 Iniciando deploy em PROD..." -ForegroundColor Cyan
+          Write-Host "⚠️  AMBIENTE DE PRODUÇÃO - Deploy aprovado manualmente" -ForegroundColor Yellow
+          Write-Host "Branch/Tag: ${{ github.ref }}" -ForegroundColor Yellow
+          Write-Host "Commit: ${{ github.sha }}" -ForegroundColor Yellow
+          Write-Host "Aprovado por: ${{ github.actor }}" -ForegroundColor Yellow
+          Write-Host ""
+          
+          # Deploy de todas as stacks em prod
+          npx cdk deploy --all --context env=prod
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Deploy em PROD concluído com sucesso!" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Falha no deploy em PROD" -ForegroundColor Red
+            exit 1
+          }
+      
+      - name: Verificar deploy
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Verificando recursos deployados..." -ForegroundColor Cyan
+          aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE --query "StackSummaries[?contains(StackName, 'prod')].{Name:StackName, Status:StackStatus}" --output table
+      
+      - name: Notificar sucesso
+        if: success()
+        shell: pwsh
+        run: |
+          Write-Host "🎉 Deploy em PROD finalizado!" -ForegroundColor Green
+          Write-Host "Versão: ${{ github.ref }}" -ForegroundColor Cyan
+          Write-Host "Commit: ${{ github.sha }}" -ForegroundColor Cyan
+  
+  smoke-tests-prod:
+    name: Smoke Tests - PROD
+    needs: deploy-prod
+    runs-on: windows-latest
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    
+    environment:
+      name: prod
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Instalar dependências
+        run: npm ci
+      
+      - name: Configurar credenciais AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsAlquimistaAICICD
+          aws-region: us-east-1
+          role-session-name: GitHubActions-SmokeTests-Prod-${{ github.run_id }}
+      
+      - name: Executar Smoke Tests
+        shell: pwsh
+        run: |
+          Write-Host "🧪 Executando smoke tests em PROD..." -ForegroundColor Cyan
+          Write-Host ""
+          
+          # Aguardar 30 segundos para garantir que recursos estão prontos
+          Write-Host "⏳ Aguardando 30 segundos para estabilização..." -ForegroundColor Yellow
+          Start-Sleep -Seconds 30
+          
+          # Executar smoke tests
+          .\scripts\smoke-tests-api-dev.ps1 -Environment prod -Verbose
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host ""
+            Write-Host "✅ Smoke tests passaram com sucesso!" -ForegroundColor Green
+            Write-Host ""
+            Write-Host "🎉 Deploy em PROD validado e funcionando!" -ForegroundColor Green
+          } else {
+            Write-Host ""
+            Write-Host "❌ Smoke tests falharam!" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "⚠️  ATENÇÃO CRÍTICA: Deploy em PROD com problemas!" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "📋 Ação imediata necessária:" -ForegroundColor Cyan
+            Write-Host "  1. Verifique os logs acima para identificar o problema" -ForegroundColor White
+            Write-Host "  2. Consulte: docs/ROLLBACK-OPERACIONAL-AWS.md" -ForegroundColor White
+            Write-Host "  3. Execute: .\scripts\manual-rollback-guided.ps1 -Environment prod" -ForegroundColor White
+            Write-Host "  4. Notifique a equipe imediatamente" -ForegroundColor White
+            Write-Host ""
+            exit 1
+          }
+        continue-on-error: false

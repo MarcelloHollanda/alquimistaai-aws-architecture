@@ -1,0 +1,125 @@
+name: Kiro AI Assistant
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      task_type:
+        description: 'Tipo de assistência'
+        required: true
+        type: choice
+        options:
+          - 'code-review'
+          - 'documentation'
+          - 'bug-analysis'
+          - 'performance-check'
+
+jobs:
+  kiro-assistant:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Kiro Code Analysis
+        id: analysis
+        run: |
+          echo "🤖 Kiro AI Assistant - Análise Automática" >> analysis.md
+          echo "" >> analysis.md
+          
+          # Análise de código
+          echo "## 📊 Análise de Código" >> analysis.md
+          echo "- **Arquivos TypeScript**: $(find . -name '*.ts' | wc -l)" >> analysis.md
+          echo "- **Arquivos de Teste**: $(find . -name '*.test.ts' | wc -l)" >> analysis.md
+          echo "- **Workflows GitHub**: $(find .github/workflows -name '*.yml' | wc -l)" >> analysis.md
+          echo "" >> analysis.md
+          
+          # Verificação de segurança
+          echo "## 🔐 Verificação de Segurança" >> analysis.md
+          if npm audit --audit-level=high --json > audit.json 2>/dev/null; then
+            VULNERABILITIES=$(cat audit.json | jq '.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical')
+            echo "- **Vulnerabilidades críticas/altas**: $VULNERABILITIES" >> analysis.md
+          else
+            echo "- **Status**: ✅ Nenhuma vulnerabilidade crítica encontrada" >> analysis.md
+          fi
+          echo "" >> analysis.md
+          
+          # Verificação de testes
+          echo "## 🧪 Cobertura de Testes" >> analysis.md
+          if npm run test:coverage > /dev/null 2>&1; then
+            echo "- **Status**: ✅ Testes executados com sucesso" >> analysis.md
+          else
+            echo "- **Status**: ⚠️ Verificar configuração de testes" >> analysis.md
+          fi
+          echo "" >> analysis.md
+          
+          # Recomendações do Kiro
+          echo "## 💡 Recomendações do Kiro AI" >> analysis.md
+          echo "- Manter dependências atualizadas" >> analysis.md
+          echo "- Executar testes antes de cada deploy" >> analysis.md
+          echo "- Verificar logs do CloudWatch regularmente" >> analysis.md
+          echo "- Monitorar custos AWS mensalmente" >> analysis.md
+          echo "" >> analysis.md
+          
+          echo "## 🔗 Links Úteis" >> analysis.md
+          echo "- [Documentação do Projeto](./README.md)" >> analysis.md
+          echo "- [Guia de Deploy](./Docs/Deploy/)" >> analysis.md
+          echo "- [Configuração de Secrets](./Docs/Deploy/GITHUB-SECRETS-CONFIGURATION.md)" >> analysis.md
+          
+          # Salvar análise
+          cat analysis.md
+      
+      - name: Comment on Issue/PR
+        if: github.event_name == 'issues' || github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const analysis = fs.readFileSync('analysis.md', 'utf8');
+            
+            const comment = `## 🤖 Kiro AI Assistant
+            
+            Olá! Sou o assistente Kiro AI e analisei automaticamente este ${context.eventName === 'issues' ? 'issue' : 'pull request'}.
+            
+            ${analysis}
+            
+            ---
+            *Esta análise foi gerada automaticamente. Para assistência mais detalhada, consulte a documentação do projeto.*`;
+            
+            if (context.eventName === 'issues') {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              github.rest.pulls.createReview({
+                pull_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment,
+                event: 'COMMENT'
+              });
+            }
+      
+      - name: Update Project Status
+        run: |
+          echo "📊 Status do Projeto AlquimistaAI" > status.md
+          echo "- **Última análise**: $(date)" >> status.md
+          echo "- **Branch**: ${{ github.ref_name }}" >> status.md
+          echo "- **Commit**: ${{ github.sha }}" >> status.md
+          echo "- **Kiro AI**: ✅ Monitoramento ativo" >> status.md

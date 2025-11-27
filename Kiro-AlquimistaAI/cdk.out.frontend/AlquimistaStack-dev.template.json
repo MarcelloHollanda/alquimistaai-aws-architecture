@@ -1,0 +1,2270 @@
+{
+ "Description": "Alquimista - Plataforma SaaS Multi-Tenant",
+ "Resources": {
+  "ListAgentsFunctionServiceRole6AEFCA72": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ListAgentsFunction/ServiceRole/Resource"
+   }
+  },
+  "ListAgentsFunctionServiceRoleDefaultPolicyFCA50532": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ListAgentsFunctionServiceRoleDefaultPolicyFCA50532",
+    "Roles": [
+     {
+      "Ref": "ListAgentsFunctionServiceRole6AEFCA72"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ListAgentsFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ListAgentsFunction75B90D55": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "c877417779a1bdb92624d523c78c0638a64366ead96496408d5907dc512fb467.zip"
+    },
+    "Description": "Lista agentes disponíveis no marketplace",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-list-agents-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "ListAgentsFunctionServiceRole6AEFCA72",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "ListAgentsFunctionServiceRoleDefaultPolicyFCA50532",
+    "ListAgentsFunctionServiceRole6AEFCA72"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ListAgentsFunction/Resource",
+    "aws:asset:path": "asset.c877417779a1bdb92624d523c78c0638a64366ead96496408d5907dc512fb467",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ActivateAgentFunctionServiceRole9F82FD8A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ActivateAgentFunction/ServiceRole/Resource"
+   }
+  },
+  "ActivateAgentFunctionServiceRoleDefaultPolicy925EDEC5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ActivateAgentFunctionServiceRoleDefaultPolicy925EDEC5",
+    "Roles": [
+     {
+      "Ref": "ActivateAgentFunctionServiceRole9F82FD8A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ActivateAgentFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ActivateAgentFunction216E09F6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "636acff1f932ba2a7d4dfbf12083bb982ecb3bd13bb6c64ce9af167970d68efa.zip"
+    },
+    "Description": "Ativa agente para tenant específico",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-activate-agent-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "ActivateAgentFunctionServiceRole9F82FD8A",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "ActivateAgentFunctionServiceRoleDefaultPolicy925EDEC5",
+    "ActivateAgentFunctionServiceRole9F82FD8A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ActivateAgentFunction/Resource",
+    "aws:asset:path": "asset.636acff1f932ba2a7d4dfbf12083bb982ecb3bd13bb6c64ce9af167970d68efa",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "DeactivateAgentFunctionServiceRole460539D7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/DeactivateAgentFunction/ServiceRole/Resource"
+   }
+  },
+  "DeactivateAgentFunctionServiceRoleDefaultPolicyB7E7A632": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DeactivateAgentFunctionServiceRoleDefaultPolicyB7E7A632",
+    "Roles": [
+     {
+      "Ref": "DeactivateAgentFunctionServiceRole460539D7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/DeactivateAgentFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "DeactivateAgentFunctionFF0DBE38": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "7ab3c51d84f6f966726836f572937eb443c8f2893d6d6fb68c956261376a6e91.zip"
+    },
+    "Description": "Desativa agente para tenant específico",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-deactivate-agent-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "DeactivateAgentFunctionServiceRole460539D7",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "DeactivateAgentFunctionServiceRoleDefaultPolicyB7E7A632",
+    "DeactivateAgentFunctionServiceRole460539D7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/DeactivateAgentFunction/Resource",
+    "aws:asset:path": "asset.7ab3c51d84f6f966726836f572937eb443c8f2893d6d6fb68c956261376a6e91",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AuditLogFunctionServiceRole338E5EBB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/AuditLogFunction/ServiceRole/Resource"
+   }
+  },
+  "AuditLogFunctionServiceRoleDefaultPolicyB3CE2636": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AuditLogFunctionServiceRoleDefaultPolicyB3CE2636",
+    "Roles": [
+     {
+      "Ref": "AuditLogFunctionServiceRole338E5EBB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/AuditLogFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AuditLogFunctionBAA696D6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "e2a642f36f5af3774f12faec605fe0af844fe78ed3d857d822cc0e189426f98c.zip"
+    },
+    "Description": "Consulta logs de auditoria da plataforma",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-audit-log-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "AuditLogFunctionServiceRole338E5EBB",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "AuditLogFunctionServiceRoleDefaultPolicyB3CE2636",
+    "AuditLogFunctionServiceRole338E5EBB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/AuditLogFunction/Resource",
+    "aws:asset:path": "asset.e2a642f36f5af3774f12faec605fe0af844fe78ed3d857d822cc0e189426f98c",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AgentMetricsFunctionServiceRoleDD5EAECA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/AgentMetricsFunction/ServiceRole/Resource"
+   }
+  },
+  "AgentMetricsFunctionServiceRoleDefaultPolicyB1428369": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentMetricsFunctionServiceRoleDefaultPolicyB1428369",
+    "Roles": [
+     {
+      "Ref": "AgentMetricsFunctionServiceRoleDD5EAECA"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/AgentMetricsFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgentMetricsFunction336A67E4": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "e720f43c50373b8fec20f66f184cf358f4a5e5d4ec936519a8156a586931a4a6.zip"
+    },
+    "Description": "Calcula e retorna métricas de performance e custo por agente",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-agent-metrics-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "AgentMetricsFunctionServiceRoleDD5EAECA",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "AgentMetricsFunctionServiceRoleDefaultPolicyB1428369",
+    "AgentMetricsFunctionServiceRoleDD5EAECA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/AgentMetricsFunction/Resource",
+    "aws:asset:path": "asset.e720f43c50373b8fec20f66f184cf358f4a5e5d4ec936519a8156a586931a4a6",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CreateApprovalFunctionServiceRoleDB3AE4AE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CreateApprovalFunction/ServiceRole/Resource"
+   }
+  },
+  "CreateApprovalFunctionServiceRoleDefaultPolicyB096AF88": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CreateApprovalFunctionServiceRoleDefaultPolicyB096AF88",
+    "Roles": [
+     {
+      "Ref": "CreateApprovalFunctionServiceRoleDB3AE4AE"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CreateApprovalFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CreateApprovalFunction48E86CD3": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c.zip"
+    },
+    "Description": "Cria solicitação de aprovação para ações críticas",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-create-approval-dev",
+    "Handler": "index.createHandler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "CreateApprovalFunctionServiceRoleDB3AE4AE",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "CreateApprovalFunctionServiceRoleDefaultPolicyB096AF88",
+    "CreateApprovalFunctionServiceRoleDB3AE4AE"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CreateApprovalFunction/Resource",
+    "aws:asset:path": "asset.5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "DecideApprovalFunctionServiceRole2EB5D0EF": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/DecideApprovalFunction/ServiceRole/Resource"
+   }
+  },
+  "DecideApprovalFunctionServiceRoleDefaultPolicy09FB1EFF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DecideApprovalFunctionServiceRoleDefaultPolicy09FB1EFF",
+    "Roles": [
+     {
+      "Ref": "DecideApprovalFunctionServiceRole2EB5D0EF"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/DecideApprovalFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "DecideApprovalFunction570642CF": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c.zip"
+    },
+    "Description": "Processa decisão de aprovação (aprovar/rejeitar)",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-decide-approval-dev",
+    "Handler": "index.decideHandler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "DecideApprovalFunctionServiceRole2EB5D0EF",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "DecideApprovalFunctionServiceRoleDefaultPolicy09FB1EFF",
+    "DecideApprovalFunctionServiceRole2EB5D0EF"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/DecideApprovalFunction/Resource",
+    "aws:asset:path": "asset.5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "GetApprovalFunctionServiceRole2FF49C1C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/GetApprovalFunction/ServiceRole/Resource"
+   }
+  },
+  "GetApprovalFunctionServiceRoleDefaultPolicy25B032BB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GetApprovalFunctionServiceRoleDefaultPolicy25B032BB",
+    "Roles": [
+     {
+      "Ref": "GetApprovalFunctionServiceRole2FF49C1C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/GetApprovalFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "GetApprovalFunctionF985B0F2": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c.zip"
+    },
+    "Description": "Obtém detalhes de uma solicitação de aprovação",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-get-approval-dev",
+    "Handler": "index.getHandler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "GetApprovalFunctionServiceRole2FF49C1C",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "GetApprovalFunctionServiceRoleDefaultPolicy25B032BB",
+    "GetApprovalFunctionServiceRole2FF49C1C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/GetApprovalFunction/Resource",
+    "aws:asset:path": "asset.5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ListApprovalsFunctionServiceRole3ECA45FF": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ListApprovalsFunction/ServiceRole/Resource"
+   }
+  },
+  "ListApprovalsFunctionServiceRoleDefaultPolicy0B5C5186": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ListApprovalsFunctionServiceRoleDefaultPolicy0B5C5186",
+    "Roles": [
+     {
+      "Ref": "ListApprovalsFunctionServiceRole3ECA45FF"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ListApprovalsFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ListApprovalsFunction43A2259E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c.zip"
+    },
+    "Description": "Lista solicitações de aprovação do tenant",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-list-approvals-dev",
+    "Handler": "index.listHandler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "ListApprovalsFunctionServiceRole3ECA45FF",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "ListApprovalsFunctionServiceRoleDefaultPolicy0B5C5186",
+    "ListApprovalsFunctionServiceRole3ECA45FF"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/ListApprovalsFunction/Resource",
+    "aws:asset:path": "asset.5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CancelApprovalFunctionServiceRole55078AE2": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CancelApprovalFunction/ServiceRole/Resource"
+   }
+  },
+  "CancelApprovalFunctionServiceRoleDefaultPolicy7C37236E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CancelApprovalFunctionServiceRoleDefaultPolicy7C37236E",
+    "Roles": [
+     {
+      "Ref": "CancelApprovalFunctionServiceRole55078AE2"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CancelApprovalFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CancelApprovalFunctionCFDDA663": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c.zip"
+    },
+    "Description": "Cancela solicitação de aprovação pendente",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "alquimista-platform",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "USER_POOL_ID": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "alquimista-cancel-approval-dev",
+    "Handler": "index.cancelHandler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "CancelApprovalFunctionServiceRole55078AE2",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "CancelApprovalFunctionServiceRoleDefaultPolicy7C37236E",
+    "CancelApprovalFunctionServiceRole55078AE2"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CancelApprovalFunction/Resource",
+    "aws:asset:path": "asset.5341eb64f78e0fbb813b3795f3d0f6944ce924a4e9e9f9d1b41a150c4e31dd9c",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "PlatformApi0A9CF539": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "Content-Type",
+      "Authorization"
+     ],
+     "AllowMethods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 86400
+    },
+    "Description": "Alquimista Platform API - Marketplace e Gestão de Agentes",
+    "Name": "alquimista-platform-api-dev",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/Resource"
+   }
+  },
+  "PlatformApiDefaultStageF52EEFDE": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/DefaultStage/Resource"
+   }
+  },
+  "PlatformApiGETapiagentsListAgentsIntegration2F9E5C0F": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ListAgentsFunction75B90D55",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents/ListAgentsIntegration/Resource"
+   }
+  },
+  "PlatformApiGETapiagentsListAgentsIntegrationPermissionD838AECD": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ListAgentsFunction75B90D55",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/agents"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents/ListAgentsIntegration-Permission"
+   }
+  },
+  "PlatformApiGETapiagents7CE36CE3": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /api/agents",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiGETapiagentsListAgentsIntegration2F9E5C0F"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents/Resource"
+   }
+  },
+  "PlatformApiPOSTapiagentsidactivateActivateAgentIntegration6B00FE76": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ActivateAgentFunction216E09F6",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--activate/ActivateAgentIntegration/Resource"
+   }
+  },
+  "PlatformApiPOSTapiagentsidactivateActivateAgentIntegrationPermission16395F19": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ActivateAgentFunction216E09F6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/agents/{id}/activate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--activate/ActivateAgentIntegration-Permission"
+   }
+  },
+  "PlatformApiPOSTapiagentsidactivateCC04327F": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "POST /api/agents/{id}/activate",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiPOSTapiagentsidactivateActivateAgentIntegration6B00FE76"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--activate/Resource"
+   }
+  },
+  "PlatformApiCognitoAuthorizerE194F12E": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizerType": "JWT",
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ],
+    "JwtConfiguration": {
+     "Audience": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPoolUserPoolAuthorizerClient680A88B611CBC378"
+      }
+     ],
+     "Issuer": {
+      "Fn::Join": [
+       "",
+       [
+        "https://cognito-idp.us-east-1.amazonaws.com/",
+        {
+         "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+        }
+       ]
+      ]
+     }
+    },
+    "Name": "alquimista-authorizer-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/CognitoAuthorizer/Resource"
+   }
+  },
+  "PlatformApiPOSTapiagentsiddeactivateDeactivateAgentIntegration7F5F13FD": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "DeactivateAgentFunctionFF0DBE38",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--deactivate/DeactivateAgentIntegration/Resource"
+   }
+  },
+  "PlatformApiPOSTapiagentsiddeactivateDeactivateAgentIntegrationPermission7493DE49": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DeactivateAgentFunctionFF0DBE38",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/agents/{id}/deactivate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--deactivate/DeactivateAgentIntegration-Permission"
+   }
+  },
+  "PlatformApiPOSTapiagentsiddeactivate76EF878D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "POST /api/agents/{id}/deactivate",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiPOSTapiagentsiddeactivateDeactivateAgentIntegration7F5F13FD"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--deactivate/Resource"
+   }
+  },
+  "PlatformApiGETapiauditlogsAuditLogIntegrationC732EEF5": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "AuditLogFunctionBAA696D6",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--audit-logs/AuditLogIntegration/Resource"
+   }
+  },
+  "PlatformApiGETapiauditlogsAuditLogIntegrationPermission0336AB86": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AuditLogFunctionBAA696D6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/audit-logs"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--audit-logs/AuditLogIntegration-Permission"
+   }
+  },
+  "PlatformApiGETapiauditlogsD003DF5C": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "GET /api/audit-logs",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiGETapiauditlogsAuditLogIntegrationC732EEF5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--audit-logs/Resource"
+   }
+  },
+  "PlatformApiGETapiagentsidmetricsAgentMetricsIntegrationF13FE741": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "AgentMetricsFunction336A67E4",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents--{id}--metrics/AgentMetricsIntegration/Resource"
+   }
+  },
+  "PlatformApiGETapiagentsidmetricsAgentMetricsIntegrationPermission7774268F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AgentMetricsFunction336A67E4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/agents/{id}/metrics"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents--{id}--metrics/AgentMetricsIntegration-Permission"
+   }
+  },
+  "PlatformApiGETapiagentsidmetricsFC7B6DD3": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "GET /api/agents/{id}/metrics",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiGETapiagentsidmetricsAgentMetricsIntegrationF13FE741"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents--{id}--metrics/Resource"
+   }
+  },
+  "PlatformApiGETapiagentsmetricsAgentMetricsIntegrationPermission548D3592": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AgentMetricsFunction336A67E4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/agents/metrics"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents--metrics/AgentMetricsIntegration-Permission"
+   }
+  },
+  "PlatformApiGETapiagentsmetrics936AA137": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "GET /api/agents/metrics",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiGETapiagentsidmetricsAgentMetricsIntegrationF13FE741"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--agents--metrics/Resource"
+   }
+  },
+  "PlatformApiPOSTapiapprovalsCreateApprovalIntegrationFCD6CBF6": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "CreateApprovalFunction48E86CD3",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--approvals/CreateApprovalIntegration/Resource"
+   }
+  },
+  "PlatformApiPOSTapiapprovalsCreateApprovalIntegrationPermissionDF15641F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CreateApprovalFunction48E86CD3",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/approvals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--approvals/CreateApprovalIntegration-Permission"
+   }
+  },
+  "PlatformApiPOSTapiapprovalsFCD0609E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "POST /api/approvals",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiPOSTapiapprovalsCreateApprovalIntegrationFCD6CBF6"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--approvals/Resource"
+   }
+  },
+  "PlatformApiGETapiapprovalsListApprovalsIntegration1A3C83D3": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ListApprovalsFunction43A2259E",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--approvals/ListApprovalsIntegration/Resource"
+   }
+  },
+  "PlatformApiGETapiapprovalsListApprovalsIntegrationPermissionA756288E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ListApprovalsFunction43A2259E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/approvals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--approvals/ListApprovalsIntegration-Permission"
+   }
+  },
+  "PlatformApiGETapiapprovalsB1C61B9E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "GET /api/approvals",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiGETapiapprovalsListApprovalsIntegration1A3C83D3"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--approvals/Resource"
+   }
+  },
+  "PlatformApiGETapiapprovalsidGetApprovalIntegration833A25E8": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "GetApprovalFunctionF985B0F2",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--approvals--{id}/GetApprovalIntegration/Resource"
+   }
+  },
+  "PlatformApiGETapiapprovalsidGetApprovalIntegrationPermission9C082BD7": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GetApprovalFunctionF985B0F2",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/approvals/{id}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--approvals--{id}/GetApprovalIntegration-Permission"
+   }
+  },
+  "PlatformApiGETapiapprovalsid9C193D22": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "GET /api/approvals/{id}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiGETapiapprovalsidGetApprovalIntegration833A25E8"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/GET--api--approvals--{id}/Resource"
+   }
+  },
+  "PlatformApiPOSTapiapprovalsiddecideDecideApprovalIntegration38DE62E6": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "DecideApprovalFunction570642CF",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--approvals--{id}--decide/DecideApprovalIntegration/Resource"
+   }
+  },
+  "PlatformApiPOSTapiapprovalsiddecideDecideApprovalIntegrationPermission84614CBD": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DecideApprovalFunction570642CF",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/approvals/{id}/decide"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--approvals--{id}--decide/DecideApprovalIntegration-Permission"
+   }
+  },
+  "PlatformApiPOSTapiapprovalsiddecide8BE02AE3": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "POST /api/approvals/{id}/decide",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiPOSTapiapprovalsiddecideDecideApprovalIntegration38DE62E6"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/POST--api--approvals--{id}--decide/Resource"
+   }
+  },
+  "PlatformApiDELETEapiapprovalsidCancelApprovalIntegration13ECB907": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "CancelApprovalFunctionCFDDA663",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/DELETE--api--approvals--{id}/CancelApprovalIntegration/Resource"
+   }
+  },
+  "PlatformApiDELETEapiapprovalsidCancelApprovalIntegrationPermission57F10033": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CancelApprovalFunctionCFDDA663",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "PlatformApi0A9CF539"
+       },
+       "/*/*/api/approvals/{id}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/DELETE--api--approvals--{id}/CancelApprovalIntegration-Permission"
+   }
+  },
+  "PlatformApiDELETEapiapprovalsid21806FF2": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "PlatformApi0A9CF539"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "PlatformApiCognitoAuthorizerE194F12E"
+    },
+    "RouteKey": "DELETE /api/approvals/{id}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "PlatformApiDELETEapiapprovalsidCancelApprovalIntegration13ECB907"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/PlatformApi/DELETE--api--approvals--{id}/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12QXW6DMBCEz5J3Z1ugFyCRqualrcgB0MZs6PJjI3YdlCLuXhnUVOrTN7Maj71OIU0zeN7hJHtbtfuOLzCfFW1rcJJy7rC/VFg6X1Ej8L7iNTir7J1h7GEufEfmeHUrP33H9h7tphYjWYkipAJ5hJEMDsG2pAcUMls9zMere7TGwzT2LMLeLQYHrlFpwvsthflNdcgHjqGIaM+K9fqCTcRR4YNu6uSU6hF/i//Zv1we9MuP/E3jWv1wy2IKEh9GS2ZdIF7Cro6pj6BD0MXEz4FGnm7pCyQJJLtGmPdjcMo9QbHxB3E3SGRpAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AlquimistaStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "StackName": {
+   "Description": "Alquimista Stack Name",
+   "Value": "AlquimistaStack-dev",
+   "Export": {
+    "Name": "AlquimistaStackName-dev"
+   }
+  },
+  "PlatformApiUrl": {
+   "Description": "Platform API Gateway URL",
+   "Value": {
+    "Fn::GetAtt": [
+     "PlatformApi0A9CF539",
+     "ApiEndpoint"
+    ]
+   },
+   "Export": {
+    "Name": "AlquimistaPlatformApiUrl-dev"
+   }
+  },
+  "PlatformApiId": {
+   "Description": "Platform API Gateway ID",
+   "Value": {
+    "Ref": "PlatformApi0A9CF539"
+   },
+   "Export": {
+    "Name": "AlquimistaPlatformApiId-dev"
+   }
+  },
+  "ListAgentsFunctionName": {
+   "Description": "List Agents Lambda Function Name",
+   "Value": {
+    "Ref": "ListAgentsFunction75B90D55"
+   },
+   "Export": {
+    "Name": "AlquimistaListAgentsFunctionName-dev"
+   }
+  },
+  "ActivateAgentFunctionName": {
+   "Description": "Activate Agent Lambda Function Name",
+   "Value": {
+    "Ref": "ActivateAgentFunction216E09F6"
+   },
+   "Export": {
+    "Name": "AlquimistaActivateAgentFunctionName-dev"
+   }
+  },
+  "DeactivateAgentFunctionName": {
+   "Description": "Deactivate Agent Lambda Function Name",
+   "Value": {
+    "Ref": "DeactivateAgentFunctionFF0DBE38"
+   },
+   "Export": {
+    "Name": "AlquimistaDeactivateAgentFunctionName-dev"
+   }
+  },
+  "AuditLogFunctionName": {
+   "Description": "Audit Log Lambda Function Name",
+   "Value": {
+    "Ref": "AuditLogFunctionBAA696D6"
+   },
+   "Export": {
+    "Name": "AlquimistaAuditLogFunctionName-dev"
+   }
+  },
+  "AgentMetricsFunctionName": {
+   "Description": "Agent Metrics Lambda Function Name",
+   "Value": {
+    "Ref": "AgentMetricsFunction336A67E4"
+   },
+   "Export": {
+    "Name": "AlquimistaAgentMetricsFunctionName-dev"
+   }
+  },
+  "CreateApprovalFunctionName": {
+   "Description": "Create Approval Lambda Function Name",
+   "Value": {
+    "Ref": "CreateApprovalFunction48E86CD3"
+   },
+   "Export": {
+    "Name": "AlquimistaCreateApprovalFunctionName-dev"
+   }
+  },
+  "DecideApprovalFunctionName": {
+   "Description": "Decide Approval Lambda Function Name",
+   "Value": {
+    "Ref": "DecideApprovalFunction570642CF"
+   },
+   "Export": {
+    "Name": "AlquimistaDecideApprovalFunctionName-dev"
+   }
+  },
+  "GetApprovalFunctionName": {
+   "Description": "Get Approval Lambda Function Name",
+   "Value": {
+    "Ref": "GetApprovalFunctionF985B0F2"
+   },
+   "Export": {
+    "Name": "AlquimistaGetApprovalFunctionName-dev"
+   }
+  },
+  "ListApprovalsFunctionName": {
+   "Description": "List Approvals Lambda Function Name",
+   "Value": {
+    "Ref": "ListApprovalsFunction43A2259E"
+   },
+   "Export": {
+    "Name": "AlquimistaListApprovalsFunctionName-dev"
+   }
+  },
+  "CancelApprovalFunctionName": {
+   "Description": "Cancel Approval Lambda Function Name",
+   "Value": {
+    "Ref": "CancelApprovalFunctionCFDDA663"
+   },
+   "Export": {
+    "Name": "AlquimistaCancelApprovalFunctionName-dev"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

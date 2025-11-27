@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Segurança
+*_accessKeys*.csv
+*.pem
+*.pfx
+.terraform/
+build/

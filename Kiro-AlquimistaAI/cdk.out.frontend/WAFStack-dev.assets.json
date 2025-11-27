@@ -1,0 +1,21 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "d7778533850f9f2c43e48503fa64d37ace77c15b5c5b9c2736612e966bd6fd59": {
+      "displayName": "WAFStack-dev Template",
+      "source": {
+        "path": "WAFStack-dev.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "207933152643-us-east-1-44de86fa": {
+          "bucketName": "cdk-hnb659fds-assets-207933152643-us-east-1",
+          "objectKey": "d7778533850f9f2c43e48503fa64d37ace77c15b5c5b9c2736612e966bd6fd59.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-file-publishing-role-207933152643-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

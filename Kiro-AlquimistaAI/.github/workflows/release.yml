@@ -1,0 +1,236 @@
+name: Release and Changelog
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Check if release is needed
+        id: check_release
+        run: |
+          # Check if there are any commits since last tag that would trigger a release
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tags found, creating first release"
+            echo "needs_release=true" >> $GITHUB_OUTPUT
+          else
+            # Check for conventional commits since last tag
+            COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --grep="^feat\|^fix\|^perf\|BREAKING CHANGE" || echo "")
+            if [ -n "$COMMITS" ]; then
+              echo "Found commits that require a release:"
+              echo "$COMMITS"
+              echo "needs_release=true" >> $GITHUB_OUTPUT
+            else
+              echo "No commits found that require a release"
+              echo "needs_release=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Determine release type
+        id: release_type
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "release_type=${{ github.event.inputs.release_type }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-determine release type based on conventional commits
+            LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -z "$LAST_TAG" ]; then
+              echo "release_type=minor" >> $GITHUB_OUTPUT
+            else
+              # Check for breaking changes
+              BREAKING=$(git log ${LAST_TAG}..HEAD --grep="BREAKING CHANGE" --oneline || echo "")
+              if [ -n "$BREAKING" ]; then
+                echo "release_type=major" >> $GITHUB_OUTPUT
+              else
+                # Check for features
+                FEATURES=$(git log ${LAST_TAG}..HEAD --grep="^feat" --oneline || echo "")
+                if [ -n "$FEATURES" ]; then
+                  echo "release_type=minor" >> $GITHUB_OUTPUT
+                else
+                  echo "release_type=patch" >> $GITHUB_OUTPUT
+                fi
+              fi
+            fi
+          fi
+
+      - name: Run tests
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        run: npm test
+
+      - name: Run linting
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        run: npm run lint
+
+      - name: Generate changelog and create release
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          # Check if this is the first release
+          if ! git describe --tags --abbrev=0 2>/dev/null; then
+            echo "Creating first changelog..."
+            npm run changelog:first
+          fi
+          
+          # Create release with standard-version
+          npm run release:${{ steps.release_type.outputs.release_type }}
+
+      - name: Push changes and tags
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          git push --follow-tags origin main
+
+      - name: Get release info
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        id: release_info
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Extract changelog for this version
+          if [ -f CHANGELOG.md ]; then
+            # Get the changelog content between the first two version headers
+            CHANGELOG_CONTENT=$(awk '/^## \[/{if(++count==2) exit} count==1{if(NR>1) print}' CHANGELOG.md)
+            echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "changelog_content=No changelog available" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release_info.outputs.version }}
+          release_name: Release ${{ steps.release_info.outputs.version }}
+          body: |
+            ## Changes in ${{ steps.release_info.outputs.version }}
+            
+            ${{ steps.release_info.outputs.changelog_content }}
+            
+            ## Installation
+            
+            ```bash
+            git clone https://github.com/alquimista-ai/fibonacci-aws-setup.git
+            cd fibonacci-aws-setup
+            git checkout ${{ steps.release_info.outputs.version }}
+            npm install
+            ```
+            
+            ## Deployment
+            
+            ```bash
+            # Development
+            npm run deploy:dev
+            
+            # Staging
+            npm run deploy:staging
+            
+            # Production (requires manual approval)
+            npm run deploy:prod
+            ```
+            
+            ---
+            
+            **Full Changelog**: https://github.com/alquimista-ai/fibonacci-aws-setup/compare/${{ steps.release_info.outputs.version }}...main
+          draft: false
+          prerelease: false
+
+      - name: Comment on related issues and PRs
+        if: steps.check_release.outputs.needs_release == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.release_info.outputs.version }}';
+            const changelog = `${{ steps.release_info.outputs.changelog_content }}`;
+            
+            // Get commits since last release
+            const lastTag = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            }).catch(() => null);
+            
+            const commits = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              since: lastTag ? lastTag.data.created_at : undefined,
+            });
+            
+            // Extract issue numbers from commit messages
+            const issueNumbers = new Set();
+            commits.data.forEach(commit => {
+              const matches = commit.commit.message.match(/#(\d+)/g);
+              if (matches) {
+                matches.forEach(match => {
+                  issueNumbers.add(parseInt(match.substring(1)));
+                });
+              }
+            });
+            
+            // Comment on related issues
+            for (const issueNumber of issueNumbers) {
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: `🎉 This issue has been resolved in release [${version}](https://github.com/${context.repo.owner}/${context.repo.repo}/releases/tag/${version})`
+                });
+              } catch (error) {
+                console.log(`Could not comment on issue #${issueNumber}: ${error.message}`);
+              }
+            }
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: release
+    if: always() && needs.release.result == 'success'
+    
+    steps:
+      - name: Notify team
+        run: |
+          echo "🚀 New release created successfully!"
+          echo "Check the releases page: https://github.com/${{ github.repository }}/releases"

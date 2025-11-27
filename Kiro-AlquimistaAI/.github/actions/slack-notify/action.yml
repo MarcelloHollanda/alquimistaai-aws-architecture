@@ -1,0 +1,147 @@
+name: 'Slack Notification'
+description: 'Send deployment notifications to Slack'
+inputs:
+  webhook-url:
+    description: 'Slack webhook URL'
+    required: true
+  status:
+    description: 'Deployment status (success, failure, cancelled)'
+    required: true
+  environment:
+    description: 'Environment name (dev, staging, prod)'
+    required: true
+  branch:
+    description: 'Git branch name'
+    required: true
+  commit:
+    description: 'Git commit SHA'
+    required: true
+  actor:
+    description: 'GitHub actor who triggered the deployment'
+    required: true
+  api-url:
+    description: 'API URL (optional)'
+    required: false
+  cloudfront-url:
+    description: 'CloudFront URL (optional)'
+    required: false
+  job-name:
+    description: 'Job name for context'
+    required: false
+    default: 'Deploy'
+  run-url:
+    description: 'GitHub Actions run URL'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send Slack notification
+      shell: bash
+      run: |
+        # Determine emoji and color based on status
+        case "${{ inputs.status }}" in
+          "success")
+            EMOJI="✅"
+            COLOR="good"
+            STATUS_TEXT="succeeded"
+            ;;
+          "failure")
+            EMOJI="❌"
+            COLOR="danger"
+            STATUS_TEXT="failed"
+            ;;
+          "cancelled")
+            EMOJI="⚠️"
+            COLOR="warning"
+            STATUS_TEXT="was cancelled"
+            ;;
+          *)
+            EMOJI="ℹ️"
+            COLOR="#439FE0"
+            STATUS_TEXT="completed with status: ${{ inputs.status }}"
+            ;;
+        esac
+        
+        # Build the message
+        MESSAGE="$EMOJI Deployment to *${{ inputs.environment }}* $STATUS_TEXT"
+        
+        # Build fields array
+        FIELDS='[
+          {
+            "title": "Environment",
+            "value": "${{ inputs.environment }}",
+            "short": true
+          },
+          {
+            "title": "Branch",
+            "value": "${{ inputs.branch }}",
+            "short": true
+          },
+          {
+            "title": "Commit",
+            "value": "<https://github.com/${{ github.repository }}/commit/${{ inputs.commit }}|$(echo ${{ inputs.commit }} | cut -c1-8)>",
+            "short": true
+          },
+          {
+            "title": "Triggered by",
+            "value": "${{ inputs.actor }}",
+            "short": true
+          }'
+        
+        # Add URLs if provided
+        if [ -n "${{ inputs.api-url }}" ]; then
+          FIELDS="$FIELDS,
+          {
+            \"title\": \"API URL\",
+            \"value\": \"<${{ inputs.api-url }}|${{ inputs.api-url }}>\",
+            \"short\": false
+          }"
+        fi
+        
+        if [ -n "${{ inputs.cloudfront-url }}" ]; then
+          FIELDS="$FIELDS,
+          {
+            \"title\": \"Frontend URL\",
+            \"value\": \"<${{ inputs.cloudfront-url }}|${{ inputs.cloudfront-url }}>\",
+            \"short\": false
+          }"
+        fi
+        
+        # Add GitHub Actions run URL if provided
+        if [ -n "${{ inputs.run-url }}" ]; then
+          FIELDS="$FIELDS,
+          {
+            \"title\": \"GitHub Actions\",
+            \"value\": \"<${{ inputs.run-url }}|View deployment logs>\",
+            \"short\": false
+          }"
+        fi
+        
+        FIELDS="$FIELDS]"
+        
+        # Create the payload
+        PAYLOAD=$(cat <<EOF
+        {
+          "username": "Fibonacci Deploy Bot",
+          "icon_emoji": ":rocket:",
+          "attachments": [
+            {
+              "color": "$COLOR",
+              "fallback": "$MESSAGE",
+              "pretext": "$MESSAGE",
+              "fields": $FIELDS,
+              "footer": "Fibonacci CI/CD",
+              "ts": $(date +%s)
+            }
+          ]
+        }
+        EOF
+        )
+        
+        # Send to Slack
+        curl -X POST -H 'Content-type: application/json' \
+          --data "$PAYLOAD" \
+          "${{ inputs.webhook-url }}"
+        
+        echo "Slack notification sent for ${{ inputs.environment }} deployment (${{ inputs.status }})"

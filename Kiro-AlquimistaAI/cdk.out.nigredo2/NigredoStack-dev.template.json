@@ -1,0 +1,5712 @@
+{
+ "Description": "Nigredo - Núcleo de Prospecção B2B",
+ "Resources": {
+  "NigredoDlqA8002B0C": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "nigredo-dlq-dev"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoDlq/Resource"
+   }
+  },
+  "RecebimentoQueue7AB70855": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-recebimento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 60
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoQueue/Resource"
+   }
+  },
+  "RecebimentoQueuePolicyC565152B": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "RecebimentoQueue7AB70855",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "RecebimentoQueue7AB70855"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoQueue/Policy/Resource"
+   }
+  },
+  "EstrategiaQueue757B78A7": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-estrategia-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 120
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaQueue/Resource"
+   }
+  },
+  "EstrategiaQueuePolicy64149F67": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "EstrategiaQueue757B78A7",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "EstrategiaQueue757B78A7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaQueue/Policy/Resource"
+   }
+  },
+  "DisparoQueueBE25067A": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-disparo-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoQueue/Resource"
+   }
+  },
+  "DisparoQueuePolicyDA8E2E2D": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "DisparoQueueBE25067A",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "DisparoQueueBE25067A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoQueue/Policy/Resource"
+   }
+  },
+  "AtendimentoQueueFAE96496": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-atendimento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoQueue/Resource"
+   }
+  },
+  "AtendimentoQueuePolicy04D84C62": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "AtendimentoQueueFAE96496",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "AtendimentoQueueFAE96496"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoQueue/Policy/Resource"
+   }
+  },
+  "SentimentoQueueEAC65B25": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-sentimento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 10
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoQueue/Resource"
+   }
+  },
+  "SentimentoQueuePolicy2BAAAD76": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "SentimentoQueueEAC65B25",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "SentimentoQueueEAC65B25"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoQueue/Policy/Resource"
+   }
+  },
+  "AgendamentoQueue78A39639": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-agendamento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoQueue/Resource"
+   }
+  },
+  "AgendamentoQueuePolicy48BE427A": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "AgendamentoQueue78A39639",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "AgendamentoQueue78A39639"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoQueue/Policy/Resource"
+   }
+  },
+  "RelatoriosQueue76D0C511": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+    },
+    "QueueName": "nigredo-relatorios-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "NigredoDlqA8002B0C",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 120
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosQueue/Resource"
+   }
+  },
+  "RelatoriosQueuePolicy79A23AC0": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "RelatoriosQueue76D0C511",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "RelatoriosQueue76D0C511"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosQueue/Policy/Resource"
+   }
+  },
+  "RecebimentoRule68C8D937": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.recebimento.* events to Recebimento Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.recebimento"
+      }
+     ]
+    },
+    "Name": "nigredo-recebimento-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "RecebimentoQueue7AB70855",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoRule/Resource"
+   }
+  },
+  "EstrategiaRule74997B94": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.estrategia.* events to Estrategia Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.estrategia"
+      }
+     ]
+    },
+    "Name": "nigredo-estrategia-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "EstrategiaQueue757B78A7",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaRule/Resource"
+   }
+  },
+  "DisparoRuleE5BAD753": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.disparo.* events to Disparo Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.disparo"
+      }
+     ]
+    },
+    "Name": "nigredo-disparo-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "DisparoQueueBE25067A",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoRule/Resource"
+   }
+  },
+  "AtendimentoRule8090B1B4": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.atendimento.* events to Atendimento Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.atendimento"
+      }
+     ]
+    },
+    "Name": "nigredo-atendimento-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "AtendimentoQueueFAE96496",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoRule/Resource"
+   }
+  },
+  "SentimentoRule6257C3D6": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.sentimento.* events to Sentimento Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.sentimento"
+      }
+     ]
+    },
+    "Name": "nigredo-sentimento-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "SentimentoQueueEAC65B25",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoRule/Resource"
+   }
+  },
+  "AgendamentoRule68EF769C": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.agendamento.* events to Agendamento Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.agendamento"
+      }
+     ]
+    },
+    "Name": "nigredo-agendamento-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "AgendamentoQueue78A39639",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoRule/Resource"
+   }
+  },
+  "RelatoriosRuleBB473A57": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route nigredo.relatorios.* events to Relatorios Queue",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      {
+       "prefix": "nigredo.relatorios"
+      }
+     ]
+    },
+    "Name": "nigredo-relatorios-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "RelatoriosQueue76D0C511",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosRule/Resource"
+   }
+  },
+  "RecebimentoLambdaServiceRole5D2DCF51": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoLambda/ServiceRole/Resource"
+   }
+  },
+  "RecebimentoLambdaServiceRoleDefaultPolicy13D13D6D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "RecebimentoQueue7AB70855",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+       }
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "NigredoDlqA8002B0C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "secretsmanager:GetSecretValue",
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:207933152643:secret:fibonacci/mcp/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "RecebimentoLambdaServiceRoleDefaultPolicy13D13D6D",
+    "Roles": [
+     {
+      "Ref": "RecebimentoLambdaServiceRole5D2DCF51"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "RecebimentoLambdaSecurityGroupA209ECAB": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevRecebimentoLambda08B73125",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoLambda/SecurityGroup/Resource"
+   }
+  },
+  "RecebimentoLambda94C8BF58": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "cd4ea1381481d45752786d6c5f55c991ba6fe560b0fd63d583965319b9e25e2a.zip"
+    },
+    "Description": "Agente de Recebimento - Higieniza, valida e enriquece leads",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-recebimento",
+      "LOG_LEVEL": "DEBUG",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DLQ_URL": {
+       "Ref": "NigredoDlqA8002B0C"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-recebimento-dev",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "RecebimentoLambdaServiceRole5D2DCF51",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 60,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "RecebimentoLambdaSecurityGroupA209ECAB",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "RecebimentoLambdaServiceRoleDefaultPolicy13D13D6D",
+    "RecebimentoLambdaServiceRole5D2DCF51"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoLambda/Resource",
+    "aws:asset:path": "asset.cd4ea1381481d45752786d6c5f55c991ba6fe560b0fd63d583965319b9e25e2a",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "RecebimentoLambdaSqsEventSourceNigredoStackdevRecebimentoQueueBF30384E30767B1F": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 10,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "RecebimentoQueue7AB70855",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "RecebimentoLambda94C8BF58"
+    },
+    "FunctionResponseTypes": [
+     "ReportBatchItemFailures"
+    ],
+    "MaximumBatchingWindowInSeconds": 5
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoLambda/SqsEventSource:NigredoStackdevRecebimentoQueueBF30384E/Resource"
+   }
+  },
+  "RecebimentoLambdaLogRetentionA79028B3": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RecebimentoLambda/LogRetention/Resource"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevRecebimentoLambdaSecurityGroupFC10C51354326C905D01": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Recebimento Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "RecebimentoLambdaSecurityGroupA209ECAB",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevRecebimentoLambdaSecurityGroupFC10C513:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevEstrategiaLambdaSecurityGroup702E75F7543205312C59": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Estrategia Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "EstrategiaLambdaSecurityGroup921EC55B",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevEstrategiaLambdaSecurityGroup702E75F7:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevDisparoLambdaSecurityGroup43D3A84754322A3C4353": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Disparo Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "DisparoLambdaSecurityGroupC69F09AB",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevDisparoLambdaSecurityGroup43D3A847:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevAtendimentoLambdaSecurityGroupD97407A55432E223FE2E": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Atendimento Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "AtendimentoLambdaSecurityGroup033377B4",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevAtendimentoLambdaSecurityGroupD97407A5:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevAgendamentoLambdaSecurityGroupE04EAAB4543230400D35": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Agendamento Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "AgendamentoLambdaSecurityGroupCEF6E3F0",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevAgendamentoLambdaSecurityGroupE04EAAB4:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevRelatoriosLambdaSecurityGroupEF3A768654328A536C31": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Relatorios Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "RelatoriosLambdaSecurityGroup12D58779",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevRelatoriosLambdaSecurityGroupEF3A7686:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevCreateLeadLambdaSecurityGroup8F4B8D8A5432C9BB86D0": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Create Lead Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "CreateLeadLambdaSecurityGroup08EA8DA7",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevCreateLeadLambdaSecurityGroup8F4B8D8A:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevListLeadsLambdaSecurityGroupCF4012F1543255F38D7B": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow List Leads Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "ListLeadsLambdaSecurityGroup0162B7FB",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevListLeadsLambdaSecurityGroupCF4012F1:5432"
+   }
+  },
+  "DbSecurityGroupfromNigredoStackdevGetLeadLambdaSecurityGroup1D5C01925432EA1A12D3": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Get Lead Lambda to access Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "GetLeadLambdaSecurityGroupACE722A9",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DbSecurityGroup/from NigredoStackdevGetLeadLambdaSecurityGroup1D5C0192:5432"
+   }
+  },
+  "EstrategiaLambdaServiceRole3FE3B52B": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaLambda/ServiceRole/Resource"
+   }
+  },
+  "EstrategiaLambdaServiceRoleDefaultPolicy2D186169": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "NigredoDlqA8002B0C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+       }
+      },
+      {
+       "Action": "secretsmanager:GetSecretValue",
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:207933152643:secret:fibonacci/mcp/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "EstrategiaLambdaServiceRoleDefaultPolicy2D186169",
+    "Roles": [
+     {
+      "Ref": "EstrategiaLambdaServiceRole3FE3B52B"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "EstrategiaLambdaSecurityGroup921EC55B": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevEstrategiaLambdaBCD4C40D",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaLambda/SecurityGroup/Resource"
+   }
+  },
+  "EstrategiaLambda99BF03B7": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "f36f80706bb1e4dae78cc68075f9fcfdc629b7c04fd064df6bc0e974149b5534.zip"
+    },
+    "Description": "Agente de Estratégia - Cria campanhas segmentadas com mensagens personalizadas",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-estrategia",
+      "LOG_LEVEL": "DEBUG",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DLQ_URL": {
+       "Ref": "NigredoDlqA8002B0C"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-estrategia-dev",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "EstrategiaLambdaServiceRole3FE3B52B",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 120,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "EstrategiaLambdaSecurityGroup921EC55B",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "EstrategiaLambdaServiceRoleDefaultPolicy2D186169",
+    "EstrategiaLambdaServiceRole3FE3B52B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaLambda/Resource",
+    "aws:asset:path": "asset.f36f80706bb1e4dae78cc68075f9fcfdc629b7c04fd064df6bc0e974149b5534",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "EstrategiaLambdaLogRetentionBC743A98": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaLambda/LogRetention/Resource"
+   }
+  },
+  "EstrategiaEventRule31DB2FBC": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Trigger Estrategia Lambda when recebimento completes",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      "nigredo.recebimento"
+     ],
+     "detail-type": [
+      "recebimento.completed"
+     ]
+    },
+    "Name": "nigredo-estrategia-trigger-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "EstrategiaLambda99BF03B7",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaEventRule/Resource"
+   }
+  },
+  "EstrategiaEventRuleAllowEventRuleNigredoStackdevEstrategiaLambdaBCD4C40D2DDFE190": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "EstrategiaLambda99BF03B7",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "EstrategiaEventRule31DB2FBC",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/EstrategiaEventRule/AllowEventRuleNigredoStackdevEstrategiaLambdaBCD4C40D"
+   }
+  },
+  "DisparoLambdaServiceRoleF8DD2BAD": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoLambda/ServiceRole/Resource"
+   }
+  },
+  "DisparoLambdaServiceRoleDefaultPolicyDA120B86": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "NigredoDlqA8002B0C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+       }
+      },
+      {
+       "Action": "secretsmanager:GetSecretValue",
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:207933152643:secret:fibonacci/mcp/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DisparoLambdaServiceRoleDefaultPolicyDA120B86",
+    "Roles": [
+     {
+      "Ref": "DisparoLambdaServiceRoleF8DD2BAD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "DisparoLambdaSecurityGroupC69F09AB": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevDisparoLambdaC1C1072D",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoLambda/SecurityGroup/Resource"
+   }
+  },
+  "DisparoLambda0A5F8F52": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "c85e986a90a6b4a9cdf82b2fbe94cb733f1fe96fb9111f8b9b293c6aee63c950.zip"
+    },
+    "Description": "Agente de Disparo - Envia mensagens respeitando horário comercial e rate limits",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-disparo",
+      "LOG_LEVEL": "DEBUG",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DLQ_URL": {
+       "Ref": "NigredoDlqA8002B0C"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-disparo-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "DisparoLambdaServiceRoleF8DD2BAD",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "DisparoLambdaSecurityGroupC69F09AB",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "DisparoLambdaServiceRoleDefaultPolicyDA120B86",
+    "DisparoLambdaServiceRoleF8DD2BAD"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoLambda/Resource",
+    "aws:asset:path": "asset.c85e986a90a6b4a9cdf82b2fbe94cb733f1fe96fb9111f8b9b293c6aee63c950",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "DisparoLambdaLogRetentionD4C40594": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoLambda/LogRetention/Resource"
+   }
+  },
+  "DisparoScheduleRule4F391FF9": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Trigger Disparo Lambda every 15 minutes during business hours",
+    "Name": "nigredo-disparo-schedule-dev",
+    "ScheduleExpression": "cron(0,15,30,45 11-20 ? * MON-FRI *)",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "DisparoLambda0A5F8F52",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoScheduleRule/Resource"
+   }
+  },
+  "DisparoScheduleRuleAllowEventRuleNigredoStackdevDisparoLambdaC1C1072DBA804F29": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DisparoLambda0A5F8F52",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "DisparoScheduleRule4F391FF9",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/DisparoScheduleRule/AllowEventRuleNigredoStackdevDisparoLambdaC1C1072D"
+   }
+  },
+  "AtendimentoLambdaServiceRole0B734484": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoLambda/ServiceRole/Resource"
+   }
+  },
+  "AtendimentoLambdaServiceRoleDefaultPolicy214AEDB1": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "NigredoDlqA8002B0C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+       }
+      },
+      {
+       "Action": "secretsmanager:GetSecretValue",
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:207933152643:secret:fibonacci/mcp/*"
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:lambda:us-east-1:207933152643:function:nigredo-sentimento-dev",
+        {
+         "Fn::GetAtt": [
+          "SentimentoLambda423C8224",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SentimentoLambda423C8224",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AtendimentoLambdaServiceRoleDefaultPolicy214AEDB1",
+    "Roles": [
+     {
+      "Ref": "AtendimentoLambdaServiceRole0B734484"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AtendimentoLambdaSecurityGroup033377B4": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevAtendimentoLambdaF0236663",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoLambda/SecurityGroup/Resource"
+   }
+  },
+  "AtendimentoLambda97A1D183": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "d7c99933c62a21057f359d1a7534adf0da737a4a820f7a4d3834d54fc499b732.zip"
+    },
+    "Description": "Agente de Atendimento - Responde leads com IA usando análise de sentimento",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-atendimento",
+      "LOG_LEVEL": "DEBUG",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DLQ_URL": {
+       "Ref": "NigredoDlqA8002B0C"
+      },
+      "SENTIMENT_LAMBDA_ARN": {
+       "Fn::GetAtt": [
+        "SentimentoLambda423C8224",
+        "Arn"
+       ]
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-atendimento-dev",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "AtendimentoLambdaServiceRole0B734484",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "AtendimentoLambdaSecurityGroup033377B4",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "AtendimentoLambdaServiceRoleDefaultPolicy214AEDB1",
+    "AtendimentoLambdaServiceRole0B734484"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoLambda/Resource",
+    "aws:asset:path": "asset.d7c99933c62a21057f359d1a7534adf0da737a4a820f7a4d3834d54fc499b732",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AtendimentoLambdaLogRetention8283A17E": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AtendimentoLambda/LogRetention/Resource"
+   }
+  },
+  "SentimentoLambdaServiceRoleCF931BAD": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoLambda/ServiceRole/Resource"
+   }
+  },
+  "SentimentoLambdaServiceRoleDefaultPolicyA859E67E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "comprehend:BatchDetectKeyPhrases",
+        "comprehend:BatchDetectSentiment",
+        "comprehend:DetectKeyPhrases",
+        "comprehend:DetectSentiment",
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SentimentoLambdaServiceRoleDefaultPolicyA859E67E",
+    "Roles": [
+     {
+      "Ref": "SentimentoLambdaServiceRoleCF931BAD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "SentimentoLambda423C8224": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "8a1f0b4595ba52e6d41929fbdd2665d3b4981f256b84c67fdcd2ea9de8d10930.zip"
+    },
+    "Description": "Agente de Análise de Sentimento - Classifica sentimento e detecta descadastro (LGPD)",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-sentimento",
+      "LOG_LEVEL": "DEBUG",
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-sentimento-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "SentimentoLambdaServiceRoleCF931BAD",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "SentimentoLambdaServiceRoleDefaultPolicyA859E67E",
+    "SentimentoLambdaServiceRoleCF931BAD"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoLambda/Resource",
+    "aws:asset:path": "asset.8a1f0b4595ba52e6d41929fbdd2665d3b4981f256b84c67fdcd2ea9de8d10930",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SentimentoLambdaLogRetention882AEAC5": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/SentimentoLambda/LogRetention/Resource"
+   }
+  },
+  "AgendamentoLambdaServiceRole159D7517": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoLambda/ServiceRole/Resource"
+   }
+  },
+  "AgendamentoLambdaServiceRoleDefaultPolicyF4C45D35": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "NigredoDlqA8002B0C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+       }
+      },
+      {
+       "Action": "secretsmanager:GetSecretValue",
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:207933152643:secret:fibonacci/mcp/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgendamentoLambdaServiceRoleDefaultPolicyF4C45D35",
+    "Roles": [
+     {
+      "Ref": "AgendamentoLambdaServiceRole159D7517"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgendamentoLambdaSecurityGroupCEF6E3F0": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevAgendamentoLambdaD0E96495",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoLambda/SecurityGroup/Resource"
+   }
+  },
+  "AgendamentoLambda083CE1CF": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "7b975ebe14665b8990f2ed3b48f90872d0590d4fda4ea0b136a79425e99caf53.zip"
+    },
+    "Description": "Agente de Agendamento - Marca reuniões verificando disponibilidade em tempo real",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-agendamento",
+      "LOG_LEVEL": "DEBUG",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DLQ_URL": {
+       "Ref": "NigredoDlqA8002B0C"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-agendamento-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "AgendamentoLambdaServiceRole159D7517",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "AgendamentoLambdaSecurityGroupCEF6E3F0",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "AgendamentoLambdaServiceRoleDefaultPolicyF4C45D35",
+    "AgendamentoLambdaServiceRole159D7517"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoLambda/Resource",
+    "aws:asset:path": "asset.7b975ebe14665b8990f2ed3b48f90872d0590d4fda4ea0b136a79425e99caf53",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "AgendamentoLambdaLogRetention87CB9F44": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoLambda/LogRetention/Resource"
+   }
+  },
+  "AgendamentoEventRule5EEA7BB0": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Trigger Agendamento Lambda when schedule is requested",
+    "EventBusName": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+    },
+    "EventPattern": {
+     "source": [
+      "nigredo.atendimento"
+     ],
+     "detail-type": [
+      "schedule_requested"
+     ]
+    },
+    "Name": "nigredo-agendamento-trigger-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "AgendamentoLambda083CE1CF",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoEventRule/Resource"
+   }
+  },
+  "AgendamentoEventRuleAllowEventRuleNigredoStackdevAgendamentoLambdaD0E96495FEB86A74": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AgendamentoLambda083CE1CF",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "AgendamentoEventRule5EEA7BB0",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/AgendamentoEventRule/AllowEventRuleNigredoStackdevAgendamentoLambdaD0E96495"
+   }
+  },
+  "RelatoriosLambdaServiceRoleE8548A97": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosLambda/ServiceRole/Resource"
+   }
+  },
+  "RelatoriosLambdaServiceRoleDefaultPolicyF9C66D4C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "NigredoDlqA8002B0C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "RelatoriosLambdaServiceRoleDefaultPolicyF9C66D4C",
+    "Roles": [
+     {
+      "Ref": "RelatoriosLambdaServiceRoleE8548A97"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "RelatoriosLambdaSecurityGroup12D58779": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevRelatoriosLambdaCAD762FC",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosLambda/SecurityGroup/Resource"
+   }
+  },
+  "RelatoriosLambda21B77625": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "522a86d6a782237bd77b79981abbea1728335cf6834cd6b38b4fed3185ffdf47.zip"
+    },
+    "Description": "Agente de Relatórios - Gera dashboards e métricas de conversão do funil",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-relatorios",
+      "LOG_LEVEL": "DEBUG",
+      "EVENT_BUS_NAME": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+      },
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DLQ_URL": {
+       "Ref": "NigredoDlqA8002B0C"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-relatorios-dev",
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "RelatoriosLambdaServiceRoleE8548A97",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 120,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "RelatoriosLambdaSecurityGroup12D58779",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "RelatoriosLambdaServiceRoleDefaultPolicyF9C66D4C",
+    "RelatoriosLambdaServiceRoleE8548A97"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosLambda/Resource",
+    "aws:asset:path": "asset.522a86d6a782237bd77b79981abbea1728335cf6834cd6b38b4fed3185ffdf47",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "RelatoriosLambdaLogRetentionF19BA1FB": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "RelatoriosLambda21B77625"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosLambda/LogRetention/Resource"
+   }
+  },
+  "RelatoriosScheduleRule6239324E": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Trigger Relatorios Lambda daily at 8am BRT",
+    "Name": "nigredo-relatorios-schedule-dev",
+    "ScheduleExpression": "cron(0 11 ? * MON-FRI *)",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "RelatoriosLambda21B77625",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosScheduleRule/Resource"
+   }
+  },
+  "RelatoriosScheduleRuleAllowEventRuleNigredoStackdevRelatoriosLambdaCAD762FCD3A2ADBC": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RelatoriosLambda21B77625",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "RelatoriosScheduleRule6239324E",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/RelatoriosScheduleRule/AllowEventRuleNigredoStackdevRelatoriosLambdaCAD762FC"
+   }
+  },
+  "NigredoAgentsDashboard0BD81886": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"periodOverride\":\"auto\",\"widgets\":[{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Leads Processados por Agente (Invocations)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Taxa de Sucesso por Agente (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Recebimento\",\"expression\":\"(recebimento_inv - recebimento_err) / recebimento_inv * 100\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"id\":\"recebimento_inv\",\"visible\":false,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"id\":\"recebimento_err\",\"visible\":false,\"stat\":\"Sum\"}],[{\"label\":\"Estratégia\",\"expression\":\"(estrategia_inv - estrategia_err) / estrategia_inv * 100\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"id\":\"estrategia_inv\",\"visible\":false,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"id\":\"estrategia_err\",\"visible\":false,\"stat\":\"Sum\"}],[{\"label\":\"Disparo\",\"expression\":\"(disparo_inv - disparo_err) / disparo_inv * 100\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"id\":\"disparo_inv\",\"visible\":false,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"id\":\"disparo_err\",\"visible\":false,\"stat\":\"Sum\"}],[{\"label\":\"Atendimento\",\"expression\":\"(atendimento_inv - atendimento_err) / atendimento_inv * 100\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"id\":\"atendimento_inv\",\"visible\":false,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"id\":\"atendimento_err\",\"visible\":false,\"stat\":\"Sum\"}],[{\"label\":\"Sentimento\",\"expression\":\"(sentimento_inv - sentimento_err) / sentimento_inv * 100\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\",\"id\":\"sentimento_inv\",\"visible\":false,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\",\"id\":\"sentimento_err\",\"visible\":false,\"stat\":\"Sum\"}],[{\"label\":\"Agendamento\",\"expression\":\"(agendamento_inv - agendamento_err) / agendamento_inv * 100\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\",\"id\":\"agendamento_inv\",\"visible\":false,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\",\"id\":\"agendamento_err\",\"visible\":false,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Tempo Médio de Processamento (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":18,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Tempo de Processamento P95 (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento (p95)\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia (p95)\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo (p95)\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento (p95)\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento (p95)\",\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento (p95)\",\"stat\":\"p95\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":24,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Erros por Agente\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Throttles por Agente\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":36,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Concurrent Executions por Agente\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Maximum\"}],[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Maximum\"}],[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Maximum\"}],[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Maximum\"}],[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "SentimentoLambda423C8224"
+       },
+       "\",{\"label\":\"Sentimento\",\"stat\":\"Maximum\"}],[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "AgendamentoLambda083CE1CF"
+       },
+       "\",{\"label\":\"Agendamento\",\"stat\":\"Maximum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":42,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Agente Recebimento - Detalhes\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":42,\"properties\":{\"view\":\"singleValue\",\"title\":\"Recebimento - Última Execução\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "RecebimentoLambda94C8BF58"
+       },
+       "\",{\"label\":\"Recebimento\",\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":48,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Agente Estratégia - Detalhes\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":48,\"properties\":{\"view\":\"singleValue\",\"title\":\"Estratégia - Última Execução\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "EstrategiaLambda99BF03B7"
+       },
+       "\",{\"label\":\"Estratégia\",\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":54,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Agente Disparo - Detalhes\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":54,\"properties\":{\"view\":\"singleValue\",\"title\":\"Disparo - Última Execução\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "DisparoLambda0A5F8F52"
+       },
+       "\",{\"label\":\"Disparo\",\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":60,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Agente Atendimento - Detalhes\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":60,\"properties\":{\"view\":\"singleValue\",\"title\":\"Atendimento - Última Execução\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "AtendimentoLambda97A1D183"
+       },
+       "\",{\"label\":\"Atendimento\",\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":66,\"properties\":{\"view\":\"timeSeries\",\"title\":\"MCP Calls por Serviço\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/MCP\",\"WhatsAppCalls\",{\"label\":\"WhatsApp API\",\"stat\":\"Sum\"}],[\"Fibonacci/MCP\",\"CalendarCalls\",{\"label\":\"Google Calendar\",\"stat\":\"Sum\"}],[\"Fibonacci/MCP\",\"EnrichmentCalls\",{\"label\":\"Data Enrichment\",\"stat\":\"Sum\"}],[\"Fibonacci/MCP\",\"SentimentCalls\",{\"label\":\"Sentiment Analysis\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":72,\"properties\":{\"view\":\"timeSeries\",\"title\":\"MCP Errors por Serviço\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/MCP\",\"WhatsAppErrors\",{\"label\":\"WhatsApp API\",\"stat\":\"Sum\"}],[\"Fibonacci/MCP\",\"CalendarErrors\",{\"label\":\"Google Calendar\",\"stat\":\"Sum\"}],[\"Fibonacci/MCP\",\"EnrichmentErrors\",{\"label\":\"Data Enrichment\",\"stat\":\"Sum\"}],[\"Fibonacci/MCP\",\"SentimentErrors\",{\"label\":\"Sentiment Analysis\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":78,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Agente Relatórios - Detalhes\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "RelatoriosLambda21B77625"
+       },
+       "\",{\"label\":\"Relatórios\",\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "RelatoriosLambda21B77625"
+       },
+       "\",{\"label\":\"Relatórios\",\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "RelatoriosLambda21B77625"
+       },
+       "\",{\"label\":\"Relatórios\",\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":78,\"properties\":{\"view\":\"singleValue\",\"title\":\"Relatórios - Última Execução\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "RelatoriosLambda21B77625"
+       },
+       "\",{\"label\":\"Relatórios\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "RelatoriosLambda21B77625"
+       },
+       "\",{\"label\":\"Relatórios\",\"stat\":\"Sum\"}]]}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "Nigredo-Agents-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAgentsDashboard/Dashboard/Resource"
+   }
+  },
+  "BusinessMetricsDashboard8CC247ED": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"periodOverride\":\"auto\",\"widgets\":[{\"type\":\"metric\",\"width\":24,\"height\":8,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Funil de Conversão - Leads por Estágio\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"stacked\":false,\"metrics\":[[\"Fibonacci/Business\",\"LeadsRecebidos\",{\"label\":\"Leads Recebidos\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsEnriquecidos\",{\"label\":\"Leads Enriquecidos\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsContatados\",{\"label\":\"Leads Contatados\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsResponderam\",{\"label\":\"Leads Responderam\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsInteressados\",{\"label\":\"Leads Interessados\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsAgendados\",{\"label\":\"Leads Agendados\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsConvertidos\",{\"label\":\"Leads Convertidos\",\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":4,\"height\":4,\"x\":0,\"y\":8,\"properties\":{\"view\":\"singleValue\",\"title\":\"Leads Recebidos\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"LeadsRecebidos\",{\"label\":\"Leads Recebidos\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":4,\"height\":4,\"x\":4,\"y\":8,\"properties\":{\"view\":\"singleValue\",\"title\":\"Leads Enriquecidos\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"LeadsEnriquecidos\",{\"label\":\"Leads Enriquecidos\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":4,\"height\":4,\"x\":8,\"y\":8,\"properties\":{\"view\":\"singleValue\",\"title\":\"Leads Contatados\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"LeadsContatados\",{\"label\":\"Leads Contatados\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":4,\"height\":4,\"x\":12,\"y\":8,\"properties\":{\"view\":\"singleValue\",\"title\":\"Leads Responderam\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"LeadsResponderam\",{\"label\":\"Leads Responderam\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":4,\"height\":4,\"x\":16,\"y\":8,\"properties\":{\"view\":\"singleValue\",\"title\":\"Leads Interessados\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"LeadsInteressados\",{\"label\":\"Leads Interessados\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":4,\"height\":4,\"x\":20,\"y\":8,\"properties\":{\"view\":\"singleValue\",\"title\":\"Leads Agendados\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"LeadsAgendados\",{\"label\":\"Leads Agendados\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Taxa de Resposta (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Resposta (%)\",\"expression\":\"(resposta_m2 / resposta_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsContatados\",{\"label\":\"Leads Contatados\",\"id\":\"resposta_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsResponderam\",{\"label\":\"Leads Responderam\",\"id\":\"resposta_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":12,\"properties\":{\"view\":\"singleValue\",\"title\":\"Taxa de Resposta Atual\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Resposta (%)\",\"expression\":\"(resposta_m2 / resposta_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsContatados\",{\"label\":\"Leads Contatados\",\"id\":\"resposta_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsResponderam\",{\"label\":\"Leads Responderam\",\"id\":\"resposta_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":18,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Taxa de Agendamento (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Agendamento (%)\",\"expression\":\"(agend_m2 / agend_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsInteressados\",{\"label\":\"Leads Interessados\",\"id\":\"agend_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsAgendados\",{\"label\":\"Leads Agendados\",\"id\":\"agend_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":18,\"properties\":{\"view\":\"singleValue\",\"title\":\"Taxa de Agendamento Atual\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Agendamento (%)\",\"expression\":\"(agend_m2 / agend_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsInteressados\",{\"label\":\"Leads Interessados\",\"id\":\"agend_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsAgendados\",{\"label\":\"Leads Agendados\",\"id\":\"agend_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":24,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Taxa de Conversão Final (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Conversão (%)\",\"expression\":\"(conv_m2 / conv_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsRecebidos\",{\"label\":\"Leads Recebidos\",\"id\":\"conv_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsConvertidos\",{\"label\":\"Leads Convertidos\",\"id\":\"conv_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":24,\"properties\":{\"view\":\"singleValue\",\"title\":\"Taxa de Conversão Atual\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Conversão (%)\",\"expression\":\"(conv_m2 / conv_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsRecebidos\",{\"label\":\"Leads Recebidos\",\"id\":\"conv_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsConvertidos\",{\"label\":\"Leads Convertidos\",\"id\":\"conv_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Custo por Lead (R$)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"CustoPorLead\",{\"label\":\"Custo por Lead (R$)\",\"period\":3600}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":30,\"properties\":{\"view\":\"singleValue\",\"title\":\"Custo Médio por Lead\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"CustoPorLead\",{\"label\":\"Custo por Lead (R$)\",\"period\":3600}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":36,\"properties\":{\"view\":\"timeSeries\",\"title\":\"ROI por Campanha (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"ROICampanha\",{\"label\":\"ROI (%)\",\"period\":3600}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":36,\"properties\":{\"view\":\"singleValue\",\"title\":\"ROI Médio\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"ROICampanha\",{\"label\":\"ROI (%)\",\"period\":3600}]]}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":42,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Custo Total vs Receita Estimada (R$)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"CustoTotal\",{\"label\":\"Custo Total (R$)\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"ReceitaEstimada\",{\"label\":\"Receita Estimada (R$)\",\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":48,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Métricas de Eficiência por Estágio (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Enriquecimento (%)\",\"expression\":\"(enriq_m2 / enriq_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsRecebidos\",{\"label\":\"Leads Recebidos\",\"id\":\"enriq_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsEnriquecidos\",{\"label\":\"Leads Enriquecidos\",\"id\":\"enriq_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[{\"label\":\"Taxa de Contato (%)\",\"expression\":\"(contato_m2 / contato_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsEnriquecidos\",{\"label\":\"Leads Enriquecidos\",\"id\":\"contato_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsContatados\",{\"label\":\"Leads Contatados\",\"id\":\"contato_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[{\"label\":\"Taxa de Resposta (%)\",\"expression\":\"(resposta_m2 / resposta_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsContatados\",{\"label\":\"Leads Contatados\",\"id\":\"resposta_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsResponderam\",{\"label\":\"Leads Responderam\",\"id\":\"resposta_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[{\"label\":\"Taxa de Interesse (%)\",\"expression\":\"(interesse_m2 / interesse_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsResponderam\",{\"label\":\"Leads Responderam\",\"id\":\"interesse_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsInteressados\",{\"label\":\"Leads Interessados\",\"id\":\"interesse_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[{\"label\":\"Taxa de Agendamento (%)\",\"expression\":\"(agend_m2 / agend_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsInteressados\",{\"label\":\"Leads Interessados\",\"id\":\"agend_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsAgendados\",{\"label\":\"Leads Agendados\",\"id\":\"agend_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[{\"label\":\"Taxa de Conversão (%)\",\"expression\":\"(conv_m2 / conv_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"LeadsRecebidos\",{\"label\":\"Leads Recebidos\",\"id\":\"conv_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsConvertidos\",{\"label\":\"Leads Convertidos\",\"id\":\"conv_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100}}}},{\"type\":\"metric\",\"width\":6,\"height\":4,\"x\":0,\"y\":54,\"properties\":{\"view\":\"singleValue\",\"title\":\"Campanhas Ativas\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"CampanhasAtivas\",{\"label\":\"Campanhas Ativas\",\"period\":3600,\"stat\":\"Maximum\"}]]}},{\"type\":\"metric\",\"width\":6,\"height\":4,\"x\":6,\"y\":54,\"properties\":{\"view\":\"singleValue\",\"title\":\"Mensagens Enviadas\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"MensagensEnviadas\",{\"label\":\"Mensagens Enviadas\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":6,\"height\":4,\"x\":12,\"y\":54,\"properties\":{\"view\":\"singleValue\",\"title\":\"Mensagens Entregues\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"MensagensEntregues\",{\"label\":\"Mensagens Entregues\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":6,\"height\":4,\"x\":18,\"y\":54,\"properties\":{\"view\":\"singleValue\",\"title\":\"Mensagens Lidas\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"MensagensLidas\",{\"label\":\"Mensagens Lidas\",\"period\":3600,\"stat\":\"Sum\"}]]}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":58,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Taxa de Entrega e Leitura de Mensagens (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Taxa de Entrega (%)\",\"expression\":\"(entrega_m2 / entrega_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"MensagensEnviadas\",{\"label\":\"Mensagens Enviadas\",\"id\":\"entrega_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"MensagensEntregues\",{\"label\":\"Mensagens Entregues\",\"id\":\"entrega_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[{\"label\":\"Taxa de Leitura (%)\",\"expression\":\"(leitura_m2 / leitura_m1) * 100\",\"period\":3600}],[\"Fibonacci/Business\",\"MensagensEntregues\",{\"label\":\"Mensagens Entregues\",\"id\":\"leitura_m1\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"MensagensLidas\",{\"label\":\"Mensagens Lidas\",\"id\":\"leitura_m2\",\"visible\":false,\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":64,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Objeções, Descadastros e Descartes\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Fibonacci/Business\",\"Objecoes\",{\"label\":\"Objeções\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"Descadastros\",{\"label\":\"Descadastros (LGPD)\",\"period\":3600,\"stat\":\"Sum\"}],[\"Fibonacci/Business\",\"LeadsDescartados\",{\"label\":\"Leads Descartados\",\"period\":3600,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "Business-Metrics-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/BusinessMetricsDashboard/Dashboard/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:DeleteRetentionPolicy",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "Roles": [
+     {
+      "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Handler": "index.handler",
+    "Runtime": "nodejs22.x",
+    "Timeout": 900,
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+    "aws:asset:path": "asset.2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "NigredoInsightsQueriesErrorsByAgentQueryEC4A29E4": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "RecebimentoLambdaLogRetentionA79028B3",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "EstrategiaLambdaLogRetentionBC743A98",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "DisparoLambdaLogRetentionD4C40594",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AtendimentoLambdaLogRetention8283A17E",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "SentimentoLambdaLogRetention882AEAC5",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AgendamentoLambdaLogRetention87CB9F44",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "RelatoriosLambdaLogRetentionF19BA1FB",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/errors-by-agent",
+    "QueryString": "fields @timestamp, agent, message, error.message, error.name, error.stack, traceId, leadId\n| filter level = \"ERROR\"\n| stats count() as errorCount by agent\n| sort errorCount desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoInsightsQueries/ErrorsByAgentQuery"
+   }
+  },
+  "NigredoInsightsQueriesLatencyByEndpointQuery7C75674E": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "RecebimentoLambdaLogRetentionA79028B3",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "EstrategiaLambdaLogRetentionBC743A98",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "DisparoLambdaLogRetentionD4C40594",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AtendimentoLambdaLogRetention8283A17E",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "SentimentoLambdaLogRetention882AEAC5",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AgendamentoLambdaLogRetention87CB9F44",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "RelatoriosLambdaLogRetentionF19BA1FB",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/latency-by-endpoint",
+    "QueryString": "fields @timestamp, requestContext.http.path as endpoint, duration, requestContext.http.method as method\n| filter requestContext.http.path like /api/\n| stats \n    count() as requestCount,\n    avg(duration) as avgDuration,\n    min(duration) as minDuration,\n    max(duration) as maxDuration,\n    pct(duration, 50) as p50,\n    pct(duration, 95) as p95,\n    pct(duration, 99) as p99\n  by endpoint, method\n| sort p95 desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoInsightsQueries/LatencyByEndpointQuery"
+   }
+  },
+  "NigredoInsightsQueriesFunnelConversionQueryD790F490": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "RecebimentoLambdaLogRetentionA79028B3",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "EstrategiaLambdaLogRetentionBC743A98",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "DisparoLambdaLogRetentionD4C40594",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AtendimentoLambdaLogRetention8283A17E",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "SentimentoLambdaLogRetention882AEAC5",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AgendamentoLambdaLogRetention87CB9F44",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "RelatoriosLambdaLogRetentionF19BA1FB",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/funnel-conversion",
+    "QueryString": "fields @timestamp, leadId, agent, classification.intent, proposedAction\n| filter agent in [\"recebimento\", \"estrategia\", \"disparo\", \"atendimento\", \"agendamento\"]\n| stats \n    count() as totalLeads by agent\n| sort agent asc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoInsightsQueries/FunnelConversionQuery"
+   }
+  },
+  "NigredoInsightsQueriesMCPCallsQuery3544C878": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "RecebimentoLambdaLogRetentionA79028B3",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "EstrategiaLambdaLogRetentionBC743A98",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "DisparoLambdaLogRetentionD4C40594",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AtendimentoLambdaLogRetention8283A17E",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "SentimentoLambdaLogRetention882AEAC5",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AgendamentoLambdaLogRetention87CB9F44",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "RelatoriosLambdaLogRetentionF19BA1FB",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/mcp-calls-analysis",
+    "QueryString": "fields @timestamp, metadata.mcpServer as server, metadata.mcpMethod as method, duration, level, message\n| filter metadata.mcpServer like /.+/\n| stats \n    count() as callCount,\n    avg(duration) as avgDuration,\n    sum(level = \"ERROR\") as errorCount,\n    (sum(level = \"ERROR\") / count()) * 100 as errorRate\n  by server, method\n| sort errorRate desc, callCount desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoInsightsQueries/MCPCallsQuery"
+   }
+  },
+  "NigredoInsightsQueriesLeadProcessingTimeQuery0CB123CC": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "RecebimentoLambdaLogRetentionA79028B3",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "EstrategiaLambdaLogRetentionBC743A98",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "DisparoLambdaLogRetentionD4C40594",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AtendimentoLambdaLogRetention8283A17E",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "SentimentoLambdaLogRetention882AEAC5",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "AgendamentoLambdaLogRetention87CB9F44",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "RelatoriosLambdaLogRetentionF19BA1FB",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/lead-processing-time",
+    "QueryString": "fields @timestamp, leadId, agent, duration, classification.priority\n| filter leadId like /.+/\n| stats \n    min(@timestamp) as startTime,\n    max(@timestamp) as endTime,\n    (max(@timestamp) - min(@timestamp)) / 1000 as totalProcessingSeconds,\n    count() as stepsCompleted,\n    latest(classification.priority) as priority\n  by leadId\n| sort totalProcessingSeconds desc\n| limit 100"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoInsightsQueries/LeadProcessingTimeQuery"
+   }
+  },
+  "CreateLeadLambdaServiceRole9158918A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/CreateLeadLambda/ServiceRole/Resource"
+   }
+  },
+  "CreateLeadLambdaServiceRoleDefaultPolicy7BFEB391": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CreateLeadLambdaServiceRoleDefaultPolicy7BFEB391",
+    "Roles": [
+     {
+      "Ref": "CreateLeadLambdaServiceRole9158918A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/CreateLeadLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CreateLeadLambdaSecurityGroup08EA8DA7": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevCreateLeadLambdaE87D8541",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/CreateLeadLambda/SecurityGroup/Resource"
+   }
+  },
+  "CreateLeadLambda7973BC1C": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "b96ce3bb31bc3dc10de191f07feaef7283ec4cadcdb1fa9f382d721634d97a87.zip"
+    },
+    "Description": "Create Lead API - Public endpoint for lead form submissions",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-create-lead",
+      "LOG_LEVEL": "DEBUG",
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "FIBONACCI_WEBHOOK_URL": {
+       "Fn::Join": [
+        "",
+        [
+         "https://",
+         {
+          "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputFnGetAttHttpApiF5A9A8A7ApiEndpoint082134F8"
+         },
+         "/public/nigredo-event"
+        ]
+       ]
+      },
+      "DEFAULT_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-create-lead-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "CreateLeadLambdaServiceRole9158918A",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "CreateLeadLambdaSecurityGroup08EA8DA7",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "CreateLeadLambdaServiceRoleDefaultPolicy7BFEB391",
+    "CreateLeadLambdaServiceRole9158918A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/CreateLeadLambda/Resource",
+    "aws:asset:path": "asset.b96ce3bb31bc3dc10de191f07feaef7283ec4cadcdb1fa9f382d721634d97a87",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CreateLeadLambdaLogRetentionA089A5EA": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/CreateLeadLambda/LogRetention/Resource"
+   }
+  },
+  "ListLeadsLambdaServiceRoleA1C9ECAC": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/ListLeadsLambda/ServiceRole/Resource"
+   }
+  },
+  "ListLeadsLambdaServiceRoleDefaultPolicy1376932D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ListLeadsLambdaServiceRoleDefaultPolicy1376932D",
+    "Roles": [
+     {
+      "Ref": "ListLeadsLambdaServiceRoleA1C9ECAC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/ListLeadsLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ListLeadsLambdaSecurityGroup0162B7FB": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevListLeadsLambda9B357F8B",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/ListLeadsLambda/SecurityGroup/Resource"
+   }
+  },
+  "ListLeadsLambda2E94697E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "58569dd76e626588c7e06cc3611e95a9e88b98e00ab8838298afbeb1247ef26b.zip"
+    },
+    "Description": "List Leads API - Protected endpoint for listing leads with pagination",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-list-leads",
+      "LOG_LEVEL": "DEBUG",
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DEFAULT_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-list-leads-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "ListLeadsLambdaServiceRoleA1C9ECAC",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "ListLeadsLambdaSecurityGroup0162B7FB",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "ListLeadsLambdaServiceRoleDefaultPolicy1376932D",
+    "ListLeadsLambdaServiceRoleA1C9ECAC"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/ListLeadsLambda/Resource",
+    "aws:asset:path": "asset.58569dd76e626588c7e06cc3611e95a9e88b98e00ab8838298afbeb1247ef26b",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ListLeadsLambdaLogRetention94AAF37D": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "ListLeadsLambda2E94697E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/ListLeadsLambda/LogRetention/Resource"
+   }
+  },
+  "GetLeadLambdaServiceRoleAEAD8583": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/GetLeadLambda/ServiceRole/Resource"
+   }
+  },
+  "GetLeadLambdaServiceRoleDefaultPolicyBC366B58": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GetLeadLambdaServiceRoleDefaultPolicyBC366B58",
+    "Roles": [
+     {
+      "Ref": "GetLeadLambdaServiceRoleAEAD8583"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/GetLeadLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "GetLeadLambdaSecurityGroupACE722A9": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatic security group for Lambda Function NigredoStackdevGetLeadLambda09DCA998",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/GetLeadLambda/SecurityGroup/Resource"
+   }
+  },
+  "GetLeadLambda3A46EB2B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "3d47206de2caf7113917e51891fb6729d06f4635ab4305388a0ccb32c365be70.zip"
+    },
+    "Description": "Get Lead API - Protected endpoint for retrieving lead details",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nigredo-get-lead",
+      "LOG_LEVEL": "DEBUG",
+      "DB_SECRET_ARN": {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+      },
+      "DEFAULT_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "nigredo-get-lead-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "GetLeadLambdaServiceRoleAEAD8583",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "GetLeadLambdaSecurityGroupACE722A9",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+      },
+      {
+       "Fn::ImportValue": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "GetLeadLambdaServiceRoleDefaultPolicyBC366B58",
+    "GetLeadLambdaServiceRoleAEAD8583"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/GetLeadLambda/Resource",
+    "aws:asset:path": "asset.3d47206de2caf7113917e51891fb6729d06f4635ab4305388a0ccb32c365be70",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "GetLeadLambdaLogRetentionE1D96EC6": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "GetLeadLambda3A46EB2B"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/GetLeadLambda/LogRetention/Resource"
+   }
+  },
+  "NigredoHttpApiD078601F": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "Content-Type",
+      "Authorization",
+      "X-Correlation-Id"
+     ],
+     "AllowMethods": [
+      "GET",
+      "POST",
+      "OPTIONS"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 3600
+    },
+    "Description": "Nigredo Prospecting Core API",
+    "Name": "nigredo-api-dev",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/Resource"
+   }
+  },
+  "NigredoHttpApiDefaultStageBCD56680": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/DefaultStage/Resource"
+   }
+  },
+  "NigredoHttpApiPOSTapileadsCreateLeadIntegration44ACCC50": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "CreateLeadLambda7973BC1C",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/POST--api--leads/CreateLeadIntegration/Resource"
+   }
+  },
+  "NigredoHttpApiPOSTapileadsCreateLeadIntegrationPermission21607911": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CreateLeadLambda7973BC1C",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "/*/*/api/leads"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/POST--api--leads/CreateLeadIntegration-Permission"
+   }
+  },
+  "NigredoHttpApiPOSTapileads45E5639D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /api/leads",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "NigredoHttpApiPOSTapileadsCreateLeadIntegration44ACCC50"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/POST--api--leads/Resource"
+   }
+  },
+  "NigredoHttpApiGETapileadsListLeadsIntegration161C9B8A": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "ListLeadsLambda2E94697E",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/GET--api--leads/ListLeadsIntegration/Resource"
+   }
+  },
+  "NigredoHttpApiGETapileadsListLeadsIntegrationPermissionE7AE4A30": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ListLeadsLambda2E94697E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "/*/*/api/leads"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/GET--api--leads/ListLeadsIntegration-Permission"
+   }
+  },
+  "NigredoHttpApiGETapileads4076AE62": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /api/leads",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "NigredoHttpApiGETapileadsListLeadsIntegration161C9B8A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/GET--api--leads/Resource"
+   }
+  },
+  "NigredoHttpApiGETapileadsidGetLeadIntegrationFF3CA7BC": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "GetLeadLambda3A46EB2B",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/GET--api--leads--{id}/GetLeadIntegration/Resource"
+   }
+  },
+  "NigredoHttpApiGETapileadsidGetLeadIntegrationPermission5A875533": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GetLeadLambda3A46EB2B",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "/*/*/api/leads/{id}"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/GET--api--leads--{id}/GetLeadIntegration-Permission"
+   }
+  },
+  "NigredoHttpApiGETapileadsid32939827": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "NigredoHttpApiD078601F"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /api/leads/{id}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "NigredoHttpApiGETapileadsidGetLeadIntegrationFF3CA7BC"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoHttpApi/GET--api--leads--{id}/Resource"
+   }
+  },
+  "NigredoApiAlarmTopicB70677AA": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "Nigredo API Alarms",
+    "TopicName": "nigredo-api-alarms-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiAlarmTopic/Resource"
+   }
+  },
+  "NigredoAlarmsApiErrorRateAlarmFA5F8276": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: Nigredo API error rate exceeds 5%",
+    "AlarmName": "nigredo-api-error-rate-critical-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "EvaluationPeriods": 2,
+    "Metrics": [
+     {
+      "Expression": "((e4xx + e5xx) / requests) * 100",
+      "Id": "expr_1",
+      "ReturnData": true
+     },
+     {
+      "Id": "requests",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "ApiId",
+          "Value": {
+           "Ref": "NigredoHttpApiD078601F"
+          }
+         }
+        ],
+        "MetricName": "Count",
+        "Namespace": "AWS/ApiGateway"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "e4xx",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "ApiId",
+          "Value": {
+           "Ref": "NigredoHttpApiD078601F"
+          }
+         }
+        ],
+        "MetricName": "4XXError",
+        "Namespace": "AWS/ApiGateway"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "e5xx",
+      "MetricStat": {
+       "Metric": {
+        "Dimensions": [
+         {
+          "Name": "ApiId",
+          "Value": {
+           "Ref": "NigredoHttpApiD078601F"
+          }
+         }
+        ],
+        "MetricName": "5XXError",
+        "Namespace": "AWS/ApiGateway"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     }
+    ],
+    "Threshold": 5,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/ApiErrorRateAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsApiLatencyP99AlarmD56D7BA2": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: Nigredo API p99 latency exceeds 1000ms",
+    "AlarmName": "nigredo-api-latency-p99-critical-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "ApiId",
+      "Value": {
+       "Ref": "NigredoHttpApiD078601F"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "ExtendedStatistic": "p99",
+    "MetricName": "Latency",
+    "Namespace": "AWS/ApiGateway",
+    "Period": 300,
+    "Threshold": 1000,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/ApiLatencyP99Alarm/Resource"
+   }
+  },
+  "NigredoAlarmsWebhookFailureRateAlarmF133D721": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: Nigredo webhook failure rate exceeds 10%",
+    "AlarmName": "nigredo-webhook-failure-rate-critical-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "EvaluationPeriods": 2,
+    "Metrics": [
+     {
+      "Expression": "(failure / (success + failure)) * 100",
+      "Id": "expr_1",
+      "ReturnData": true
+     },
+     {
+      "Id": "success",
+      "MetricStat": {
+       "Metric": {
+        "MetricName": "WebhookSuccess",
+        "Namespace": "Nigredo/Prospecting"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     },
+     {
+      "Id": "failure",
+      "MetricStat": {
+       "Metric": {
+        "MetricName": "WebhookFailure",
+        "Namespace": "Nigredo/Prospecting"
+       },
+       "Period": 300,
+       "Stat": "Sum"
+      },
+      "ReturnData": false
+     }
+    ],
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/WebhookFailureRateAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsCreateLeadErrorAlarm3388E261": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: Nigredo CreateLead Lambda errors exceed threshold",
+    "AlarmName": "nigredo-createlead-errors-critical-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "CreateLeadLambda7973BC1C"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "Errors",
+    "Namespace": "AWS/Lambda",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 5,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/CreateLeadErrorAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsListLeadsErrorAlarm25FAE02A": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: Nigredo ListLeads Lambda errors exceed threshold",
+    "AlarmName": "nigredo-listleads-errors-critical-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "ListLeadsLambda2E94697E"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "Errors",
+    "Namespace": "AWS/Lambda",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 5,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/ListLeadsErrorAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsGetLeadErrorAlarm6C247D8A": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: Nigredo GetLead Lambda errors exceed threshold",
+    "AlarmName": "nigredo-getlead-errors-critical-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "GetLeadLambda3A46EB2B"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "Errors",
+    "Namespace": "AWS/Lambda",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 5,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/GetLeadErrorAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsApiLatencyP95Alarm0CF3F1DE": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "WARNING: Nigredo API p95 latency exceeds 500ms",
+    "AlarmName": "nigredo-api-latency-p95-warning-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "ApiId",
+      "Value": {
+       "Ref": "NigredoHttpApiD078601F"
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "ExtendedStatistic": "p95",
+    "MetricName": "Latency",
+    "Namespace": "AWS/ApiGateway",
+    "Period": 300,
+    "Threshold": 500,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/ApiLatencyP95Alarm/Resource"
+   }
+  },
+  "NigredoAlarmsCreateLeadDurationAlarm8C71BDF4": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "WARNING: Nigredo CreateLead Lambda p95 duration exceeds 500ms",
+    "AlarmName": "nigredo-createlead-duration-warning-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "CreateLeadLambda7973BC1C"
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "ExtendedStatistic": "p95",
+    "MetricName": "Duration",
+    "Namespace": "AWS/Lambda",
+    "Period": 300,
+    "Threshold": 500,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/CreateLeadDurationAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsCreateLeadThrottleAlarm35AC272B": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "WARNING: Nigredo CreateLead Lambda is being throttled",
+    "AlarmName": "nigredo-createlead-throttles-warning-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "CreateLeadLambda7973BC1C"
+      }
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "Throttles",
+    "Namespace": "AWS/Lambda",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 1,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/CreateLeadThrottleAlarm/Resource"
+   }
+  },
+  "NigredoAlarmsRateLimitAlarm4C3DA21F": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "NigredoApiAlarmTopicB70677AA"
+     }
+    ],
+    "AlarmDescription": "WARNING: High number of rate limit hits detected",
+    "AlarmName": "nigredo-rate-limit-hits-warning-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "EvaluationPeriods": 2,
+    "MetricName": "RateLimitHits",
+    "Namespace": "Nigredo/Prospecting",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 100,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoAlarms/RateLimitAlarm/Resource"
+   }
+  },
+  "NigredoDashboard9A17C519": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"periodOverride\":\"auto\",\"widgets\":[{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Lead Submissions Over Time\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Nigredo/Prospecting\",\"LeadSubmissions\",{\"label\":\"Lead Submissions\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Webhook Success Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Webhook Success Rate (%)\",\"expression\":\"(success / (success + failure)) * 100\"}],[\"Nigredo/Prospecting\",\"WebhookSuccess\",{\"label\":\"Webhook Success\",\"id\":\"success\",\"visible\":false,\"stat\":\"Sum\"}],[\"Nigredo/Prospecting\",\"WebhookFailure\",{\"label\":\"Webhook Failure\",\"id\":\"failure\",\"visible\":false,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100,\"label\":\"Success Rate (%)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Webhook Attempts\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Nigredo/Prospecting\",\"WebhookSuccess\",{\"label\":\"Webhook Success\",\"stat\":\"Sum\"}],[\"Nigredo/Prospecting\",\"WebhookFailure\",{\"label\":\"Webhook Failure\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Count\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Requests per Minute\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Count\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"Total Requests\",\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Requests\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Error Rate\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[{\"label\":\"Error Rate (%)\",\"expression\":\"((e4xx + e5xx) / requests) * 100\",\"period\":60}],[\"AWS/ApiGateway\",\"Count\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"Total Requests\",\"id\":\"requests\",\"visible\":false,\"period\":60,\"stat\":\"Sum\"}],[\"AWS/ApiGateway\",\"4XXError\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"4xx Errors\",\"id\":\"e4xx\",\"period\":60,\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/ApiGateway\",\"5XXError\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"5xx Errors\",\"id\":\"e5xx\",\"period\":60,\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{\"left\":{\"min\":0,\"max\":100,\"label\":\"Error Rate (%)\"},\"right\":{\"min\":0,\"label\":\"Error Count\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":18,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Latency Percentiles (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"Average\",\"period\":60}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"p50\",\"period\":60,\"stat\":\"p50\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"p95\",\"period\":60,\"stat\":\"p95\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "NigredoHttpApiD078601F"
+       },
+       "\",{\"label\":\"p99\",\"period\":60,\"stat\":\"p99\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Latency (ms)\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":24,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Errors by Endpoint\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead Errors\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "ListLeadsLambda2E94697E"
+       },
+       "\",{\"label\":\"List Leads Errors\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "GetLeadLambda3A46EB2B"
+       },
+       "\",{\"label\":\"Get Lead Errors\",\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Error Count\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Invocations by Endpoint\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "ListLeadsLambda2E94697E"
+       },
+       "\",{\"label\":\"List Leads\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "GetLeadLambda3A46EB2B"
+       },
+       "\",{\"label\":\"Get Lead\",\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Invocations\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":36,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Create Lead Lambda - Duration (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead Avg\",\"period\":60}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead p95\",\"period\":60,\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead p99\",\"period\":60,\"stat\":\"p99\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Duration (ms)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":36,\"properties\":{\"view\":\"singleValue\",\"title\":\"Create Lead - Latest Metrics\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead Errors\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead p99\",\"period\":60,\"stat\":\"p99\"}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":42,\"properties\":{\"view\":\"timeSeries\",\"title\":\"List Leads Lambda - Duration (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "ListLeadsLambda2E94697E"
+       },
+       "\",{\"label\":\"List Leads Avg\",\"period\":60}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "ListLeadsLambda2E94697E"
+       },
+       "\",{\"label\":\"List Leads p95\",\"period\":60,\"stat\":\"p95\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Duration (ms)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":42,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Get Lead Lambda - Duration (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "GetLeadLambda3A46EB2B"
+       },
+       "\",{\"label\":\"Get Lead Avg\",\"period\":60}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "GetLeadLambda3A46EB2B"
+       },
+       "\",{\"label\":\"Get Lead p95\",\"period\":60,\"stat\":\"p95\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Duration (ms)\"}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":48,\"properties\":{\"view\":\"singleValue\",\"title\":\"Rate Limit Hits (Last Hour)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Nigredo/Prospecting\",\"RateLimitHits\",{\"label\":\"Rate Limit Hits\",\"stat\":\"Sum\"}]],\"setPeriodToTimeRange\":false}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":48,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Rate Limit Hits Over Time\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"Nigredo/Prospecting\",\"RateLimitHits\",{\"label\":\"Rate Limit Hits\",\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Hits\"}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":54,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Lambda Throttles\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "CreateLeadLambda7973BC1C"
+       },
+       "\",{\"label\":\"Create Lead\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "ListLeadsLambda2E94697E"
+       },
+       "\",{\"label\":\"List Leads\",\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "GetLeadLambda3A46EB2B"
+       },
+       "\",{\"label\":\"Get Lead\",\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0,\"label\":\"Throttles\"}}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "Nigredo-Prospecting-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoDashboard/Dashboard/Resource"
+   }
+  },
+  "NigredoApiInsightsQueriesTopLeadSourcesQueryADB6496F": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "CreateLeadLambdaLogRetentionA089A5EA",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "ListLeadsLambdaLogRetention94AAF37D",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "GetLeadLambdaLogRetentionE1D96EC6",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/nigredo/top-lead-sources",
+    "QueryString": "fields @timestamp, leadData.source, leadData.utm_source, leadData.utm_campaign, leadData.utm_medium\n| filter @message like /Lead created successfully/\n| stats count() as leadCount by leadData.source, leadData.utm_source, leadData.utm_campaign\n| sort leadCount desc\n| limit 20"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiInsightsQueries/TopLeadSourcesQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesConversionFunnelQuery53CD3DAF": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "CreateLeadLambdaLogRetentionA089A5EA",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "ListLeadsLambdaLogRetention94AAF37D",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "GetLeadLambdaLogRetentionE1D96EC6",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/nigredo/conversion-funnel",
+    "QueryString": "fields @timestamp, @message, leadId, webhookStatus\n| stats \n    count(@message like /Form submission received/) as formSubmissions,\n    count(@message like /Lead created successfully/) as leadsCreated,\n    count(@message like /Webhook sent successfully/) as webhooksSent,\n    count(@message like /Webhook failed/) as webhooksFailed\n| extend conversionRate = (leadsCreated / formSubmissions) * 100\n| extend webhookSuccessRate = (webhooksSent / (webhooksSent + webhooksFailed)) * 100"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiInsightsQueries/ConversionFunnelQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesErrorAnalysisQuery6434AC55": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "CreateLeadLambdaLogRetentionA089A5EA",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "ListLeadsLambdaLogRetention94AAF37D",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "GetLeadLambdaLogRetentionE1D96EC6",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/nigredo/error-analysis",
+    "QueryString": "fields @timestamp, level, error.message, error.name, error.code, requestContext.http.path as endpoint, requestContext.http.method as method\n| filter level = \"ERROR\"\n| stats count() as errorCount by endpoint, method, error.name, error.code\n| sort errorCount desc\n| limit 50"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiInsightsQueries/ErrorAnalysisQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesWebhookFailuresQuery24BC13FF": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "CreateLeadLambdaLogRetentionA089A5EA",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "ListLeadsLambdaLogRetention94AAF37D",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "GetLeadLambdaLogRetentionE1D96EC6",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/nigredo/webhook-failures",
+    "QueryString": "fields @timestamp, leadId, webhookUrl, webhookStatus, webhookError, attemptNumber\n| filter @message like /Webhook failed/ or @message like /Webhook retry/\n| stats \n    count() as failureCount,\n    latest(@timestamp) as lastFailure,\n    latest(webhookError) as lastError,\n    max(attemptNumber) as maxAttempts\n  by leadId, webhookUrl\n| sort failureCount desc\n| limit 50"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiInsightsQueries/WebhookFailuresQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesRateLimitAnalysisQueryA30C5751": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "CreateLeadLambdaLogRetentionA089A5EA",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "ListLeadsLambdaLogRetention94AAF37D",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "GetLeadLambdaLogRetentionE1D96EC6",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/nigredo/rate-limit-analysis",
+    "QueryString": "fields @timestamp, ipAddress, @message\n| filter @message like /Rate limit exceeded/\n| stats count() as rateLimitHits by ipAddress, bin(1h) as hour\n| sort rateLimitHits desc\n| limit 100"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiInsightsQueries/RateLimitAnalysisQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesPerformanceAnalysisQuery20203D6E": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "CreateLeadLambdaLogRetentionA089A5EA",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "ListLeadsLambdaLogRetention94AAF37D",
+       "LogGroupName"
+      ]
+     },
+     {
+      "Fn::GetAtt": [
+       "GetLeadLambdaLogRetentionE1D96EC6",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/nigredo/performance-analysis",
+    "QueryString": "fields @timestamp, requestContext.http.path as endpoint, requestContext.http.method as method, duration\n| filter duration > 0\n| stats \n    count() as requestCount,\n    avg(duration) as avgDuration,\n    min(duration) as minDuration,\n    max(duration) as maxDuration,\n    pct(duration, 50) as p50,\n    pct(duration, 95) as p95,\n    pct(duration, 99) as p99\n  by endpoint, method\n| sort p99 desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/NigredoApiInsightsQueries/PerformanceAnalysisQuery"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31R224iMQz9lr4Hdxn6A5RepV6HviOTMdPATJLGDghF8++rZAqVqtW+5Fx8ke1UUFUz+HOBB57oZjfpzBrSUlDvFB54lfiLIb1HiqQWGzuS8r65zujj2RzloGhPVhhSHbtSkXFQHfbrBlfWNbRleClwF60W46wy2EOq3Xd+xp/ep7Y8WyEzCcM8g+IZXEe9I7lGJkW6grQkHYOR431w0efa/xuPtg3EfJoN0mJjzyPd5i2WLgZNz+i9sW2u/7f7RqE3zMbZQXWuZUhPrq1JyJZW44HC8YY2xhopabpzsTmg6E9IN8ifa4ehyZk/Yt5h6LNVyKDQmxaFDnjcV5AeRPzcmxL3RmW5FGzLBUeSrdpFGdmjFWoDngb6JUveoNgypA/njc5mIcOgauKysSqHz82/9z4HFhv7GsVHGVT+YNjy5b66gukUphdbNmYSohXTE9Qj/gWdmVjycwIAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "NigredoStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "RecebimentoQueueUrl": {
+   "Description": "Nigredo Recebimento Queue URL",
+   "Value": {
+    "Ref": "RecebimentoQueue7AB70855"
+   },
+   "Export": {
+    "Name": "NigredoRecebimentoQueueUrl-dev"
+   }
+  },
+  "RecebimentoQueueArn": {
+   "Description": "Nigredo Recebimento Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "RecebimentoQueue7AB70855",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoRecebimentoQueueArn-dev"
+   }
+  },
+  "EstrategiaQueueUrl": {
+   "Description": "Nigredo Estrategia Queue URL",
+   "Value": {
+    "Ref": "EstrategiaQueue757B78A7"
+   },
+   "Export": {
+    "Name": "NigredoEstrategiaQueueUrl-dev"
+   }
+  },
+  "EstrategiaQueueArn": {
+   "Description": "Nigredo Estrategia Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "EstrategiaQueue757B78A7",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoEstrategiaQueueArn-dev"
+   }
+  },
+  "DisparoQueueUrl": {
+   "Description": "Nigredo Disparo Queue URL",
+   "Value": {
+    "Ref": "DisparoQueueBE25067A"
+   },
+   "Export": {
+    "Name": "NigredoDisparoQueueUrl-dev"
+   }
+  },
+  "DisparoQueueArn": {
+   "Description": "Nigredo Disparo Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "DisparoQueueBE25067A",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoDisparoQueueArn-dev"
+   }
+  },
+  "AtendimentoQueueUrl": {
+   "Description": "Nigredo Atendimento Queue URL",
+   "Value": {
+    "Ref": "AtendimentoQueueFAE96496"
+   },
+   "Export": {
+    "Name": "NigredoAtendimentoQueueUrl-dev"
+   }
+  },
+  "AtendimentoQueueArn": {
+   "Description": "Nigredo Atendimento Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "AtendimentoQueueFAE96496",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoAtendimentoQueueArn-dev"
+   }
+  },
+  "SentimentoQueueUrl": {
+   "Description": "Nigredo Sentimento Queue URL",
+   "Value": {
+    "Ref": "SentimentoQueueEAC65B25"
+   },
+   "Export": {
+    "Name": "NigredoSentimentoQueueUrl-dev"
+   }
+  },
+  "SentimentoQueueArn": {
+   "Description": "Nigredo Sentimento Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "SentimentoQueueEAC65B25",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoSentimentoQueueArn-dev"
+   }
+  },
+  "AgendamentoQueueUrl": {
+   "Description": "Nigredo Agendamento Queue URL",
+   "Value": {
+    "Ref": "AgendamentoQueue78A39639"
+   },
+   "Export": {
+    "Name": "NigredoAgendamentoQueueUrl-dev"
+   }
+  },
+  "AgendamentoQueueArn": {
+   "Description": "Nigredo Agendamento Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "AgendamentoQueue78A39639",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoAgendamentoQueueArn-dev"
+   }
+  },
+  "RelatoriosQueueUrl": {
+   "Description": "Nigredo Relatorios Queue URL",
+   "Value": {
+    "Ref": "RelatoriosQueue76D0C511"
+   },
+   "Export": {
+    "Name": "NigredoRelatoriosQueueUrl-dev"
+   }
+  },
+  "RelatoriosQueueArn": {
+   "Description": "Nigredo Relatorios Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "RelatoriosQueue76D0C511",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoRelatoriosQueueArn-dev"
+   }
+  },
+  "NigredoDlqUrl": {
+   "Description": "Nigredo Dead Letter Queue URL",
+   "Value": {
+    "Ref": "NigredoDlqA8002B0C"
+   },
+   "Export": {
+    "Name": "NigredoDlqUrl-dev"
+   }
+  },
+  "NigredoDlqArn": {
+   "Description": "Nigredo Dead Letter Queue ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "NigredoDlqA8002B0C",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoDlqArn-dev"
+   }
+  },
+  "RecebimentoLambdaArn": {
+   "Description": "Nigredo Recebimento Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "RecebimentoLambda94C8BF58",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoRecebimentoLambdaArn-dev"
+   }
+  },
+  "RecebimentoLambdaName": {
+   "Description": "Nigredo Recebimento Lambda Name",
+   "Value": {
+    "Ref": "RecebimentoLambda94C8BF58"
+   },
+   "Export": {
+    "Name": "NigredoRecebimentoLambdaName-dev"
+   }
+  },
+  "EstrategiaLambdaArn": {
+   "Description": "Nigredo Estrategia Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "EstrategiaLambda99BF03B7",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoEstrategiaLambdaArn-dev"
+   }
+  },
+  "EstrategiaLambdaName": {
+   "Description": "Nigredo Estrategia Lambda Name",
+   "Value": {
+    "Ref": "EstrategiaLambda99BF03B7"
+   },
+   "Export": {
+    "Name": "NigredoEstrategiaLambdaName-dev"
+   }
+  },
+  "DisparoLambdaArn": {
+   "Description": "Nigredo Disparo Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "DisparoLambda0A5F8F52",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoDisparoLambdaArn-dev"
+   }
+  },
+  "DisparoLambdaName": {
+   "Description": "Nigredo Disparo Lambda Name",
+   "Value": {
+    "Ref": "DisparoLambda0A5F8F52"
+   },
+   "Export": {
+    "Name": "NigredoDisparoLambdaName-dev"
+   }
+  },
+  "AtendimentoLambdaArn": {
+   "Description": "Nigredo Atendimento Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "AtendimentoLambda97A1D183",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoAtendimentoLambdaArn-dev"
+   }
+  },
+  "AtendimentoLambdaName": {
+   "Description": "Nigredo Atendimento Lambda Name",
+   "Value": {
+    "Ref": "AtendimentoLambda97A1D183"
+   },
+   "Export": {
+    "Name": "NigredoAtendimentoLambdaName-dev"
+   }
+  },
+  "SentimentoLambdaArn": {
+   "Description": "Nigredo Sentimento Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "SentimentoLambda423C8224",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoSentimentoLambdaArn-dev"
+   }
+  },
+  "SentimentoLambdaName": {
+   "Description": "Nigredo Sentimento Lambda Name",
+   "Value": {
+    "Ref": "SentimentoLambda423C8224"
+   },
+   "Export": {
+    "Name": "NigredoSentimentoLambdaName-dev"
+   }
+  },
+  "AgendamentoLambdaArn": {
+   "Description": "Nigredo Agendamento Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "AgendamentoLambda083CE1CF",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoAgendamentoLambdaArn-dev"
+   }
+  },
+  "AgendamentoLambdaName": {
+   "Description": "Nigredo Agendamento Lambda Name",
+   "Value": {
+    "Ref": "AgendamentoLambda083CE1CF"
+   },
+   "Export": {
+    "Name": "NigredoAgendamentoLambdaName-dev"
+   }
+  },
+  "RelatoriosLambdaArn": {
+   "Description": "Nigredo Relatorios Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "RelatoriosLambda21B77625",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoRelatoriosLambdaArn-dev"
+   }
+  },
+  "RelatoriosLambdaName": {
+   "Description": "Nigredo Relatorios Lambda Name",
+   "Value": {
+    "Ref": "RelatoriosLambda21B77625"
+   },
+   "Export": {
+    "Name": "NigredoRelatoriosLambdaName-dev"
+   }
+  },
+  "AgentsDashboardName": {
+   "Description": "Nigredo Agents Dashboard Name",
+   "Value": {
+    "Ref": "NigredoAgentsDashboard0BD81886"
+   },
+   "Export": {
+    "Name": "NigredoAgentsDashboardName-dev"
+   }
+  },
+  "BusinessDashboardName": {
+   "Description": "Business Metrics Dashboard Name",
+   "Value": {
+    "Ref": "BusinessMetricsDashboard8CC247ED"
+   },
+   "Export": {
+    "Name": "BusinessMetricsDashboardName-dev"
+   }
+  },
+  "NigredoInsightsQueryErrorsByAgent": {
+   "Description": "CloudWatch Insights Query: Erros por Agente Nigredo",
+   "Value": "dev/fibonacci/errors-by-agent",
+   "Export": {
+    "Name": "NigredoProspecting-InsightsQueryErrorsByAgent-dev"
+   }
+  },
+  "NigredoInsightsQueryFunnelConversion": {
+   "Description": "CloudWatch Insights Query: Taxa de Conversão do Funil Nigredo",
+   "Value": "dev/fibonacci/funnel-conversion",
+   "Export": {
+    "Name": "NigredoProspecting-ProspectConversionQuery-dev"
+   }
+  },
+  "NigredoInsightsQueryLeadProcessingTime": {
+   "Description": "CloudWatch Insights Query: Tempo de Processamento de Leads Nigredo",
+   "Value": "dev/fibonacci/lead-processing-time",
+   "Export": {
+    "Name": "NigredoProspecting-InsightsQueryLeadProcessingTime-dev"
+   }
+  },
+  "NigredoAlarmsCriticalAlarmsCount3627FDF6": {
+   "Description": "Number of critical alarms configured",
+   "Value": "6",
+   "Export": {
+    "Name": "dev-NigredoCriticalAlarmsCount"
+   }
+  },
+  "NigredoAlarmsWarningAlarmsCountF2EC5B5E": {
+   "Description": "Number of warning alarms configured",
+   "Value": "4",
+   "Export": {
+    "Name": "dev-NigredoWarningAlarmsCount"
+   }
+  },
+  "NigredoApiInsightsQueriesTopLeadSourcesQueryName3DF16832": {
+   "Description": "CloudWatch Insights Query: Top Lead Sources",
+   "Value": "dev/nigredo/top-lead-sources",
+   "Export": {
+    "Name": "dev-Nigredo-TopLeadSourcesQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesConversionFunnelQueryName06DF57EA": {
+   "Description": "CloudWatch Insights Query: Conversion Funnel",
+   "Value": "dev/nigredo/conversion-funnel",
+   "Export": {
+    "Name": "dev-Nigredo-ConversionFunnelQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesErrorAnalysisQueryName1C4E93A0": {
+   "Description": "CloudWatch Insights Query: Error Analysis",
+   "Value": "dev/nigredo/error-analysis",
+   "Export": {
+    "Name": "dev-Nigredo-ErrorAnalysisQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesWebhookFailuresQueryName7B7E6982": {
+   "Description": "CloudWatch Insights Query: Webhook Failures",
+   "Value": "dev/nigredo/webhook-failures",
+   "Export": {
+    "Name": "dev-Nigredo-WebhookFailuresQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesRateLimitAnalysisQueryName1E2655F4": {
+   "Description": "CloudWatch Insights Query: Rate Limit Analysis",
+   "Value": "dev/nigredo/rate-limit-analysis",
+   "Export": {
+    "Name": "dev-Nigredo-RateLimitAnalysisQuery"
+   }
+  },
+  "NigredoApiInsightsQueriesPerformanceAnalysisQueryNameB4AE033E": {
+   "Description": "CloudWatch Insights Query: Performance Analysis",
+   "Value": "dev/nigredo/performance-analysis",
+   "Export": {
+    "Name": "dev-Nigredo-PerformanceAnalysisQuery"
+   }
+  },
+  "NigredoApiUrl": {
+   "Description": "Nigredo API Gateway URL",
+   "Value": {
+    "Fn::GetAtt": [
+     "NigredoHttpApiD078601F",
+     "ApiEndpoint"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoApiUrl-dev"
+   }
+  },
+  "NigredoApiId": {
+   "Description": "Nigredo API Gateway ID",
+   "Value": {
+    "Ref": "NigredoHttpApiD078601F"
+   },
+   "Export": {
+    "Name": "NigredoApiId-dev"
+   }
+  },
+  "CreateLeadLambdaArn": {
+   "Description": "Create Lead Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "CreateLeadLambda7973BC1C",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoCreateLeadLambdaArn-dev"
+   }
+  },
+  "ListLeadsLambdaArn": {
+   "Description": "List Leads Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "ListLeadsLambda2E94697E",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoListLeadsLambdaArn-dev"
+   }
+  },
+  "GetLeadLambdaArn": {
+   "Description": "Get Lead Lambda ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "GetLeadLambda3A46EB2B",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "NigredoGetLeadLambdaArn-dev"
+   }
+  },
+  "AlarmTopicArn": {
+   "Description": "SNS Topic ARN for API alarms",
+   "Value": {
+    "Ref": "NigredoApiAlarmTopicB70677AA"
+   },
+   "Export": {
+    "Name": "NigredoApiAlarmTopicArn-dev"
+   }
+  },
+  "NigredoDashboardName": {
+   "Description": "Nigredo Prospecting Dashboard Name",
+   "Value": {
+    "Ref": "NigredoDashboard9A17C519"
+   },
+   "Export": {
+    "Name": "NigredoDashboardName-dev"
+   }
+  },
+  "NigredoTopLeadSourcesQuery": {
+   "Description": "CloudWatch Insights Query: Top Lead Sources",
+   "Value": "dev/nigredo/top-lead-sources",
+   "Export": {
+    "Name": "NigredoTopLeadSourcesQuery-dev"
+   }
+  },
+  "NigredoConversionFunnelQuery": {
+   "Description": "CloudWatch Insights Query: Conversion Funnel",
+   "Value": "dev/nigredo/conversion-funnel",
+   "Export": {
+    "Name": "NigredoConversionFunnelQuery-dev"
+   }
+  },
+  "NigredoErrorAnalysisQuery": {
+   "Description": "CloudWatch Insights Query: Error Analysis",
+   "Value": "dev/nigredo/error-analysis",
+   "Export": {
+    "Name": "NigredoErrorAnalysisQuery-dev"
+   }
+  },
+  "NigredoCriticalAlarmsCount": {
+   "Description": "Number of critical alarms configured",
+   "Value": "6",
+   "Export": {
+    "Name": "NigredoCriticalAlarmsCount-dev"
+   }
+  },
+  "NigredoWarningAlarmsCount": {
+   "Description": "Number of warning alarms configured",
+   "Value": "4",
+   "Export": {
+    "Name": "NigredoWarningAlarmsCount-dev"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

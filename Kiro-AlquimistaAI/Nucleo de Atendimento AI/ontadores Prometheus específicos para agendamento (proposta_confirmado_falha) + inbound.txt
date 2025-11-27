@@ -1,0 +1,228 @@
+﻿1. ontadores Prometheus específicos para agendamento (proposta/confirmado/falha) + inbound
+
+2. instrumentação nos pontos críticos (propor/confirmar)
+
+3. endpoint GET /agendamentos/:id para inspeção rápida no navegador (HTML simples)
+
+4. (opcional) pequena view SQL para facilitar consultas
+
+reuso: /observability/metrics.ts, /agents/agendamento/index.ts, /agents/atendimento/index.ts, /shared/db.ts
+ sem libs novas.
+________________
+
+
+1) Novos counters de métricas
+// /observability/metrics.ts  (ACRESCENTE ao arquivo já existente)
+import client from "prom-client";
+import express from "express";
+
+
+export const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+
+export const cntEvento = new client.Counter({
+  name: "event_total",
+  help: "Eventos canônicos recebidos/emitidos",
+  labelNames: ["event_type"] as const
+});
+export const cntDisparo = new client.Counter({
+  name: "disparo_total",
+  help: "Disparos por canal",
+  labelNames: ["canal","status"] as const
+});
+export const histLat = new client.Histogram({
+  name: "latency_ms",
+  help: "Latência operações críticas",
+  buckets: [25, 50, 100, 250, 500, 1000, 2000, 5000]
+});
+
+
+// === NOVOS CONTADORES ===
+export const cntInbound = new client.Counter({
+  name: "inbound_total",
+  help: "Mensagens recebidas por canal",
+  labelNames: ["canal"] as const
+});
+export const cntAgendamentoProposta = new client.Counter({
+  name: "agendamento_proposta_total",
+  help: "Totais de propostas de horário enviadas",
+  labelNames: ["canal"] as const
+});
+export const cntAgendamentoConfirmado = new client.Counter({
+  name: "agendamento_confirmado_total",
+  help: "Totais de agendamentos confirmados",
+  labelNames: ["canal"] as const
+});
+export const cntAgendamentoFalha = new client.Counter({
+  name: "agendamento_falha_total",
+  help: "Falhas em propostas/confirmacoes",
+  labelNames: ["fase","erro"] as const
+});
+
+
+register.registerMetric(cntEvento);
+register.registerMetric(cntDisparo);
+register.registerMetric(histLat);
+
+
+// registre também os novos
+register.registerMetric(cntInbound);
+register.registerMetric(cntAgendamentoProposta);
+register.registerMetric(cntAgendamentoConfirmado);
+register.registerMetric(cntAgendamentoFalha);
+
+
+export function mountMetrics(app: express.Express){
+  app.get("/metrics", async (_req, res)=>{
+    res.setHeader("Content-Type", register.contentType);
+    res.send(await register.metrics());
+  });
+}
+
+
+________________
+
+
+2) Instrumentar Atendimento (inbound)
+// /agents/atendimento/index.ts  (ADICIONE import e incrementos)
+import { cntInbound, cntEvento } from "../../observability/metrics";
+
+
+// ...dentro do POST /webhook/evolution, após obter from_e164/text:
+cntInbound.inc({ canal: "whatsapp" });
+
+
+// ao gravar resposta.recebida@v1:
+cntEvento.inc({ event_type: "resposta.recebida@v1" });
+
+
+Se você também recebe e-mail inbound (futuro), incremente cntInbound com { canal:"email" }.
+________________
+
+
+3) Instrumentar Agendamento (propor/confirmar/falha)
+// /agents/agendamento/index.ts  (ADICIONE imports)
+import { cntAgendamentoProposta, cntAgendamentoConfirmado, cntAgendamentoFalha, cntEvento, histLat } from "../../observability/metrics";
+
+
+// ...dentro de propor()
+const endTimerProp = histLat.startTimer();
+try {
+  // (código já existente)
+  // após envio WA/Email bem-sucedido:
+  cntAgendamentoProposta.inc({ canal });
+  cntEvento.inc({ event_type: "agendamento.proposta@v1" });
+} catch (err:any){
+  cntAgendamentoFalha.inc({ fase: "proposta", erro: (err?.code||err?.message||"unknown").toString().slice(0,40) });
+  throw err;
+} finally { endTimerProp(); }
+
+
+// ...dentro de confirmar()
+const endTimerConf = histLat.startTimer();
+try {
+  // (código já existente)
+  // após criar no Calendar e notificar:
+  cntAgendamentoConfirmado.inc({ canal: ag.canal });
+  cntEvento.inc({ event_type: "agendamento.confirmado@v1" });
+} catch (err:any){
+  cntAgendamentoFalha.inc({ fase: "confirmacao", erro: (err?.code||err?.message||"unknown").toString().slice(0,40) });
+  throw err;
+} finally { endTimerConf(); }
+
+
+________________
+
+
+4) Endpoint GET /agendamentos/:id (inspeção rápida)
+HTML simples, com joins mínimos para contexto. Útil para debug no navegador.
+// /agents/agendamento/http.ts  (NOVO)
+import { makeApp } from "../../shared/http";
+import { pool } from "../../shared/db";
+
+
+export const appAg = makeApp();
+
+
+appAg.get("/agendamentos/:id", async (req, res) => {
+  const { id } = req.params;
+  const q = await pool.query(`
+    select a.*, 
+           e.razao_social as empresa, c.nome as contato_nome, c.email, c.telefone_e164
+      from agendamentos a
+      join leads l on l.id=a.lead_id
+      join empresas e on e.id=l.empresa_id
+      left join contatos c on c.id=l.contato_id
+     where a.id=$1
+  `, [id]);
+
+
+  if (!q.rowCount) return res.status(404).send("Agendamento não encontrado.");
+  const r = q.rows[0];
+
+
+  const h = /*html*/`
+  <html><head><meta charset="utf-8"><title>Agendamento ${id}</title>
+  <style>body{font-family:system-ui,Arial;margin:20px} pre{background:#f6f6f6;padding:12px;border-radius:8px;}</style>
+  </head><body>
+    <h2>Agendamento — ${r.empresa}</h2>
+    <p><b>Status:</b> ${r.status} &nbsp;|&nbsp; <b>Canal:</b> ${r.canal}</p>
+    <p><b>Lead:</b> ${r.lead_id}</p>
+    <p><b>Contato:</b> ${r.contato_nome || "—"} &lt;${r.email || "—"}&gt; ${r.telefone_e164 || ""}</p>
+    <h3>Propostas</h3>
+    <pre>${JSON.stringify(r.propostas, null, 2)}</pre>
+    <h3>Escolha</h3>
+    <pre>${JSON.stringify(r.escolha || {}, null, 2)}</pre>
+    <p><b>Provider Event ID:</b> ${r.provider_event_id || "—"}</p>
+    <p><i>Criado:</i> ${new Date(r.created_at).toLocaleString("pt-BR")} |
+       <i>Atualizado:</i> ${new Date(r.updated_at).toLocaleString("pt-BR")}</p>
+  </body></html>`;
+  res.status(200).send(h);
+});
+
+
+Inicialização HTTP do agente de agendamento (além do worker):
+// /agents/agendamento/index.ts  (ACRESCENTE ao final do arquivo)
+import { appAg } from "./http";
+appAg.listen(process.env.AG_HTTP_PORT || 3004, ()=> console.log("agendamento http up"));
+
+
+________________
+
+
+5) View SQL (opcional) para facilitar BI/consultas
+create or replace view v_agendamentos as
+select a.id as agendamento_id, a.status, a.canal, a.provider_event_id,
+       (a.escolha->>'inicio')::timestamptz as inicio,
+       (a.escolha->>'fim')::timestamptz as fim,
+       e.razao_social as empresa, c.nome as contato_nome, c.email, c.telefone_e164,
+       a.created_at, a.updated_at
+  from agendamentos a
+  join leads l on l.id=a.lead_id
+  join empresas e on e.id=l.empresa_id
+  left join contatos c on c.id=l.contato_id;
+
+
+Exemplo rápido:
+select canal, status, count(*)
+  from v_agendamentos
+ group by canal, status
+ order by 1,2;
+
+
+________________
+
+
+6) Checklist final
+   * Atualizar /observability/metrics.ts com counters e registrar no register.
+
+   * Importar e incrementar métricas em Atendimento e Agendamento.
+
+   * Subir o servidor do Agendamento HTTP (AG_HTTP_PORT=3004).
+
+   * Criar a view v_agendamentos (opcional, mas recomendado).
+
+   * Conferir /metrics: devem aparecer inbound_total, agendamento_*_total, latency_ms, etc.
+
+   * Testar GET /agendamentos/:id no navegador (HTML de diagnóstico).

@@ -1,0 +1,245 @@
+{
+  "common": {
+    "appName": "Alquimista AI",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "finish": "Finalizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "refresh": "Actualizar",
+    "viewMore": "Ver más",
+    "viewLess": "Ver menos",
+    "learnMore": "Saber más",
+    "getStarted": "Comenzar ahora",
+    "tryFree": "Probar gratis"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "signup": "Crear cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "rememberMe": "Recuérdame",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "loginSuccess": "¡Inicio de sesión exitoso!",
+    "loginError": "Correo o contraseña incorrectos",
+    "signupSuccess": "¡Cuenta creada exitosamente!",
+    "signupError": "Error al crear cuenta",
+    "invalidEmail": "Correo electrónico inválido",
+    "passwordTooShort": "Contraseña muy corta (mínimo 8 caracteres)",
+    "passwordsDontMatch": "Las contraseñas no coinciden",
+    "requiredFields": "Por favor, completa todos los campos obligatorios",
+    "autoLogoutWarning": "Serás desconectado en {minutes} minutos por inactividad",
+    "stayLoggedIn": "Mantener sesión",
+    "logoutNow": "Cerrar sesión ahora"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "agents": "Agentes",
+    "analytics": "Análisis",
+    "settings": "Configuración",
+    "onboarding": "Integración",
+    "help": "Ayuda",
+    "documentation": "Documentación",
+    "support": "Soporte"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de nuevo",
+    "overview": "Resumen",
+    "recentActivity": "Actividad Reciente",
+    "quickActions": "Acciones Rápidas",
+    "statistics": "Estadísticas",
+    "activeAgents": "Agentes Activos",
+    "totalLeads": "Total de Leads",
+    "conversionRate": "Tasa de Conversión",
+    "revenue": "Ingresos",
+    "noAgentsActive": "No hay agentes activos",
+    "activateFirstAgent": "Activa tu primer agente para comenzar"
+  },
+  "agents": {
+    "title": "Agentes de IA",
+    "description": "Gestiona tus agentes de automatización",
+    "createNew": "Crear nuevo agente",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "configure": "Configurar",
+    "status": "Estado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "performance": "Rendimiento",
+    "leads": "Leads",
+    "conversions": "Conversiones",
+    "noAgents": "No hay agentes configurados",
+    "agentTypes": {
+      "recebimento": "Recepción de Leads",
+      "qualificacao": "Calificación",
+      "estrategia": "Estrategia de Contenido",
+      "disparo": "Envío de Mensajes",
+      "atendimento": "Atención al Cliente",
+      "sentimento": "Análisis de Sentimiento",
+      "agendamento": "Programación",
+      "relatorios": "Informes"
+    }
+  },
+  "analytics": {
+    "title": "Análisis",
+    "overview": "Resumen",
+    "performance": "Rendimiento",
+    "trends": "Tendencias",
+    "reports": "Informes",
+    "period": "Período",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "last7Days": "Últimos 7 días",
+    "last30Days": "Últimos 30 días",
+    "thisMonth": "Este mes",
+    "lastMonth": "Mes pasado",
+    "custom": "Personalizado",
+    "metrics": {
+      "totalLeads": "Total de Leads",
+      "qualifiedLeads": "Leads Calificados",
+      "conversions": "Conversiones",
+      "conversionRate": "Tasa de Conversión",
+      "averageResponseTime": "Tiempo Promedio de Respuesta",
+      "customerSatisfaction": "Satisfacción del Cliente"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "profile": "Perfil",
+    "account": "Cuenta",
+    "security": "Seguridad",
+    "notifications": "Notificaciones",
+    "integrations": "Integraciones",
+    "billing": "Facturación",
+    "language": "Idioma",
+    "theme": "Tema",
+    "timezone": "Zona Horaria",
+    "saveChanges": "Guardar cambios",
+    "changesSaved": "Cambios guardados exitosamente",
+    "changePassword": "Cambiar contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "twoFactorAuth": "Autenticación de dos factores",
+    "enable": "Activar",
+    "disable": "Desactivar"
+  },
+  "onboarding": {
+    "title": "Bienvenido a Alquimista AI",
+    "subtitle": "Configuremos tu cuenta en pocos pasos",
+    "step1": "Información de la Empresa",
+    "step2": "Configurar Agentes",
+    "step3": "Integraciones",
+    "step4": "Completar",
+    "companyName": "Nombre de la Empresa",
+    "industry": "Sector",
+    "teamSize": "Tamaño del Equipo",
+    "selectAgents": "Selecciona los agentes que deseas activar",
+    "connectIntegrations": "Conecta tus herramientas favoritas",
+    "allSet": "¡Todo listo!",
+    "startUsing": "Comenzar a usar"
+  },
+  "marketing": {
+    "hero": {
+      "title": "Transforma Leads en Clientes con IA",
+      "subtitle": "Automatiza tu embudo de ventas con agentes inteligentes que trabajan 24/7",
+      "cta": "Comenzar gratis"
+    },
+    "features": {
+      "title": "Funciones Poderosas",
+      "subtitle": "Todo lo que necesitas para automatizar tus ventas",
+      "feature1": {
+        "title": "Calificación Automática",
+        "description": "La IA califica leads automáticamente según criterios personalizados"
+      },
+      "feature2": {
+        "title": "Atención 24/7",
+        "description": "Responde a tus clientes en cualquier momento, en cualquier lugar"
+      },
+      "feature3": {
+        "title": "Análisis de Sentimiento",
+        "description": "Comprende el estado de ánimo e intención de tus leads en tiempo real"
+      }
+    },
+    "pricing": {
+      "title": "Planes y Precios",
+      "subtitle": "Elige el plan ideal para tu negocio",
+      "monthly": "Mensual",
+      "annually": "Anual",
+      "save": "Ahorra {percent}%",
+      "starter": {
+        "name": "Starter",
+        "price": "$99",
+        "description": "Perfecto para comenzar",
+        "features": [
+          "Hasta 1,000 leads/mes",
+          "3 agentes activos",
+          "Soporte por correo",
+          "Integraciones básicas"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$299",
+        "description": "Para equipos en crecimiento",
+        "features": [
+          "Hasta 10,000 leads/mes",
+          "Agentes ilimitados",
+          "Soporte prioritario",
+          "Todas las integraciones",
+          "Análisis avanzados"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Personalizado",
+        "description": "Para grandes empresas",
+        "features": [
+          "Leads ilimitados",
+          "Agentes ilimitados",
+          "Soporte dedicado",
+          "SLA garantizado",
+          "Personalizaciones"
+        ]
+      }
+    },
+    "testimonials": {
+      "title": "Lo que dicen nuestros clientes",
+      "subtitle": "Empresas que transformaron sus ventas con Alquimista AI"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Resuelve tus dudas sobre la plataforma"
+    }
+  },
+  "errors": {
+    "generic": "Algo salió mal. Inténtalo de nuevo.",
+    "network": "Error de conexión. Verifica tu internet.",
+    "unauthorized": "No tienes permiso para acceder a este recurso.",
+    "notFound": "Página no encontrada.",
+    "serverError": "Error del servidor. Inténtalo más tarde.",
+    "validation": "Por favor, verifica los campos del formulario.",
+    "timeout": "La solicitud tardó demasiado. Inténtalo de nuevo."
+  },
+  "footer": {
+    "copyright": "© {year} Alquimista AI. Todos los derechos reservados.",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Uso",
+    "contact": "Contacto"
+  }
+}

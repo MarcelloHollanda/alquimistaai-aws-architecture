@@ -1,0 +1,1666 @@
+[
+  {
+    "slug": "agente_sdr",
+    "name": "SDR · Qualificador de Leads (SPIN Selling)",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'SDR · Qualificador de Leads (SPIN Selling)' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente SDR · Qualificador de Leads (SPIN Selling). Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_atendimento_salao_beleza",
+    "name": "Atendimento · Salão de Beleza",
+    "category": "Atendimento",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Atendimento · Salão de Beleza' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Atendimento · Salão de Beleza. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_atendimento_clinica_odontologica",
+    "name": "Atendimento · Clínica Odontológica",
+    "category": "Saúde",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Atendimento · Clínica Odontológica' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Atendimento · Clínica Odontológica. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_atendimento_clinica_medica",
+    "name": "Atendimento · Clínica Médica",
+    "category": "Saúde",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Atendimento · Clínica Médica' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Atendimento · Clínica Médica. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_atendimento_alunos",
+    "name": "Atendimento · Alunos de Curso Digital",
+    "category": "Educação",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Atendimento · Alunos de Curso Digital' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Atendimento · Alunos de Curso Digital. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_cobranca_credito",
+    "name": "Cobrança e Recuperação de Crédito",
+    "category": "Financeiro",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Cobrança e Recuperação de Crédito' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Cobrança e Recuperação de Crédito. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_suporte_tecnico",
+    "name": "Suporte Técnico",
+    "category": "Suporte",
+    "subnucleo_id": "Suporte",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Suporte Técnico' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Suporte Técnico. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_pesquisa_satisfacao",
+    "name": "Pesquisa de Satisfação",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Pesquisa de Satisfação' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Pesquisa de Satisfação. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_agendamento_consultas_mentorias",
+    "name": "Agendamento · Consultas/Reuniões/Mentorias",
+    "category": "Agenda",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Agendamento · Consultas/Reuniões/Mentorias' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Agendamento · Consultas/Reuniões/Mentorias. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_retencao_clientes",
+    "name": "Retenção de Clientes",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Retenção de Clientes' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Retenção de Clientes. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_convites_divulgacao_eventos",
+    "name": "Convites & Divulgação de Eventos",
+    "category": "Marketing/Eventos",
+    "subnucleo_id": "Marketing",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Convites & Divulgação de Eventos' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Convites & Divulgação de Eventos. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_agendamento_reunioes",
+    "name": "Agendamento · Reuniões",
+    "category": "Agenda",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Agendamento · Reuniões' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Agendamento · Reuniões. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_clientes_vip",
+    "name": "Assistência a Clientes VIPs",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Assistência a Clientes VIPs' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Assistência a Clientes VIPs. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_consultas_educacionais",
+    "name": "Consultas Educacionais & Lembretes",
+    "category": "Educação",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Consultas Educacionais & Lembretes' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Consultas Educacionais & Lembretes. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_cross_up_selling",
+    "name": "Vendas Cruzadas & Upselling",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Vendas Cruzadas & Upselling' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Vendas Cruzadas & Upselling. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_telemedicina",
+    "name": "Telemedicina",
+    "category": "Saúde",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Telemedicina' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Telemedicina. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_juridico_advocacia",
+    "name": "Consultoria Jurídica & Advocacia",
+    "category": "Jurídico",
+    "subnucleo_id": "Consultoria",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Consultoria Jurídica & Advocacia' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Consultoria Jurídica & Advocacia. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_imobiliario_virtual",
+    "name": "Imobiliário Virtual",
+    "category": "Imobiliário",
+    "subnucleo_id": "Comercial",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Imobiliário Virtual' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Imobiliário Virtual. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_delivery_comida",
+    "name": "Delivery & Serviços de Comida",
+    "category": "Serviços",
+    "subnucleo_id": "Comercial",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Delivery & Serviços de Comida' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Delivery & Serviços de Comida. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_gestao_seguros",
+    "name": "Gestão de Seguros",
+    "category": "Financeiro",
+    "subnucleo_id": "Comercial",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Gestão de Seguros' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Gestão de Seguros. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_turismo_viagens",
+    "name": "Turismo & Viagens",
+    "category": "Serviços",
+    "subnucleo_id": "Comercial",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Turismo & Viagens' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Turismo & Viagens. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_educacao_ead",
+    "name": "Educação / EAD",
+    "category": "Educação",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Educação / EAD' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Educação / EAD. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_manutencao_predial",
+    "name": "Manutenção Predial & Residencial",
+    "category": "Serviços",
+    "subnucleo_id": "Comercial",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Manutenção Predial & Residencial' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Manutenção Predial & Residencial. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_saude_bem_estar",
+    "name": "Saúde & Bem-Estar",
+    "category": "Saúde",
+    "subnucleo_id": "Atendimento",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Saúde & Bem-Estar' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Saúde & Bem-Estar. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_seg_eletronica_servicos",
+    "name": "Segurança Eletrônica (Serviços)",
+    "category": "Segurança",
+    "subnucleo_id": "Serviços",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Segurança Eletrônica (Serviços)' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Segurança Eletrônica (Serviços). Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_organizacao_eventos",
+    "name": "Organização de Eventos",
+    "category": "Marketing/Eventos",
+    "subnucleo_id": "Marketing",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Organização de Eventos' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Organização de Eventos. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_captador_associacoes",
+    "name": "Captador p/ Associações/ONGs",
+    "category": "Captação",
+    "subnucleo_id": "Comercial",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Captador p/ Associações/ONGs' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Captador p/ Associações/ONGs. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_seg_eletronica_empresas",
+    "name": "Segurança Eletrônica (Empresas)",
+    "category": "Segurança",
+    "subnucleo_id": "Serviços",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Segurança Eletrônica (Empresas)' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Segurança Eletrônica (Empresas). Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_rh_recrutamento",
+    "name": "Recursos Humanos & Recrutamento",
+    "category": "RH",
+    "subnucleo_id": "Operações",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Recursos Humanos & Recrutamento' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Recursos Humanos & Recrutamento. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_vendas_ativas",
+    "name": "Profissional de Vendas Ativas",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Profissional de Vendas Ativas' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Profissional de Vendas Ativas. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_consultor_financeiro",
+    "name": "Consultor Financeiro & Investimentos",
+    "category": "Financeiro",
+    "subnucleo_id": "Consultoria",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Consultor Financeiro & Investimentos' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Consultor Financeiro & Investimentos. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  },
+  {
+    "slug": "agente_follow_up",
+    "name": "Profissional de Follow-up",
+    "category": "Comercial",
+    "subnucleo_id": "Nigredo",
+    "version": "v1",
+    "prompt_system": "Você é o agente 'Profissional de Follow-up' da AlquimistaAI (Fibonacci). Aja com linguagem natural, ética e foco em resultados. Siga LGPD, registre eventos (audit.log) com trace_id e nunca exponha PII sem máscara. Quando necessário, utilize ferramentas MCP registradas.",
+    "prompt_instructions": "Objetivo: executar a função do agente Profissional de Follow-up. Receba input estruturado, valide com input_schema, execute passos, gere saída compatível com output_schema. Se faltar dado obrigatório, solicite de forma objetiva. Sempre registre resumo da ação via audit.log e retorne `acao_sugerida`.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "description": "Contexto do tenant, canal e usuário."
+        },
+        "payload": {
+          "type": "object",
+          "description": "Dados específicos da tarefa do agente."
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "resultado": {
+          "type": "object"
+        },
+        "acao_sugerida": {
+          "type": "string"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "resultado"
+      ]
+    },
+    "tools": [
+      "audit.log"
+    ],
+    "metadata": {
+      "owner": "AlquimistaAI",
+      "source": "seed"
+    }
+  }
+]

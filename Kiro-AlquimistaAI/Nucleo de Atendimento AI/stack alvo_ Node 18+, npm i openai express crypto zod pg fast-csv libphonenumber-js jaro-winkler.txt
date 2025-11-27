@@ -1,0 +1,577 @@
+﻿stack alvo: Node 18+, npm i openai express crypto zod pg fast-csv libphonenumber-js jaro-winkler
+ variáveis: OPENAI_API_KEY, DATABASE_URL, HMAC_SECRET, TZ=America/Fortaleza
+________________
+
+
+0) Utilitários centrais (/shared/utils.ts)
+// /shared/utils.ts
+import crypto from "crypto";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+import jaroWinkler from "jaro-winkler";
+
+
+export const sleep = (ms:number)=> new Promise(r=>setTimeout(r,ms));
+
+
+// --- HMAC assinatura/validação --- //
+export function hmacSign(body: string, secret: string) {
+  return crypto.createHmac("sha256", secret).update(body, "utf8").digest("hex");
+}
+export function hmacVerify(body: string, sig: string, secret: string) {
+  try {
+    const calc = hmacSign(body, secret);
+    return crypto.timingSafeEqual(Buffer.from(calc), Buffer.from(sig || ""));
+  } catch { return false; }
+}
+
+
+// --- Idempotency key (estável por origem + tipo) --- //
+export function makeIdemKey(eventType: string, origin: string, idOrigem: string) {
+  return crypto.createHash("sha256").update(`${eventType}:${origin}:${idOrigem}`).digest("hex");
+}
+
+
+// --- E.164 BR: +55 + validação básica --- //
+export function toE164BR(raw?: string): { ok: boolean; e164?: string; ddd?: string } {
+  if (!raw) return { ok:false };
+  const digits = raw.replace(/\D+/g, "");
+  const guess = digits.startsWith("55") ? `+${digits}` : `+55${digits}`;
+  const p = parsePhoneNumberFromString(guess);
+  if (!p || !p.isValid()) return { ok:false };
+  const national = p.nationalNumber; // ex.: 11987654321
+  const ddd = national.slice(0,2);
+  return { ok:true, e164: p.number, ddd };
+}
+
+
+// --- E-mail --- //
+export function normalizeEmail(email?: string){
+  if(!email) return {ok:false};
+  const e = email.trim().toLowerCase();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const hash = crypto.createHash("sha256").update(e).digest("hex");
+  return { ok: valid, email: e, hash };
+}
+
+
+// --- Similaridade de razão social / fantasia --- //
+export function similaridadeEmpresa(a?: string, b?: string){
+  if(!a || !b) return 0;
+  const clean = (s:string)=> s
+    .toUpperCase()
+    .replace(/[^\p{L}\p{N}\s]/gu," ")
+    .replace(/\b(SA|S\.A\.|LTDA|ME|EPP|EIRELI|SIMPLES|IND|COM|SERV|DE|DA|DO)\b/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+  return jaroWinkler(clean(a), clean(b));
+}
+
+
+________________
+
+
+1) CNPJ/CPF — validação (módulo 11) (/shared/br-docs.ts)
+// /shared/br-docs.ts
+function onlyDigits(s?: string){ return (s||"").replace(/\D+/g,""); }
+
+
+export function isValidCPF(cpfRaw?: string){
+  const cpf = onlyDigits(cpfRaw);
+  if (!cpf || cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  const calc = (slice:number)=> {
+    let sum = 0, factor = slice + 1;
+    for(let i=0;i<slice;i++) sum += parseInt(cpf[i]) * (factor - i);
+    const rest = sum % 11;
+    return rest < 2 ? 0 : 11 - rest;
+  };
+  return calc(9) === +cpf[9] && calc(10) === +cpf[10];
+}
+
+
+export function isValidCNPJ(cnpjRaw?: string){
+  const cnpj = onlyDigits(cnpjRaw);
+  if (!cnpj || cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+  const calc = (len:number) => {
+    const weights = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+    let sum = 0;
+    for(let i=0;i<len;i++) sum += +cnpj[i]*weights[weights.length - len + i];
+    const rest = sum % 11;
+    return rest < 2 ? 0 : 11 - rest;
+  };
+  return calc(12) === +cnpj[12] && calc(13) === +cnpj[13];
+}
+
+
+export function maskCNPJ(cnpj?: string){
+  const d = onlyDigits(cnpj); if(d.length!==14) return cnpj||"";
+  return `${d.slice(0,2)}.${d.slice(2,5)}.${d.slice(5,8)}/${d.slice(8,12)}-${d.slice(12)}`;
+}
+
+
+________________
+
+
+2) Score A/B/C & PF×PJ (/shared/scoring.ts)
+// /shared/scoring.ts
+import { isValidCNPJ, isValidCPF } from "./br-docs";
+
+
+export type LeadRaw = {
+  razao_social?: string; nome_fantasia?: string; cnpj?: string;
+  contato_nome?: string; email?: string; telefone?: string;
+  uf?: string; cidade?: string; cnae?: string; origem?: string; tags?: string[];
+  setor?: string; porte?: string; idade_anos?: number;
+};
+
+
+export function tipoPessoa(cpfCnpj?: string): "PJ"|"PF"|"DESCONHECIDO"{
+  if (isValidCNPJ(cpfCnpj)) return "PJ";
+  if (isValidCPF(cpfCnpj))  return "PF";
+  return "DESCONHECIDO";
+}
+
+
+export function scoreLead(input: LeadRaw){
+  // pesos padrão (ajuste conforme aprendizado)
+  const w = { icp: 0.6, alcance: 0.2, urg: 0.2 };
+
+
+  // ICP fit: setor/porte/região/idade
+  let icp = 0;
+  if (input.setor) icp += 20;             // + heurísticas por CNAE
+  if (input.porte) icp += 15;
+  if (input.uf) icp += 10;
+  if ((input.idade_anos ?? 0) >= 2) icp += 15; // maturidade mínima
+  icp = Math.min(icp, 60);
+
+
+  // Alcance: canais válidos
+  let alcance = 0;
+  if (input.email) alcance += 10;
+  if (input.telefone) alcance += 10;
+
+
+  // Urgência: placeholder simples (ajuste por calendário/DDD/campanhas)
+  const urg = 10; // default médio
+
+
+  const score = Math.round(w.icp*icp + w.alcance*alcance + w.urg*urg);
+  const classe = score >= 80 ? "A" : score >= 60 ? "B" : "C";
+  return { score, classe };
+}
+
+
+________________
+
+
+3) Similaridade (Jaro-Winkler) p/ deduplicação
+// uso típico:
+import { similaridadeEmpresa } from "./shared/utils";
+// ...
+const sim = similaridadeEmpresa(razaoSocialA, razaoSocialB);
+if (sim >= 0.92) {
+  // considere duplicado (fuzzy)
+}
+
+
+________________
+
+
+4) Middleware Express HMAC + “/healthz” (/shared/http.ts)
+// /shared/http.ts
+import express, { Request, Response, NextFunction } from "express";
+import { hmacVerify } from "./utils";
+
+
+export function makeApp(){
+  const app = express();
+  app.use(express.text({ type: "*/*" })); // receba como string p/ HMAC exato
+
+
+  app.get("/", (_req,res)=>res.status(200).send("ok"));
+  app.get("/healthz", (_req,res)=>res.json({ok:true}));
+
+
+  // Valida HMAC em POSTs (ex.: webhooks de importação/disparo)
+  app.use((req:Request, res:Response, next:NextFunction)=>{
+    if (req.method !== "POST") return next();
+    const sig = req.header("x-signature") || "";
+    const ok = hmacVerify(req.body as string, sig, process.env.HMAC_SECRET!);
+    if (!ok) return res.status(401).json({ error: "invalid signature" });
+    next();
+  });
+
+
+  return app;
+}
+
+
+________________
+
+
+5) Conexão Postgres + migração rápida (/shared/db.ts)
+// /shared/db.ts
+import { Pool } from "pg";
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+
+// helper
+export async function tx<T>(fn:(q:(sql:string,params?:any[])=>Promise<any>)=>Promise<T>):Promise<T>{
+  const client = await pool.connect();
+  try{
+    await client.query("BEGIN");
+    const q = (sql:string, params:any[]=[])=>client.query(sql, params);
+    const out = await fn(q);
+    await client.query("COMMIT");
+    return out;
+  } catch(e){
+    await client.query("ROLLBACK");
+    throw e;
+  } finally { client.release(); }
+}
+
+
+índices úteis (rodar uma vez):
+-- unicidades e performance
+create unique index if not exists idx_event_log_idem on event_log (idempotency_key);
+create index if not exists idx_empresas_cnpj on empresas (cnpj);
+create index if not exists idx_contatos_emailhash on contatos (email_hash);
+create index if not exists idx_contatos_phone on contatos (telefone_e164);
+create index if not exists idx_leads_empresa on leads (empresa_id);
+create index if not exists idx_outbox_status on outbox (status);
+
+
+________________
+
+
+6) Importador CSV → Tabelas + Dedup + Outbox (/agents/recebimento/import-csv.ts)
+// /agents/recebimento/import-csv.ts
+import fs from "fs";
+import { parse } from "fast-csv";
+import { tx } from "../../shared/db";
+import { toE164BR, normalizeEmail, makeIdemKey } from "../../shared/utils";
+import { isValidCNPJ, maskCNPJ } from "../../shared/br-docs";
+import { scoreLead, tipoPessoa } from "../../shared/scoring";
+
+
+type Row = {
+  razao_social?: string; nome_fantasia?: string; cnpj?: string; site?: string;
+  contato_nome?: string; email?: string; telefone?: string;
+  uf?: string; cidade?: string; cnae?: string; origem?: string; tags?: string;
+};
+
+
+export async function importCSV(path:string, origem="upload:csv"){
+  const rows: Row[] = [];
+  await new Promise<void>((resolve,reject)=>{
+    fs.createReadStream(path)
+      .pipe(parse<Row, Row>({ headers: true }))
+      .on("error", reject)
+      .on("data", r => rows.push(r))
+      .on("end", ()=> resolve());
+  });
+
+
+  for (const r of rows){
+    await tx(async q=>{
+      // normalizações
+      const email = normalizeEmail(r.email);
+      const phone = toE164BR(r.telefone);
+      const cnpjRaw = (r.cnpj||"").replace(/\D+/g,"");
+      const cnpjOk = isValidCNPJ(cnpjRaw);
+
+
+      // PF×PJ
+      const tipo = tipoPessoa(cnpjRaw);
+
+
+      // empresa (PJ obrigatória p/ B2B; PF aceita se estratégia permitir)
+      if (tipo==="DESCONHECIDO" && !email.ok && !phone.ok) {
+        await q(`insert into event_log(event_type,payload,idempotency_key,trace_id)
+                 values ($1,$2,$3,gen_random_uuid())`,[
+          "lead.rejeitado@v1",
+          { motivo:"no_channel|doc_invalid", r },
+          makeIdemKey("lead.rejeitado@v1", origem, JSON.stringify(r))
+        ]);
+        return;
+      }
+
+
+      // UPSERT empresa por CNPJ se houver; senão por (razao_social + cidade)
+      let empresaId: string;
+      if (cnpjOk){
+        const e = await q(`insert into empresas(cnpj,razao_social,nome_fantasia,site,cnae,uf,cidade)
+                          values ($1,$2,$3,$4,$5,$6,$7)
+                          on conflict (cnpj) do update set razao_social=excluded.razao_social
+                          returning id`,[
+          cnpjRaw, r.razao_social?.trim()||r.nome_fantasia?.trim()||"N/D",
+          r.nome_fantasia?.trim()||null, r.site||null, r.cnae||null, r.uf||null, r.cidade||null
+        ]);
+        empresaId = e.rows[0].id;
+      } else {
+        const e = await q(`insert into empresas(cnpj,razao_social,nome_fantasia,site,cnae,uf,cidade)
+                          values (null,$1,$2,$3,$4,$5,$6)
+                          returning id`,[
+          r.razao_social?.trim()||r.nome_fantasia?.trim()||"N/D",
+          r.nome_fantasia?.trim()||null, r.site||null, r.cnae||null, r.uf||null, r.cidade||null
+        ]);
+        empresaId = e.rows[0].id;
+      }
+
+
+      // contato
+      let contatoId: string | null = null;
+      if (email.ok || phone.ok){
+        const c = await q(`insert into contatos(empresa_id,nome,email,email_hash,telefone_e164,ddd,origem,is_valid_email,is_valid_phone)
+                           values ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+                           on conflict do nothing
+                           returning id`,[
+          empresaId, r.contato_nome?.trim()||null, email.email||null, email.hash||null,
+          phone.e164||null, phone.ddd||null, r.origem||origem, !!email.ok, !!phone.ok
+        ]);
+        contatoId = c.rows[0]?.id || null;
+      }
+
+
+      // lead
+      const { score, classe } = scoreLead({
+        razao_social: r.razao_social, nome_fantasia: r.nome_fantasia,
+        cnpj: cnpjRaw, email: email.email, telefone: phone.e164,
+        uf: r.uf, cidade: r.cidade, cnae: r.cnae
+      });
+      const lead = await q(`insert into leads(empresa_id,contato_id,tipo,score,classe,observacoes)
+                            values ($1,$2,$3,$4,$5,$6)
+                            returning id`,[
+        empresaId, contatoId, tipo==="DESCONHECIDO"?"PJ":tipo, score, classe,
+        { cnpj: cnpjOk ? maskCNPJ(cnpjRaw): null }
+      ]);
+      const leadId = lead.rows[0].id;
+
+
+      // evento + outbox → agente de estratégia (ou próximo estágio)
+      const payload = { lead_id: leadId, empresa_id: empresaId, origem };
+      const idem = makeIdemKey("lead.higienizado@v1", origem, leadId);
+      const ev = await q(`insert into event_log(event_type,payload,idempotency_key,trace_id)
+                          values ($1,$2,$3,gen_random_uuid()) returning id`,[
+        "lead.higienizado@v1", payload, idem
+      ]);
+      await q(`insert into outbox(event_id,consumer) values ($1,$2)`,[ ev.rows[0].id, "agents.estrategia" ]);
+    });
+  }
+}
+
+
+________________
+
+
+7) Worker Outbox (consumidor básico) (/shared/worker.ts)
+// /shared/worker.ts
+import { pool } from "./db";
+
+
+export async function runOutbox(consumer: string, handler: (payload:any)=>Promise<void>){
+  while (true){
+    const client = await pool.connect();
+    try{
+      await client.query("BEGIN");
+      const { rows } = await client.query(
+        `select o.id as outbox_id, e.id as event_id, e.payload
+           from outbox o join event_log e on e.id=o.event_id
+          where o.consumer=$1 and o.status='pending'
+          order by o.id asc
+          limit 1
+          for update skip locked`, [consumer]
+      );
+      if (rows.length === 0){
+        await client.query("COMMIT"); client.release();
+        await new Promise(r=>setTimeout(r, 1500));
+        continue;
+      }
+      const row = rows[0];
+      try{
+        await handler(row.payload);
+        await client.query(`update outbox set status='done', updated_at=now() where id=$1`,[row.outbox_id]);
+        await client.query("COMMIT");
+      } catch (err:any){
+        await client.query(`update outbox set status='pending', retries=retries+1, last_error=$2, updated_at=now() where id=$1`,
+          [row.outbox_id, String(err?.message||err)]);
+        await client.query("COMMIT");
+        await new Promise(r=>setTimeout(r, 1500));
+      }
+    } catch(e){
+      client.release();
+      await new Promise(r=>setTimeout(r, 1500));
+    }
+  }
+}
+
+
+________________
+
+
+8) OpenAI wrapper + chamada de Estratégia (/shared/ai.ts & /agents/estrategia/plan.ts)
+// /shared/ai.ts
+import OpenAI from "openai";
+export const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+
+export async function chat(system: string, user: string){
+  const { choices } = await ai.chat.completions.create({
+    model: "gpt-4.1-mini",
+    temperature: 0.2,
+    messages: [{ role:"system", content: system }, { role:"user", content: user }]
+  });
+  return choices[0].message?.content || "";
+}
+
+
+// /agents/estrategia/plan.ts
+import { chat } from "../../shared/ai";
+import { pool } from "../../shared/db";
+
+
+const SYSTEM = `
+Você é o Agente de Estratégia. Gere plano TOPO–MEIO–FUNDO com:
+- diagnóstico do lote (ICP/dor/valor/linguagem/objeções)
+- 2–3 templates parametrizados por estágio ({{placeholders}})
+- canais e cadência (janelas, pacing, limites)
+- riscos reputacionais (LGPD/opt-out)
+- metas (resp_qualificada, avanço, agenda)
+Responda em JSON: {resumo, canais, janelas, metas, mensagens:{TOPO:[],MEIO:[],FUNDO:[]}}.`;
+
+
+export async function gerarEstrategiaParaLote(loteId: string){
+  // carregue dados do lote/leads
+  const { rows: lote } = await pool.query(`select criterio from lotes where id=$1`,[loteId]);
+  const { rows: leads } = await pool.query(`
+    select l.id, e.setor, e.porte, e.uf
+      from leads_lotes ll
+      join leads l on l.id=ll.lead_id
+      join empresas e on e.id=l.empresa_id
+     where ll.lote_id=$1 limit 100`,[loteId]);
+
+
+  const user = JSON.stringify({ loteId, criterio: lote[0]?.criterio, sample: leads.slice(0,20) });
+  const content = await chat(SYSTEM, user);
+  const plan = JSON.parse(content);
+
+
+  // persistência
+  const st = await pool.query(`insert into estrategias(lote_id,resumo,canais,janelas,metas)
+  values ($1,$2,$3,$4,$5) returning id`,
+  [loteId, plan.resumo, plan.canais, plan.janelas, plan.metas]);
+  const estrategiaId = st.rows[0].id;
+
+
+  for (const stage of ["TOPO","MEIO","FUNDO"] as const){
+    for (let i=0;i<(plan.mensagens[stage]?.length||0);i++){
+      const m = plan.mensagens[stage][i];
+      await pool.query(`insert into mensagens_modelo(estrategia_id,stage,variante,canal,template,risco)
+                        values ($1,$2,$3,$4,$5,$6)`,
+        [estrategiaId, stage, String.fromCharCode(65+i), m.canal, m.template, m.risco||{}]);
+    }
+  }
+  return estrategiaId;
+}
+
+
+________________
+
+
+9) Epsilon-Greedy (roteamento de tráfego entre variações)
+// /shared/ab.ts
+export type Arm = { id: string; reward: number; impressions: number; };
+export function pickArmEpsilonGreedy(arms: Arm[], epsilon=0.1){
+  if (Math.random() < epsilon) {
+    return arms[Math.floor(Math.random()*arms.length)];
+  }
+  const scored = arms.map(a=>({ a, mean: (a.impressions>0? a.reward/a.impressions : 0) }))
+                     .sort((x,y)=>y.mean-x.mean);
+  return scored[0].a;
+}
+// uso: guardar reward= respostas qualificadas; impressions= enviados
+
+
+________________
+
+
+10) Servidor do Recebimento (webhook POST + job)
+// /agents/recebimento/index.ts
+import { makeApp } from "../../shared/http";
+import { importCSV } from "./import-csv";
+
+
+const app = makeApp();
+
+
+app.post("/process/csv", async (req, res)=>{
+  // body deve ser caminho temporário ou base64 -> simplificado
+  const path = (req.body||"").trim();
+  await importCSV(path, "api:csv");
+  res.json({ ok:true });
+});
+
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, ()=> console.log("recebimento up on", PORT));
+
+
+________________
+
+
+11) Servidor do Estratégia + Worker
+// /agents/estrategia/index.ts
+import { makeApp } from "../../shared/http";
+import { runOutbox } from "../../shared/worker";
+import { gerarEstrategiaParaLote } from "./plan";
+
+
+const app = makeApp();
+app.post("/plan/lote", async (req,res)=>{
+  const { lote_id } = JSON.parse(req.body||"{}");
+  const id = await gerarEstrategiaParaLote(lote_id);
+  res.json({ ok:true, estrategia_id: id });
+});
+
+
+app.listen(process.env.PORT || 3002, ()=>console.log("estrategia up"));
+
+
+// worker consome outbox e chama estratégia quando lote/evento pronto
+runOutbox("agents.estrategia", async (payload)=>{
+  if (payload?.lead_id) {
+    // opcional: formar lote por heurística/cron e só então chamar estratégia
+    // aqui apenas “ack” — ou agrupar por setor/porte e emitir lote.pronto@v1
+  }
+});
+
+
+________________
+
+
+12) .env exemplo (Replit → Secrets)
+OPENAI_API_KEY=sk-...
+DATABASE_URL=postgres://user:pass@host:5432/db
+HMAC_SECRET=super-secreto
+TZ=America/Fortaleza
+
+
+________________
+
+
+como usar (roteiro rápido)
+1. Crie os arquivos conforme os caminhos acima.
+
+2. Execute as migrações SQL (tabelas + índices).
+
+3. Suba agents/recebimento e agents/estrategia (duas repls ou processos).
+
+4. Envie um CSV para o recebedor:
+
+   * Faça upload do arquivo no Replit (ex.: /mnt/data/leads.csv)
+
+   * curl -X POST http://<recebimento>/process/csv -H "x-signature: $(echo -n /mnt/data/leads.csv | openssl dgst -sha256 -hmac $HMAC_SECRET -binary | xxd -p -c 256)" --data '/mnt/data/leads.csv'
+
+      5. Verifique event_log e outbox; o worker processa e a estratégia fica pronta com templates cadastrados.
+
+      6. Conecte o Agente de Disparo para consumir mensagens_modelo e aplicar epsilon-greedy.

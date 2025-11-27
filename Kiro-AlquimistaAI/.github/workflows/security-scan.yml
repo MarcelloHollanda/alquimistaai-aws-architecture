@@ -1,0 +1,126 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scan daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        id: audit
+        run: |
+          echo "Running npm audit..."
+          npm audit --audit-level=moderate || true
+          npm audit --json > audit-report.json || true
+        continue-on-error: true
+      
+      - name: Run security check
+        id: security-check
+        run: |
+          echo "Running enhanced security check with CDK-NAG..."
+          npm run security:full
+        continue-on-error: false
+      
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: |
+            audit-report.json
+            Docs/Deploy/SECURITY-SCAN-REPORT.md
+          retention-days: 30
+      
+      - name: Comment PR with security status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let reportContent = '## 🔒 Security Scan Results\n\n';
+            
+            try {
+              const auditReport = JSON.parse(fs.readFileSync('audit-report.json', 'utf8'));
+              const metadata = auditReport.metadata || {};
+              const vulnerabilities = metadata.vulnerabilities || {};
+              
+              const critical = vulnerabilities.critical || 0;
+              const high = vulnerabilities.high || 0;
+              const moderate = vulnerabilities.moderate || 0;
+              const low = vulnerabilities.low || 0;
+              
+              reportContent += `### Vulnerability Summary\n\n`;
+              reportContent += `- 🔴 Critical: **${critical}**\n`;
+              reportContent += `- 🟠 High: **${high}**\n`;
+              reportContent += `- 🟡 Moderate: **${moderate}**\n`;
+              reportContent += `- 🔵 Low: **${low}**\n\n`;
+              
+              if (critical > 0) {
+                reportContent += `### ❌ Security Check Failed\n\n`;
+                reportContent += `Critical vulnerabilities detected. Deployment is blocked.\n\n`;
+                reportContent += `**Action Required:**\n`;
+                reportContent += `1. Run \`npm audit fix\` to fix vulnerabilities\n`;
+                reportContent += `2. Review and test changes\n`;
+                reportContent += `3. Push fixes and re-run security scan\n`;
+              } else if (high > 0) {
+                reportContent += `### ⚠️ Security Check Passed with Warnings\n\n`;
+                reportContent += `High severity vulnerabilities found. Consider fixing before merge.\n`;
+              } else {
+                reportContent += `### ✅ Security Check Passed\n\n`;
+                reportContent += `No critical or high severity vulnerabilities found.\n`;
+              }
+              
+            } catch (error) {
+              reportContent += `⚠️ Could not parse audit report: ${error.message}\n`;
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: reportContent
+            });
+      
+      - name: Fail if critical vulnerabilities found
+        if: steps.security-check.outcome == 'failure'
+        run: |
+          echo "❌ Critical vulnerabilities found. Deployment blocked."
+          exit 1
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
+          deny-licenses: GPL-3.0, AGPL-3.0
+          comment-summary-in-pr: always

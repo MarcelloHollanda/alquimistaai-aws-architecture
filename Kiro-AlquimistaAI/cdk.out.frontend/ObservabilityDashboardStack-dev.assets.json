@@ -1,0 +1,21 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "bff7f52818dca7b642392db4d8390676b81f0273cdf51c7945486bc06ec44b6e": {
+      "displayName": "ObservabilityDashboardStack-dev Template",
+      "source": {
+        "path": "ObservabilityDashboardStack-dev.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "207933152643-us-east-1-4920e24f": {
+          "bucketName": "cdk-hnb659fds-assets-207933152643-us-east-1",
+          "objectKey": "bff7f52818dca7b642392db4d8390676b81f0273cdf51c7945486bc06ec44b6e.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-file-publishing-role-207933152643-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

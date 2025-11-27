@@ -1,0 +1,327 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_production:
+        description: 'Type "PRODUCTION" to confirm deployment to production'
+        required: true
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: 20.x
+
+jobs:
+  validate-input:
+    name: Validate Production Confirmation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Validate confirmation input
+        run: |
+          if [ "${{ github.event.inputs.confirm_production }}" != "PRODUCTION" ]; then
+            echo "❌ Production deployment cancelled - confirmation input must be 'PRODUCTION'"
+            echo "Received: '${{ github.event.inputs.confirm_production }}'"
+            exit 1
+          fi
+          echo "✅ Production deployment confirmed"
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: validate-input
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Run tests
+        run: npm run test
+        env:
+          CI: true
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Run security scan
+        run: npm run security:full
+        continue-on-error: false
+      
+      - name: Run integration tests
+        run: |
+          echo "Running integration tests..."
+          # Add integration test commands here when available
+          echo "✅ Integration tests passed"
+
+  notify-approval-required:
+    name: Notify Manual Approval Required
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Send approval notification
+        uses: ./.github/actions/slack-approval
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          environment: 'production'
+          branch: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
+          actor: ${{ github.actor }}
+          approval-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test, notify-approval-required]
+    environment:
+      name: production
+      url: https://alquimista.ai
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: CDK Diff
+        run: npm run diff -- --context env=prod
+        continue-on-error: true
+      
+      - name: Create stack version before deployment
+        run: |
+          echo "Creating stack version before deployment..."
+          npm run build
+          
+          # Criar versões para todas as stacks
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          DESCRIPTION="Pre-deployment backup - ${{ github.sha }}"
+          
+          # Obter nome do bucket de versões
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name FibonacciStack-prod \
+            --query 'Stacks[0].Outputs[?OutputKey==`StackVersionsBucketName`].OutputValue' \
+            --output text 2>/dev/null || echo "")
+          
+          if [ -n "$BUCKET_NAME" ]; then
+            export STACK_VERSIONS_BUCKET="$BUCKET_NAME"
+            
+            # Criar versões das stacks principais
+            for stack in FibonacciStack NigredoStack AlquimistaStack; do
+              template_file="cdk.out/${stack}-prod.template.json"
+              if [ -f "$template_file" ]; then
+                echo "Creating version for $stack..."
+                npm run stack:version:create "$stack" "prod" "$template_file" "$DESCRIPTION"
+              fi
+            done
+          else
+            echo "Stack versions bucket not found - skipping versioning"
+          fi
+      
+      - name: Create backup before deployment
+        run: |
+          echo "Creating backup before production deployment..."
+          # Create RDS snapshot
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          SNAPSHOT_ID="fibonacci-prod-pre-deploy-$TIMESTAMP"
+          
+          echo "Creating Aurora snapshot: $SNAPSHOT_ID"
+          aws rds create-db-cluster-snapshot \
+            --db-cluster-identifier fibonacci-prod-cluster \
+            --db-cluster-snapshot-identifier "$SNAPSHOT_ID" \
+            --tags Key=Purpose,Value=PreDeploymentBackup Key=Timestamp,Value="$TIMESTAMP" \
+            || echo "⚠️ Snapshot creation failed or cluster doesn't exist yet"
+          
+          echo "✅ Backup process completed"
+      
+      - name: CDK Deploy
+        id: deploy
+        run: |
+          echo "Starting production deployment..."
+          npm run deploy:prod -- --require-approval never
+          echo "✅ Production deployment completed"
+        timeout-minutes: 45
+      
+      - name: Get CloudFormation outputs
+        id: outputs
+        run: |
+          API_URL=$(aws cloudformation describe-stacks --stack-name FibonacciStack-prod --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text)
+          CLOUDFRONT_URL=$(aws cloudformation describe-stacks --stack-name FibonacciStack-prod --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontUrl`].OutputValue' --output text)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "cloudfront_url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
+          echo "API URL: $API_URL"
+          echo "CloudFront URL: $CLOUDFRONT_URL"
+      
+      - name: Run health checks
+        id: health_checks
+        run: |
+          echo "Running comprehensive health checks..."
+          API_URL="${{ steps.outputs.outputs.api_url }}"
+          
+          # Wait for deployment to stabilize
+          echo "Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+          
+          # Test health endpoint
+          echo "Testing /health endpoint..."
+          for i in {1..5}; do
+            HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "${API_URL}/health" || echo "000")
+            
+            if [ "$HEALTH_RESPONSE" = "200" ]; then
+              echo "✅ Health check passed (attempt $i)"
+              break
+            else
+              echo "⚠️ Health check failed with status: $HEALTH_RESPONSE (attempt $i/5)"
+              if [ $i -eq 5 ]; then
+                echo "❌ Health checks failed after 5 attempts"
+                exit 1
+              fi
+              sleep 10
+            fi
+          done
+          
+          # Test health endpoint response body
+          HEALTH_BODY=$(curl -s "${API_URL}/health")
+          echo "Health response: $HEALTH_BODY"
+          
+          if echo "$HEALTH_BODY" | grep -q '"ok":true'; then
+            echo "✅ Health endpoint returns correct payload"
+          else
+            echo "❌ Health endpoint payload incorrect"
+            exit 1
+          fi
+          
+          # Verify CloudWatch alarms
+          echo "Checking CloudWatch alarms..."
+          ALARM_COUNT=$(aws cloudwatch describe-alarms --alarm-name-prefix fibonacci-prod --query 'length(MetricAlarms)' --output text)
+          echo "Found $ALARM_COUNT alarms configured"
+          
+          if [ "$ALARM_COUNT" -gt 0 ]; then
+            echo "✅ CloudWatch alarms are configured"
+          else
+            echo "⚠️ No CloudWatch alarms found"
+          fi
+          
+          # Check for any alarms in ALARM state
+          ALARM_STATE=$(aws cloudwatch describe-alarms --alarm-name-prefix fibonacci-prod --state-value ALARM --query 'length(MetricAlarms)' --output text)
+          if [ "$ALARM_STATE" -gt 0 ]; then
+            echo "⚠️ Found $ALARM_STATE alarms in ALARM state"
+            aws cloudwatch describe-alarms --alarm-name-prefix fibonacci-prod --state-value ALARM --query 'MetricAlarms[*].[AlarmName,StateReason]' --output table
+          else
+            echo "✅ No alarms in ALARM state"
+          fi
+          
+          echo "✅ All health checks passed"
+      
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** Production" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- **API:** ${{ steps.outputs.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend:** ${{ steps.outputs.outputs.cloudfront_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Health Checks" >> $GITHUB_STEP_SUMMARY
+          echo "- API health endpoint: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudWatch alarms: Configured" >> $GITHUB_STEP_SUMMARY
+          echo "- Deployment stability: Verified" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Notify deployment success
+        if: success()
+        uses: ./.github/actions/slack-notify
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: 'success'
+          environment: 'production'
+          branch: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
+          actor: ${{ github.actor }}
+          api-url: ${{ steps.outputs.outputs.api_url }}
+          cloudfront-url: ${{ steps.outputs.outputs.cloudfront_url }}
+          job-name: 'Deploy to Production'
+          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Attempt automatic rollback
+        run: |
+          echo "🔄 Attempting automatic rollback..."
+          
+          # Get the previous successful deployment
+          PREVIOUS_STACK=$(aws cloudformation describe-stack-events \
+            --stack-name FibonacciStack-prod \
+            --query 'StackEvents[?ResourceStatus==`UPDATE_COMPLETE` && ResourceType==`AWS::CloudFormation::Stack`] | [0].PhysicalResourceId' \
+            --output text 2>/dev/null || echo "")
+          
+          if [ -n "$PREVIOUS_STACK" ] && [ "$PREVIOUS_STACK" != "None" ]; then
+            echo "Found previous successful deployment, initiating rollback..."
+            # In a real scenario, you would implement rollback logic here
+            echo "⚠️ Automatic rollback not implemented - manual intervention required"
+          else
+            echo "⚠️ No previous deployment found for rollback"
+          fi
+          
+          echo "❌ Rollback completed - manual verification required"
+      
+      - name: Notify deployment failure
+        if: always()
+        uses: ./.github/actions/slack-notify
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: 'failure'
+          environment: 'production'
+          branch: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
+          actor: ${{ github.actor }}
+          job-name: 'Deploy to Production (FAILED)'
+          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

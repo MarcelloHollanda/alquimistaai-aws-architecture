@@ -1,0 +1,302 @@
+import { APIGatewayProxyResult } from 'aws-lambda';
+import { withEnhancedObservability, EnhancedContext } from '../shared/enhanced-middleware';
+import { executeWithPreset, ResilientPresets, createResilientOperation } from '../shared/resilient-middleware';
+import { CircuitBreakerRegistry } from '../shared/circuit-breaker';
+import { Resilient, Retry, Timeout } from '../shared/resilient-middleware';
+
+/**
+ * Exemplo 1: Usando preset para chamada de API externa
+ */
+export const externalApiHandler = withEnhancedObservability(
+  'external-api-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    try {
+      // Usar preset 'externalApi' que já configura circuit breaker, retry e timeout
+      const result = await executeWithPreset(
+        'stripe-api',
+        async () => {
+          logger.info('Calling Stripe API');
+          // Simular chamada à API externa
+          const response = await fetch('https://api.stripe.com/v1/charges', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer sk_test_...' }
+          });
+          return response.json();
+        },
+        'externalApi',
+        logger
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ success: true, data: result })
+      };
+    } catch (error) {
+      logger.error('External API call failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to process payment' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 2: Usando preset para operação de banco de dados
+ */
+export const databaseHandler = withEnhancedObservability(
+  'database-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    try {
+      // Usar preset 'database' com circuit breaker e retry otimizados para DB
+      const users = await executeWithPreset(
+        'database-query',
+        async () => {
+          logger.info('Querying database');
+          // Simular query ao banco
+          // return await db.query('SELECT * FROM users WHERE active = true');
+          return [{ id: 1, name: 'User 1' }];
+        },
+        'database',
+        logger
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ users })
+      };
+    } catch (error) {
+      logger.error('Database query failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Database error' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 3: Configuração customizada com fallback
+ */
+export const customResilientHandler = withEnhancedObservability(
+  'custom-resilient-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    const resilientOp = createResilientOperation(
+      'custom-operation',
+      {
+        circuitBreaker: {
+          failureThreshold: 3,
+          successThreshold: 2,
+          timeout: 30000,
+          resetTimeout: 60000,
+          monitoringPeriod: 60000
+        },
+        retry: {
+          maxAttempts: 2,
+          initialDelay: 1000,
+          maxDelay: 5000,
+          backoffMultiplier: 2
+        },
+        timeout: {
+          timeout: 10000
+        },
+        // Fallback em caso de falha
+        fallback: async (error) => {
+          logger.warn('Using fallback data', {
+            operation: 'fallback',
+            customMetrics: { errorType: error.name }
+          });
+          return { cached: true, data: [] };
+        }
+      },
+      logger
+    );
+
+    try {
+      const result = await resilientOp.execute(async () => {
+        logger.info('Executing main operation');
+        // Operação principal
+        return { cached: false, data: [1, 2, 3] };
+      });
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify(result)
+      };
+    } catch (error) {
+      logger.error('Operation failed even with fallback', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Operation failed' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 4: Usando decorators em uma classe
+ */
+class ResilientService {
+  constructor(private logger: EnhancedLogger) {}
+
+  // Método com retry automático
+  @Retry({
+    maxAttempts: 3,
+    initialDelay: 1000,
+    maxDelay: 10000,
+    backoffMultiplier: 2
+  })
+  async fetchData(): Promise<any> {
+    this.logger.info('Fetching data with retry');
+    // Simular operação que pode falhar
+    if (Math.random() > 0.7) {
+      throw new Error('Random failure');
+    }
+    return { data: 'success' };
+  }
+
+  // Método com timeout
+  @Timeout(5000)
+  async processData(data: any): Promise<any> {
+    this.logger.info('Processing data with timeout');
+    // Simular processamento
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return { processed: true };
+  }
+
+  // Método com resiliência completa
+  @Resilient({
+    circuitBreaker: {
+      failureThreshold: 5,
+      successThreshold: 2,
+      timeout: 30000,
+      resetTimeout: 60000,
+      monitoringPeriod: 60000
+    },
+    retry: {
+      maxAttempts: 3,
+      initialDelay: 1000,
+      maxDelay: 10000,
+      backoffMultiplier: 2
+    },
+    timeout: {
+      timeout: 10000
+    }
+  })
+  async criticalOperation(): Promise<any> {
+    this.logger.info('Executing critical operation');
+    // Operação crítica
+    return { success: true };
+  }
+}
+
+/**
+ * Exemplo 5: Monitorando métricas de circuit breakers
+ */
+export const metricsHandler = withEnhancedObservability(
+  'metrics-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    // Obter registry de circuit breakers
+    const registry = CircuitBreakerRegistry.getInstance(logger);
+
+    // Obter métricas de todos os circuit breakers
+    const metrics = registry.getAllMetrics();
+
+    logger.info('Circuit breaker metrics', {
+      operation: 'metrics.circuit-breakers',
+      customMetrics: metrics
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ metrics })
+    };
+  }
+);
+
+/**
+ * Exemplo 6: Integrando com MCP
+ */
+export const mcpHandler = withEnhancedObservability(
+  'mcp-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    try {
+      // Usar preset 'mcp' otimizado para integrações MCP
+      const result = await executeWithPreset(
+        'whatsapp-mcp',
+        async () => {
+          logger.info('Calling WhatsApp MCP');
+          // Simular chamada MCP
+          // return await mcpClient.call('whatsapp', 'sendMessage', { ... });
+          return { messageId: '123', status: 'sent' };
+        },
+        'mcp',
+        logger
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ success: true, result })
+      };
+    } catch (error) {
+      logger.error('MCP call failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'MCP integration failed' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 7: Operação crítica sem retry (fast fail)
+ */
+export const criticalHandler = withEnhancedObservability(
+  'critical-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    try {
+      // Usar preset 'critical' - apenas timeout, sem retry
+      const result = await executeWithPreset(
+        'critical-operation',
+        async () => {
+          logger.info('Executing critical operation');
+          // Operação crítica que não deve ser retentada
+          return { success: true };
+        },
+        'critical',
+        logger
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify(result)
+      };
+    } catch (error) {
+      logger.error('Critical operation failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Critical failure' })
+      };
+    }
+  }
+);
+
+// Import necessário para o exemplo 4
+import { EnhancedLogger } from '../shared/enhanced-logger';

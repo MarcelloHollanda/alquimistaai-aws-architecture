@@ -1,0 +1,91 @@
+'use client';
+
+/**
+ * Global Error Component - Next.js 14 App Router
+ * 
+ * Este componente é OBRIGATÓRIO para produção no Next.js 14.
+ * Ele captura erros que ocorrem no root layout e em toda a aplicação.
+ * 
+ * Diferença entre error.tsx e global-error.tsx:
+ * - error.tsx: Captura erros em segmentos específicos da árvore de rotas
+ * - global-error.tsx: Captura erros no root layout e em toda a aplicação
+ * 
+ * IMPORTANTE: Este componente substitui o root layout quando um erro ocorre,
+ * por isso precisa incluir as tags <html> e <body>.
+ */
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <html lang="pt-BR">
+      <body>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <svg
+                  className="h-6 w-6 text-red-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Algo deu errado
+              </h2>
+              
+              <p className="text-gray-600 mb-6">
+                Ocorreu um erro ao acessar a página solicitada.
+              </p>
+
+              {error.message && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-md text-left">
+                  <p className="text-sm font-mono text-gray-700 break-words">
+                    {error.message}
+                  </p>
+                  {error.digest && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      ID do erro: {error.digest}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => reset()}
+                  className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium"
+                >
+                  Tentar novamente
+                </button>
+                
+                <button
+                  onClick={() => window.location.href = '/'}
+                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Voltar para a página inicial
+                </button>
+              </div>
+
+              <p className="mt-6 text-xs text-gray-500">
+                Se o problema persistir, entre em contato com o suporte.
+              </p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  );
+}

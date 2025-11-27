@@ -1,0 +1,74 @@
+# Exemplo de arquivo terraform.tfvars para DEV
+# Copie este arquivo para terraform.tfvars e ajuste os valores conforme necessário
+
+# ============================================
+# Recursos AWS Existentes
+# ============================================
+
+# ARN do tópico SNS para alertas (opcional - será detectado automaticamente)
+# alerts_sns_topic_arn = "arn:aws:sns:us-east-1:207933152643:alquimista-alerts-dev"
+
+# Nome do bucket S3 para artefatos Lambda
+lambda_artifact_bucket = "alquimista-lambda-artifacts-dev"
+
+# ============================================
+# Rate Limiting (Configurações Conservadoras para DEV)
+# ============================================
+
+# WhatsApp: 100 mensagens/hora (padrão conservador)
+rate_limit_whatsapp_hourly = 100
+
+# Email: 500 mensagens/hora (padrão conservador)
+rate_limit_email_hourly = 500
+
+# SMS: 50 mensagens/hora (padrão conservador)
+rate_limit_sms_hourly = 50
+
+# ============================================
+# Timeouts das Lambdas
+# ============================================
+
+# API Handler: 30 segundos
+lambda_timeout_api = 30
+
+# Send Messages: 180 segundos (3 minutos)
+lambda_timeout_send = 180
+
+# Schedule Meeting: 300 segundos (5 minutos)
+lambda_timeout_schedule = 300
+
+# ============================================
+# Memória das Lambdas
+# ============================================
+
+# API Handler: 512 MB
+lambda_memory_api = 512
+
+# Send Messages: 1024 MB (1 GB)
+lambda_memory_send = 1024
+
+# Schedule Meeting: 1024 MB (1 GB)
+lambda_memory_schedule = 1024
+
+# ============================================
+# Horários Comerciais
+# ============================================
+
+# Início do expediente: 8h (America/Sao_Paulo)
+business_hours_start = 8
+
+# Término do expediente: 18h (America/Sao_Paulo)
+business_hours_end = 18
+
+# ============================================
+# Configurações de Agendamento
+# ============================================
+
+# Duração padrão de reuniões: 60 minutos
+meeting_duration_default = 60
+
+# Buffer entre reuniões: 15 minutos
+buffer_minutes = 15
+
+# Timeout para confirmação: 24 horas
+confirmation_timeout_hours = 24

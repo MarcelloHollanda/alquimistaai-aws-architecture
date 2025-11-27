@@ -1,0 +1,4552 @@
+{
+  "version": "48.0.0",
+  "artifacts": {
+    "SecurityStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "SecurityStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "SecurityStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "SecurityStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "component": "security-guardrails",
+          "Component": "Security-Cost-Guardrails",
+          "costcenter": "core",
+          "env": "dev",
+          "Environment": "dev",
+          "managed-by": "cdk",
+          "ManagedBy": "CDK",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core",
+          "Project": "Alquimista"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/6755b00486b63d8b46b81584f156aefc28641a8023f50dd589226d49b8fefa63.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "SecurityStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "SecurityStack-dev.assets"
+      ],
+      "metadata": {
+        "/SecurityStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "component",
+                "Value": "security-guardrails"
+              },
+              {
+                "Key": "Component",
+                "Value": "Security-Cost-Guardrails"
+              },
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              },
+              {
+                "Key": "Project",
+                "Value": "Alquimista"
+              }
+            ]
+          }
+        ],
+        "/SecurityStack-dev/CloudTrailBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudTrailBucket98B0BFE1"
+          }
+        ],
+        "/SecurityStack-dev/CloudTrailBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudTrailBucketPolicy2A856177"
+          }
+        ],
+        "/SecurityStack-dev/CloudTrailBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudTrailBucketAutoDeleteObjectsCustomResource4283719F"
+          }
+        ],
+        "/SecurityStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/SecurityStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/SecurityStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/SecurityStack-dev/AuditTrail/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuditTrailFF0F2BB5"
+          }
+        ],
+        "/SecurityStack-dev/GuardDutyDetector": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GuardDutyDetector"
+          }
+        ],
+        "/SecurityStack-dev/SecurityAlertTopic/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SecurityAlertTopic8D84EA7A"
+          }
+        ],
+        "/SecurityStack-dev/SecurityAlertTopic/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SecurityAlertTopicPolicyDF3E5DDE"
+          }
+        ],
+        "/SecurityStack-dev/GuardDutyHighSeverityRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GuardDutyHighSeverityRule8982E7BD"
+          }
+        ],
+        "/SecurityStack-dev/CostAlertTopic/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CostAlertTopic839A4E50"
+          }
+        ],
+        "/SecurityStack-dev/MonthlyBudget": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MonthlyBudget"
+          }
+        ],
+        "/SecurityStack-dev/CostAnomalyMonitor": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CostAnomalyMonitor"
+          }
+        ],
+        "/SecurityStack-dev/CostAnomalySubscription": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CostAnomalySubscription"
+          }
+        ],
+        "/SecurityStack-dev/OpsAlertTopic/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OpsAlertTopicA45431CF"
+          }
+        ],
+        "/SecurityStack-dev/CloudTrailBucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudTrailBucketName"
+          }
+        ],
+        "/SecurityStack-dev/CloudTrailName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudTrailName"
+          }
+        ],
+        "/SecurityStack-dev/GuardDutyDetectorId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GuardDutyDetectorId"
+          }
+        ],
+        "/SecurityStack-dev/SecurityAlertTopicArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SecurityAlertTopicArn"
+          }
+        ],
+        "/SecurityStack-dev/CostAlertTopicArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CostAlertTopicArn"
+          }
+        ],
+        "/SecurityStack-dev/MonthlyBudgetName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MonthlyBudgetName"
+          }
+        ],
+        "/SecurityStack-dev/MonthlyBudgetAmount": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MonthlyBudgetAmount"
+          }
+        ],
+        "/SecurityStack-dev/CostAnomalyMonitorArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CostAnomalyMonitorArn"
+          }
+        ],
+        "/SecurityStack-dev/OpsAlertTopicArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OpsAlertTopicArn"
+          }
+        ],
+        "/SecurityStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/SecurityStack-dev/Exports/Output{\"Ref\":\"SecurityAlertTopic8D84EA7A\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefSecurityAlertTopic8D84EA7A77A8D013"
+          }
+        ],
+        "/SecurityStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/SecurityStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "SecurityStack-dev"
+    },
+    "WAFStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "WAFStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "WAFStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "WAFStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "component": "waf-edge-security",
+          "Component": "WAF",
+          "costcenter": "core",
+          "env": "dev",
+          "Environment": "dev",
+          "managed-by": "cdk",
+          "ManagedBy": "CDK",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core",
+          "Project": "AlquimistaAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/d7778533850f9f2c43e48503fa64d37ace77c15b5c5b9c2736612e966bd6fd59.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "WAFStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "SecurityStack-dev",
+        "WAFStack-dev.assets"
+      ],
+      "metadata": {
+        "/WAFStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "component",
+                "Value": "waf-edge-security"
+              },
+              {
+                "Key": "Component",
+                "Value": "WAF"
+              },
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              },
+              {
+                "Key": "Project",
+                "Value": "AlquimistaAI"
+              }
+            ]
+          }
+        ],
+        "/WAFStack-dev/AllowedIPs": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AllowedIPs"
+          }
+        ],
+        "/WAFStack-dev/BlockedIPs": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BlockedIPs"
+          }
+        ],
+        "/WAFStack-dev/WAFLogGroupDev/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFLogGroupDev48F60186"
+          }
+        ],
+        "/WAFStack-dev/WAFLogGroupProd/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFLogGroupProd93923921"
+          }
+        ],
+        "/WAFStack-dev/WebACLDev": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebACLDev"
+          }
+        ],
+        "/WAFStack-dev/WebACLProd": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebACLProd"
+          }
+        ],
+        "/WAFStack-dev/WAFLoggingDev": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFLoggingDev"
+          }
+        ],
+        "/WAFStack-dev/WAFLoggingProd": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFLoggingProd"
+          }
+        ],
+        "/WAFStack-dev/HighBlockRateAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HighBlockRateAlarm1D0DDB93"
+          }
+        ],
+        "/WAFStack-dev/RateLimitTriggeredAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RateLimitTriggeredAlarmB46CC9DA"
+          }
+        ],
+        "/WAFStack-dev/WebAclDevArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebAclDevArn"
+          }
+        ],
+        "/WAFStack-dev/WebAclProdArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebAclProdArn"
+          }
+        ],
+        "/WAFStack-dev/AllowedIPsArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AllowedIPsArn"
+          }
+        ],
+        "/WAFStack-dev/BlockedIPsArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BlockedIPsArn"
+          }
+        ],
+        "/WAFStack-dev/WAFLogGroupDevName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFLogGroupDevName"
+          }
+        ],
+        "/WAFStack-dev/WAFLogGroupProdName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFLogGroupProdName"
+          }
+        ],
+        "/WAFStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/WAFStack-dev/Exports/Output{\"Fn::GetAtt\":[\"WebACLDev\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttWebACLDevArn49673A89"
+          }
+        ],
+        "/WAFStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/WAFStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "WAFStack-dev"
+    },
+    "FibonacciStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "FibonacciStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "FibonacciStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "FibonacciStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "costcenter": "core",
+          "env": "dev",
+          "managed-by": "cdk",
+          "nucleus": "fibonacci",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/a28636ce5b54d28a718f8fdd77c05eada4b65ceed602866dadc4facb1dd940b4.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "FibonacciStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "WAFStack-dev",
+        "FibonacciStack-dev.assets"
+      ],
+      "metadata": {
+        "/FibonacciStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "nucleus",
+                "Value": "fibonacci"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              }
+            ]
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciKmsKey/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciKmsKey4FDBC47E"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciKmsKey/Alias/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciKmsKeyAlias0E1FF909"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcB997BDC3"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet1SubnetE9415DB7"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet1RouteTable1FDEB4B1"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet1RouteTableAssociationA26321EC"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet1DefaultRoute967169FC"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet2SubnetEAF9A033"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet2RouteTable723BB512"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet2RouteTableAssociation1CF6F2F6"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPublicSubnet2DefaultRouteF174A0DB"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPrivateIsolatedSubnet1RouteTable2D23BEA5"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPrivateIsolatedSubnet1RouteTableAssociationE7AFA15D"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPrivateIsolatedSubnet2RouteTableF181CB21"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcPrivateIsolatedSubnet2RouteTableAssociation4ADCA747"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcIGW6389DCD2"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcVPCGWB6162534"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/RestrictDefaultSecurityGroupCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcRestrictDefaultSecurityGroupCustomResourceC1528A4C"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/S3Endpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcS3Endpoint8300220D"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcSecretsManagerEndpointSecurityGroup2603E8CC"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/SecurityGroup/from FibonacciStackdevLambdaSg4C2F05B4:443": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcSecretsManagerEndpointSecurityGroupfromFibonacciStackdevLambdaSg4C2F05B444331827B6A"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcSecretsManagerEndpoint9776A8FB"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcEventBridgeEndpointSecurityGroupCB38502F"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/SecurityGroup/from FibonacciStackdevLambdaSg4C2F05B4:443": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcEventBridgeEndpointSecurityGroupfromFibonacciStackdevLambdaSg4C2F05B44432D01A0B1"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciVpcEventBridgeEndpoint21DDD643"
+          }
+        ],
+        "/FibonacciStack-dev/Custom::VpcRestrictDefaultSGCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/FibonacciStack-dev/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+          }
+        ],
+        "/FibonacciStack-dev/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E"
+          }
+        ],
+        "/FibonacciStack-dev/LambdaSg/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaSg30A6108C"
+          }
+        ],
+        "/FibonacciStack-dev/DbSg/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSg495F8305"
+          }
+        ],
+        "/FibonacciStack-dev/DbSg/from FibonacciStackdevLambdaSg4C2F05B4:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSgfromFibonacciStackdevLambdaSg4C2F05B45432495034CC"
+          }
+        ],
+        "/FibonacciStack-dev/DbSecret/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecret685A0FA5"
+          }
+        ],
+        "/FibonacciStack-dev/DbSecret/Attachment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecretAttachment0609CE05"
+          }
+        ],
+        "/FibonacciStack-dev/DbSecret/RotationSchedule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecretRotationSchedule0F97D85A"
+          }
+        ],
+        "/FibonacciStack-dev/DbSecret/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecretPolicyAD0422AC"
+          }
+        ],
+        "/FibonacciStack-dev/AuroraCluster/Subnets/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuroraClusterSubnetsF3E9E6AD"
+          }
+        ],
+        "/FibonacciStack-dev/AuroraCluster/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuroraCluster23D869C0"
+          }
+        ],
+        "/FibonacciStack-dev/AuroraCluster/writer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuroraClusterwriter499C523E"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciBus/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciBus476BDCEA"
+          }
+        ],
+        "/FibonacciStack-dev/DeadLetterQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeadLetterQueue9F481546"
+          }
+        ],
+        "/FibonacciStack-dev/MainQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MainQueueD24C6076"
+          }
+        ],
+        "/FibonacciStack-dev/MainQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MainQueuePolicy7EC89565"
+          }
+        ],
+        "/FibonacciStack-dev/recebimentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "recebimentoQueue4D4DA6BB"
+          }
+        ],
+        "/FibonacciStack-dev/estrategiaQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "estrategiaQueueE6DA45F3"
+          }
+        ],
+        "/FibonacciStack-dev/disparoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "disparoQueue6A7B4E4F"
+          }
+        ],
+        "/FibonacciStack-dev/atendimentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "atendimentoQueue9007AAA7"
+          }
+        ],
+        "/FibonacciStack-dev/sentimentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "sentimentoQueue97C535CB"
+          }
+        ],
+        "/FibonacciStack-dev/agendamentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "agendamentoQueue4667B75A"
+          }
+        ],
+        "/FibonacciStack-dev/relatoriosQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "relatoriosQueue740D4E5C"
+          }
+        ],
+        "/FibonacciStack-dev/NigredoRoutingRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoRoutingRule00BB606C"
+          }
+        ],
+        "/FibonacciStack-dev/AlquimistaRoutingRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlquimistaRoutingRule08F00E17"
+          }
+        ],
+        "/FibonacciStack-dev/DemoRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DemoRuleC8625E3C"
+          }
+        ],
+        "/FibonacciStack-dev/SiteBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SiteBucket397A1860"
+          }
+        ],
+        "/FibonacciStack-dev/SiteBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SiteBucketPolicy3AC1D0F8"
+          }
+        ],
+        "/FibonacciStack-dev/SiteBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SiteBucketAutoDeleteObjectsCustomResource9585E968"
+          }
+        ],
+        "/FibonacciStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/FibonacciStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/FibonacciStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/FibonacciStack-dev/StackVersionsBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StackVersionsBucket900BB24B"
+          }
+        ],
+        "/FibonacciStack-dev/StackVersionsBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StackVersionsBucketPolicy5158ED61"
+          }
+        ],
+        "/FibonacciStack-dev/StackVersionsBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StackVersionsBucketAutoDeleteObjectsCustomResource2D51B08C"
+          }
+        ],
+        "/FibonacciStack-dev/CloudFrontWebACL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudFrontWebACL"
+          }
+        ],
+        "/FibonacciStack-dev/WAFBlockedRequestsAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFBlockedRequestsAlarm74585045"
+          }
+        ],
+        "/FibonacciStack-dev/WAFRateLimitAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WAFRateLimitAlarm90DB5E0E"
+          }
+        ],
+        "/FibonacciStack-dev/OAC": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OAC"
+          }
+        ],
+        "/FibonacciStack-dev/Distribution/Origin1/S3Origin/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DistributionOrigin1S3Origin5F5C0696"
+          }
+        ],
+        "/FibonacciStack-dev/Distribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Distribution830FAC52"
+          }
+        ],
+        "/FibonacciStack-dev/UserPool/smsRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolsmsRole4EA729DD"
+          }
+        ],
+        "/FibonacciStack-dev/UserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPool6BA7E5F2"
+          }
+        ],
+        "/FibonacciStack-dev/UserPool/WebClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolWebClient4C9370B0"
+          }
+        ],
+        "/FibonacciStack-dev/UserPool/UserPoolAuthorizerClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolUserPoolAuthorizerClient680A88B6"
+          }
+        ],
+        "/FibonacciStack-dev/ApiHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerServiceRole592E70E9"
+          }
+        ],
+        "/FibonacciStack-dev/ApiHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerServiceRoleDefaultPolicy10321D87"
+          }
+        ],
+        "/FibonacciStack-dev/ApiHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandler5E7490E8"
+          }
+        ],
+        "/FibonacciStack-dev/ApiHandler/CurrentVersion/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerCurrentVersion5C7F0A60d661fb25a0c22558dda85ecb5ea616ce"
+          }
+        ],
+        "/FibonacciStack-dev/ApiHandler/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerLogRetention907E318F"
+          }
+        ],
+        "/FibonacciStack-dev/ApiHandlerAlias/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerAlias005E4CA0"
+          }
+        ],
+        "/FibonacciStack-dev/NigredoWebhookHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoWebhookHandlerServiceRole1CEC625D"
+          }
+        ],
+        "/FibonacciStack-dev/NigredoWebhookHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoWebhookHandlerServiceRoleDefaultPolicy52DBC0A5"
+          }
+        ],
+        "/FibonacciStack-dev/NigredoWebhookHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoWebhookHandler1C5E581A"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiF5A9A8A7"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiDefaultStage3EEB07D6"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/GET--health/LambdaIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiGEThealthLambdaIntegrationCBB2D3F6"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/GET--health/LambdaIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiGEThealthLambdaIntegrationPermission150A73BA"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/GET--health/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiGEThealthAB1F4856"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/POST--events/LambdaIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiPOSTeventsLambdaIntegrationPermissionFBE6126E"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/POST--events/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiPOSTevents936A6091"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/POST--public--nigredo-event/NigredoWebhookIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiPOSTpublicnigredoeventNigredoWebhookIntegration8B405DD9"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/POST--public--nigredo-event/NigredoWebhookIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiPOSTpublicnigredoeventNigredoWebhookIntegrationPermission4E6A0BFF"
+          }
+        ],
+        "/FibonacciStack-dev/HttpApi/POST--public--nigredo-event/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HttpApiPOSTpublicnigredoeventB1D1481C"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciApiWAFAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciApiWAFAssociation"
+          }
+        ],
+        "/FibonacciStack-dev/VpcId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VpcId"
+          }
+        ],
+        "/FibonacciStack-dev/S3EndpointId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3EndpointId"
+          }
+        ],
+        "/FibonacciStack-dev/SecretsManagerEndpointId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SecretsManagerEndpointId"
+          }
+        ],
+        "/FibonacciStack-dev/EventBridgeEndpointId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EventBridgeEndpointId"
+          }
+        ],
+        "/FibonacciStack-dev/DbClusterArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbClusterArn"
+          }
+        ],
+        "/FibonacciStack-dev/DbSecretName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecretName"
+          }
+        ],
+        "/FibonacciStack-dev/EventBusName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EventBusName"
+          }
+        ],
+        "/FibonacciStack-dev/EventBusArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EventBusArn"
+          }
+        ],
+        "/FibonacciStack-dev/MainQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MainQueueUrl"
+          }
+        ],
+        "/FibonacciStack-dev/DlqUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DlqUrl"
+          }
+        ],
+        "/FibonacciStack-dev/UserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId"
+          }
+        ],
+        "/FibonacciStack-dev/UserPoolArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolArn"
+          }
+        ],
+        "/FibonacciStack-dev/SiteBucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SiteBucketName"
+          }
+        ],
+        "/FibonacciStack-dev/CloudFrontUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudFrontUrl"
+          }
+        ],
+        "/FibonacciStack-dev/DistributionId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DistributionId"
+          }
+        ],
+        "/FibonacciStack-dev/WebAclId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebAclId"
+          }
+        ],
+        "/FibonacciStack-dev/WebAclArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebAclArn"
+          }
+        ],
+        "/FibonacciStack-dev/StackVersionsBucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StackVersionsBucketName"
+          }
+        ],
+        "/FibonacciStack-dev/WebAclName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebAclName"
+          }
+        ],
+        "/FibonacciStack-dev/ApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiUrl"
+          }
+        ],
+        "/FibonacciStack-dev/ApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiId"
+          }
+        ],
+        "/FibonacciStack-dev/LambdaFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaFunctionName"
+          }
+        ],
+        "/FibonacciStack-dev/KmsKeyId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "KmsKeyId"
+          }
+        ],
+        "/FibonacciStack-dev/KmsKeyArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "KmsKeyArn"
+          }
+        ],
+        "/FibonacciStack-dev/FibonacciCoreDashboard/Dashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FibonacciCoreDashboard66926EE0"
+          }
+        ],
+        "/FibonacciStack-dev/DashboardName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DashboardName"
+          }
+        ],
+        "/FibonacciStack-dev/AlarmTopic/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlarmTopicD01E77F9"
+          }
+        ],
+        "/FibonacciStack-dev/HighErrorRateAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HighErrorRateAlarm9E2FAEE9"
+          }
+        ],
+        "/FibonacciStack-dev/HighLatencyAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HighLatencyAlarm61213652"
+          }
+        ],
+        "/FibonacciStack-dev/DLQNotEmptyAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DLQNotEmptyAlarm3601BB2F"
+          }
+        ],
+        "/FibonacciStack-dev/AuroraCpuAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuroraCpuAlarm999C031F"
+          }
+        ],
+        "/FibonacciStack-dev/EstimatedCostAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstimatedCostAlarm41904A99"
+          }
+        ],
+        "/FibonacciStack-dev/ApiGateway5xxAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiGateway5xxAlarm4F808175"
+          }
+        ],
+        "/FibonacciStack-dev/LambdaThrottleAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaThrottleAlarmA29C5C15"
+          }
+        ],
+        "/FibonacciStack-dev/OldMessagesAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OldMessagesAlarm7AA47467"
+          }
+        ],
+        "/FibonacciStack-dev/CriticalSystemAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CriticalSystemAlarmCA2EB036"
+          }
+        ],
+        "/FibonacciStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ],
+        "/FibonacciStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
+          }
+        ],
+        "/FibonacciStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueries/LeadProcessingTimeQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueriesLeadProcessingTimeQuery9FC7F99E"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueries/ErrorsByAgentQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueriesErrorsByAgentQuery9BA4EA2D"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueries/FunnelConversionQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueriesFunnelConversionQuery88828D05"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueries/MCPCallsQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueriesMCPCallsQuery527C041F"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueries/LatencyByEndpointQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueriesLatencyByEndpointQuery984D6B47"
+          }
+        ],
+        "/FibonacciStack-dev/AlarmTopicArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlarmTopicArn"
+          }
+        ],
+        "/FibonacciStack-dev/AlarmTopicName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlarmTopicName"
+          }
+        ],
+        "/FibonacciStack-dev/HighErrorRateAlarmName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HighErrorRateAlarmName"
+          }
+        ],
+        "/FibonacciStack-dev/HighLatencyAlarmName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HighLatencyAlarmName"
+          }
+        ],
+        "/FibonacciStack-dev/DLQNotEmptyAlarmName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DLQNotEmptyAlarmName"
+          }
+        ],
+        "/FibonacciStack-dev/AuroraCpuAlarmName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuroraCpuAlarmName"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueryErrorsByAgent": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueryErrorsByAgent"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueryLatencyByEndpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueryLatencyByEndpoint"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueryFunnelConversion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueryFunnelConversion"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueryMCPCalls": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueryMCPCalls"
+          }
+        ],
+        "/FibonacciStack-dev/InsightsQueryLeadProcessingTime": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsightsQueryLeadProcessingTime"
+          }
+        ],
+        "/FibonacciStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Fn::GetAtt\":[\"FibonacciKmsKey4FDBC47E\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"FibonacciBus476BDCEA\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefFibonacciBus476BDCEA864F6572"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Fn::GetAtt\":[\"FibonacciBus476BDCEA\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"DbSecret685A0FA5\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefDbSecret685A0FA57881E1C6"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"FibonacciVpcB997BDC3\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Fn::GetAtt\":[\"DbSg495F8305\",\"GroupId\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Fn::GetAtt\":[\"HttpApiF5A9A8A7\",\"ApiEndpoint\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttHttpApiF5A9A8A7ApiEndpoint082134F8"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"UserPool6BA7E5F2\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefUserPool6BA7E5F296FD7236"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"UserPoolUserPoolAuthorizerClient680A88B6\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefUserPoolUserPoolAuthorizerClient680A88B611CBC378"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"HttpApiF5A9A8A7\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefHttpApiF5A9A8A7F70B5BDD"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"ApiHandler5E7490E8\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefApiHandler5E7490E896301149"
+          }
+        ],
+        "/FibonacciStack-dev/Exports/Output{\"Ref\":\"AuroraCluster23D869C0\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefAuroraCluster23D869C0CA1C7DB5"
+          }
+        ],
+        "/FibonacciStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/FibonacciStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "FibonacciStack-dev"
+    },
+    "NigredoStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "NigredoStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "NigredoStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "NigredoStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "costcenter": "core",
+          "env": "dev",
+          "managed-by": "cdk",
+          "nucleus": "nigredo",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/8d8ad39af51546334e0e82b1520bc94dd8e717cffc90b932cf7ac67a77b66965.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "NigredoStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "FibonacciStack-dev",
+        "WAFStack-dev",
+        "NigredoStack-dev.assets"
+      ],
+      "metadata": {
+        "/NigredoStack-dev": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "If you are relying on AWS SDK v2 to be present in the Lambda environment already, please explicitly configure a NodeJS runtime of Node 16 or lower. [ack: @aws-cdk/aws-lambda-nodejs:sdkV2NotInRuntime]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "new Bundling (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-lambda-nodejs\\lib\\bundling.js:1:4190)",
+              "Bundling.bundle (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-lambda-nodejs\\lib\\bundling.js:1:1141)",
+              "new NodejsFunction (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-lambda-nodejs\\lib\\function.js:1:2443)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:261:30)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          },
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "nucleus",
+                "Value": "nigredo"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              }
+            ]
+          }
+        ],
+        "/NigredoStack-dev/NigredoDlq/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoDlqA8002B0C"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoQueue7AB70855"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoQueuePolicyC565152B"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaQueue757B78A7"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaQueuePolicy64149F67"
+          }
+        ],
+        "/NigredoStack-dev/DisparoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoQueueBE25067A"
+          }
+        ],
+        "/NigredoStack-dev/DisparoQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoQueuePolicyDA8E2E2D"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoQueueFAE96496"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoQueuePolicy04D84C62"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoQueueEAC65B25"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoQueuePolicy2BAAAD76"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoQueue78A39639"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoQueuePolicy48BE427A"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosQueue76D0C511"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosQueue/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosQueuePolicy79A23AC0"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoRule68C8D937"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaRule74997B94"
+          }
+        ],
+        "/NigredoStack-dev/DisparoRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoRuleE5BAD753"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoRule8090B1B4"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoRule6257C3D6"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoRule68EF769C"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosRuleBB473A57"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaServiceRole5D2DCF51"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaServiceRoleDefaultPolicy13D13D6D"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:310:40)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaSecurityGroupA209ECAB"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambda94C8BF58"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/SqsEventSource:NigredoStackdevRecebimentoQueueBF30384E/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaSqsEventSourceNigredoStackdevRecebimentoQueueBF30384E30767B1F"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaLogRetentionA79028B3"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevRecebimentoLambdaSecurityGroupFC10C513:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevRecebimentoLambdaSecurityGroupFC10C51354326C905D01"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevEstrategiaLambdaSecurityGroup702E75F7:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevEstrategiaLambdaSecurityGroup702E75F7543205312C59"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevDisparoLambdaSecurityGroup43D3A847:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevDisparoLambdaSecurityGroup43D3A84754322A3C4353"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevAtendimentoLambdaSecurityGroupD97407A5:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevAtendimentoLambdaSecurityGroupD97407A55432E223FE2E"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevAgendamentoLambdaSecurityGroupE04EAAB4:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevAgendamentoLambdaSecurityGroupE04EAAB4543230400D35"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevRelatoriosLambdaSecurityGroupEF3A7686:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevRelatoriosLambdaSecurityGroupEF3A768654328A536C31"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevCreateLeadLambdaSecurityGroup8F4B8D8A:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevCreateLeadLambdaSecurityGroup8F4B8D8A5432C9BB86D0"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevListLeadsLambdaSecurityGroupCF4012F1:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevListLeadsLambdaSecurityGroupCF4012F1543255F38D7B"
+          }
+        ],
+        "/NigredoStack-dev/DbSecurityGroup/from NigredoStackdevGetLeadLambdaSecurityGroup1D5C0192:5432": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DbSecurityGroupfromNigredoStackdevGetLeadLambdaSecurityGroup1D5C01925432EA1A12D3"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambdaServiceRole3FE3B52B"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambdaServiceRoleDefaultPolicy2D186169"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:377:39)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambdaSecurityGroup921EC55B"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambda99BF03B7"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambdaLogRetentionBC743A98"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaEventRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaEventRule31DB2FBC"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaEventRule/AllowEventRuleNigredoStackdevEstrategiaLambdaBCD4C40D": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaEventRuleAllowEventRuleNigredoStackdevEstrategiaLambdaBCD4C40D2DDFE190"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambdaServiceRoleF8DD2BAD"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambdaServiceRoleDefaultPolicyDA120B86"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:447:36)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambdaSecurityGroupC69F09AB"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambda0A5F8F52"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambdaLogRetentionD4C40594"
+          }
+        ],
+        "/NigredoStack-dev/DisparoScheduleRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoScheduleRule4F391FF9"
+          }
+        ],
+        "/NigredoStack-dev/DisparoScheduleRule/AllowEventRuleNigredoStackdevDisparoLambdaC1C1072D": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoScheduleRuleAllowEventRuleNigredoStackdevDisparoLambdaC1C1072DBA804F29"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambdaServiceRole0B734484"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambdaServiceRoleDefaultPolicy214AEDB1"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:502:40)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambdaSecurityGroup033377B4"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambda97A1D183"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambdaLogRetention8283A17E"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoLambdaServiceRoleCF931BAD"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoLambdaServiceRoleDefaultPolicyA859E67E"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoLambda423C8224"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoLambdaLogRetention882AEAC5"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambdaServiceRole159D7517"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambdaServiceRoleDefaultPolicyF4C45D35"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:631:40)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambdaSecurityGroupCEF6E3F0"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambda083CE1CF"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambdaLogRetention87CB9F44"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoEventRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoEventRule5EEA7BB0"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoEventRule/AllowEventRuleNigredoStackdevAgendamentoLambdaD0E96495": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoEventRuleAllowEventRuleNigredoStackdevAgendamentoLambdaD0E96495FEB86A74"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/DisparoQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/DisparoQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosQueueUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosQueueUrl"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosQueueArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosQueueArn"
+          }
+        ],
+        "/NigredoStack-dev/NigredoDlqUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoDlqUrl"
+          }
+        ],
+        "/NigredoStack-dev/NigredoDlqArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoDlqArn"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/RecebimentoLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RecebimentoLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/EstrategiaLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EstrategiaLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/DisparoLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DisparoLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/AtendimentoLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AtendimentoLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/SentimentoLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SentimentoLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/AgendamentoLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgendamentoLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambdaServiceRoleE8548A97"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambdaServiceRoleDefaultPolicyF9C66D4C"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:873:34)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambdaSecurityGroup12D58779"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambda21B77625"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambdaLogRetentionF19BA1FB"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosScheduleRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosScheduleRule6239324E"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosScheduleRule/AllowEventRuleNigredoStackdevRelatoriosLambdaCAD762FC": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosScheduleRuleAllowEventRuleNigredoStackdevRelatoriosLambdaCAD762FCD3A2ADBC"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/RelatoriosLambdaName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RelatoriosLambdaName"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAgentsDashboard/Dashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAgentsDashboard0BD81886"
+          }
+        ],
+        "/NigredoStack-dev/AgentsDashboardName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentsDashboardName"
+          }
+        ],
+        "/NigredoStack-dev/BusinessMetricsDashboard/Dashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BusinessMetricsDashboard8CC247ED"
+          }
+        ],
+        "/NigredoStack-dev/BusinessDashboardName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BusinessDashboardName"
+          }
+        ],
+        "/NigredoStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ],
+        "/NigredoStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
+          }
+        ],
+        "/NigredoStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueries/LeadProcessingTimeQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueriesLeadProcessingTimeQuery0CB123CC"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueries/ErrorsByAgentQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueriesErrorsByAgentQueryEC4A29E4"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueries/FunnelConversionQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueriesFunnelConversionQueryD790F490"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueries/MCPCallsQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueriesMCPCallsQuery3544C878"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueries/LatencyByEndpointQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueriesLatencyByEndpointQuery7C75674E"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueryErrorsByAgent": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueryErrorsByAgent"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueryFunnelConversion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueryFunnelConversion"
+          }
+        ],
+        "/NigredoStack-dev/NigredoInsightsQueryLeadProcessingTime": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoInsightsQueryLeadProcessingTime"
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateLeadLambdaServiceRole9158918A"
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateLeadLambdaServiceRoleDefaultPolicy7BFEB391"
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:1014:39)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateLeadLambdaSecurityGroup08EA8DA7"
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateLeadLambda7973BC1C"
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateLeadLambdaLogRetentionA089A5EA"
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListLeadsLambdaServiceRoleA1C9ECAC"
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListLeadsLambdaServiceRoleDefaultPolicy1376932D"
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:1051:38)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListLeadsLambdaSecurityGroup0162B7FB"
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListLeadsLambda2E94697E"
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListLeadsLambdaLogRetention94AAF37D"
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetLeadLambdaServiceRoleAEAD8583"
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetLeadLambdaServiceRoleDefaultPolicyBC366B58"
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambda/SecurityGroup": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "Ignoring Egress rule since 'allowAllOutbound' is set to true; To add customized rules, set allowAllOutbound=false on the SecurityGroup [ack: @aws-cdk/aws-ec2:ipv4IgnoreEgressRule]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2066)",
+              "Annotations.addWarningV2 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:984)",
+              "WrappedClass.addEgressRule (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\security-group.js:1:11164)",
+              "WrappedClass.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\core\\lib\\metadata-resource.js:1:2200)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:2011",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1972",
+              "ReactiveList.forEachAndForever (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:6094)",
+              "Connections.allowTo (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\connections.js:1:1900)",
+              "new NigredoStack (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\lib\\nigredo-stack.ts:1088:36)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\bin\\app.ts:75:22)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Module.m._compile (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+              "node:internal/modules/cjs/loader:1893:10",
+              "Object.require.extensions.<computed> [as .ts] (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "phase4 (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+              "bootstrap (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+              "main (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+              "Object.<anonymous> (C:\\Users\\Usuário\\Downloads\\Marcello\\AlquimistaAI\\Kiro-AlquimistaAI\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1761:14)",
+              "Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)",
+              "Module.load (node:internal/modules/cjs/loader:1481:32)",
+              "Module._load (node:internal/modules/cjs/loader:1300:12)",
+              "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+              "wrapModuleLoad (node:internal/modules/cjs/loader:245:24)",
+              "Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)",
+              "node:internal/main/run_main_module:33:47"
+            ]
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambda/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetLeadLambdaSecurityGroupACE722A9"
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetLeadLambda3A46EB2B"
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambda/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetLeadLambdaLogRetentionE1D96EC6"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiD078601F"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiDefaultStageBCD56680"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/POST--api--leads/CreateLeadIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiPOSTapileadsCreateLeadIntegration44ACCC50"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/POST--api--leads/CreateLeadIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiPOSTapileadsCreateLeadIntegrationPermission21607911"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/POST--api--leads/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiPOSTapileads45E5639D"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/GET--api--leads/ListLeadsIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiGETapileadsListLeadsIntegration161C9B8A"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/GET--api--leads/ListLeadsIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiGETapileadsListLeadsIntegrationPermissionE7AE4A30"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/GET--api--leads/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiGETapileads4076AE62"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/GET--api--leads--{id}/GetLeadIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiGETapileadsidGetLeadIntegrationFF3CA7BC"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/GET--api--leads--{id}/GetLeadIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiGETapileadsidGetLeadIntegrationPermission5A875533"
+          }
+        ],
+        "/NigredoStack-dev/NigredoHttpApi/GET--api--leads--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoHttpApiGETapileadsid32939827"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiAlarmTopic/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiAlarmTopicB70677AA"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/ApiErrorRateAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsApiErrorRateAlarmFA5F8276"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/ApiLatencyP99Alarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsApiLatencyP99AlarmD56D7BA2"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/WebhookFailureRateAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsWebhookFailureRateAlarmF133D721"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/CreateLeadErrorAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsCreateLeadErrorAlarm3388E261"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/ListLeadsErrorAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsListLeadsErrorAlarm25FAE02A"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/GetLeadErrorAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsGetLeadErrorAlarm6C247D8A"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/ApiLatencyP95Alarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsApiLatencyP95Alarm0CF3F1DE"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/CreateLeadDurationAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsCreateLeadDurationAlarm8C71BDF4"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/CreateLeadThrottleAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsCreateLeadThrottleAlarm35AC272B"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/RateLimitAlarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsRateLimitAlarm4C3DA21F"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/CriticalAlarmsCount": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsCriticalAlarmsCount3627FDF6"
+          }
+        ],
+        "/NigredoStack-dev/NigredoAlarms/WarningAlarmsCount": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoAlarmsWarningAlarmsCountF2EC5B5E"
+          }
+        ],
+        "/NigredoStack-dev/NigredoDashboard/Dashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoDashboard9A17C519"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/TopLeadSourcesQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesTopLeadSourcesQueryADB6496F"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/ConversionFunnelQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesConversionFunnelQuery53CD3DAF"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/ErrorAnalysisQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesErrorAnalysisQuery6434AC55"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/WebhookFailuresQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesWebhookFailuresQuery24BC13FF"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/RateLimitAnalysisQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesRateLimitAnalysisQueryA30C5751"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/PerformanceAnalysisQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesPerformanceAnalysisQuery20203D6E"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/TopLeadSourcesQueryName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesTopLeadSourcesQueryName3DF16832"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/ConversionFunnelQueryName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesConversionFunnelQueryName06DF57EA"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/ErrorAnalysisQueryName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesErrorAnalysisQueryName1C4E93A0"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/WebhookFailuresQueryName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesWebhookFailuresQueryName7B7E6982"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/RateLimitAnalysisQueryName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesRateLimitAnalysisQueryName1E2655F4"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiInsightsQueries/PerformanceAnalysisQueryName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiInsightsQueriesPerformanceAnalysisQueryNameB4AE033E"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiWAFAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiWAFAssociation"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiUrl"
+          }
+        ],
+        "/NigredoStack-dev/NigredoApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoApiId"
+          }
+        ],
+        "/NigredoStack-dev/CreateLeadLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateLeadLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/ListLeadsLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListLeadsLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/GetLeadLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetLeadLambdaArn"
+          }
+        ],
+        "/NigredoStack-dev/AlarmTopicArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlarmTopicArn"
+          }
+        ],
+        "/NigredoStack-dev/NigredoDashboardName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoDashboardName"
+          }
+        ],
+        "/NigredoStack-dev/NigredoTopLeadSourcesQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoTopLeadSourcesQuery"
+          }
+        ],
+        "/NigredoStack-dev/NigredoConversionFunnelQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoConversionFunnelQuery"
+          }
+        ],
+        "/NigredoStack-dev/NigredoErrorAnalysisQuery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoErrorAnalysisQuery"
+          }
+        ],
+        "/NigredoStack-dev/NigredoCriticalAlarmsCount": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoCriticalAlarmsCount"
+          }
+        ],
+        "/NigredoStack-dev/NigredoWarningAlarmsCount": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NigredoWarningAlarmsCount"
+          }
+        ],
+        "/NigredoStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"NigredoHttpApiD078601F\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefNigredoHttpApiD078601F909F2013"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"RecebimentoLambda94C8BF58\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefRecebimentoLambda94C8BF585831F297"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"EstrategiaLambda99BF03B7\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefEstrategiaLambda99BF03B77F9BA11A"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"DisparoLambda0A5F8F52\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefDisparoLambda0A5F8F52367B5B47"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"AtendimentoLambda97A1D183\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefAtendimentoLambda97A1D18304472377"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"SentimentoLambda423C8224\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefSentimentoLambda423C822492201CA1"
+          }
+        ],
+        "/NigredoStack-dev/Exports/Output{\"Ref\":\"AgendamentoLambda083CE1CF\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefAgendamentoLambda083CE1CFA3AD922F"
+          }
+        ],
+        "/NigredoStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/NigredoStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "NigredoStack-dev"
+    },
+    "AlquimistaStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "AlquimistaStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "AlquimistaStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "AlquimistaStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "costcenter": "core",
+          "env": "dev",
+          "managed-by": "cdk",
+          "nucleus": "alquimista",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/42b23aa206aee1c3d863f724e0786a272ee085db6e65567f0753d52f5728060d.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "AlquimistaStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "FibonacciStack-dev",
+        "AlquimistaStack-dev.assets"
+      ],
+      "metadata": {
+        "/AlquimistaStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "nucleus",
+                "Value": "alquimista"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              }
+            ]
+          }
+        ],
+        "/AlquimistaStack-dev/ListAgentsFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListAgentsFunctionServiceRole6AEFCA72"
+          }
+        ],
+        "/AlquimistaStack-dev/ListAgentsFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListAgentsFunctionServiceRoleDefaultPolicyFCA50532"
+          }
+        ],
+        "/AlquimistaStack-dev/ListAgentsFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListAgentsFunction75B90D55"
+          }
+        ],
+        "/AlquimistaStack-dev/ActivateAgentFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ActivateAgentFunctionServiceRole9F82FD8A"
+          }
+        ],
+        "/AlquimistaStack-dev/ActivateAgentFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ActivateAgentFunctionServiceRoleDefaultPolicy925EDEC5"
+          }
+        ],
+        "/AlquimistaStack-dev/ActivateAgentFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ActivateAgentFunction216E09F6"
+          }
+        ],
+        "/AlquimistaStack-dev/DeactivateAgentFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeactivateAgentFunctionServiceRole460539D7"
+          }
+        ],
+        "/AlquimistaStack-dev/DeactivateAgentFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeactivateAgentFunctionServiceRoleDefaultPolicyB7E7A632"
+          }
+        ],
+        "/AlquimistaStack-dev/DeactivateAgentFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeactivateAgentFunctionFF0DBE38"
+          }
+        ],
+        "/AlquimistaStack-dev/AuditLogFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuditLogFunctionServiceRole338E5EBB"
+          }
+        ],
+        "/AlquimistaStack-dev/AuditLogFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuditLogFunctionServiceRoleDefaultPolicyB3CE2636"
+          }
+        ],
+        "/AlquimistaStack-dev/AuditLogFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuditLogFunctionBAA696D6"
+          }
+        ],
+        "/AlquimistaStack-dev/AgentMetricsFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentMetricsFunctionServiceRoleDD5EAECA"
+          }
+        ],
+        "/AlquimistaStack-dev/AgentMetricsFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentMetricsFunctionServiceRoleDefaultPolicyB1428369"
+          }
+        ],
+        "/AlquimistaStack-dev/AgentMetricsFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentMetricsFunction336A67E4"
+          }
+        ],
+        "/AlquimistaStack-dev/CreateApprovalFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateApprovalFunctionServiceRoleDB3AE4AE"
+          }
+        ],
+        "/AlquimistaStack-dev/CreateApprovalFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateApprovalFunctionServiceRoleDefaultPolicyB096AF88"
+          }
+        ],
+        "/AlquimistaStack-dev/CreateApprovalFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateApprovalFunction48E86CD3"
+          }
+        ],
+        "/AlquimistaStack-dev/DecideApprovalFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DecideApprovalFunctionServiceRole2EB5D0EF"
+          }
+        ],
+        "/AlquimistaStack-dev/DecideApprovalFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DecideApprovalFunctionServiceRoleDefaultPolicy09FB1EFF"
+          }
+        ],
+        "/AlquimistaStack-dev/DecideApprovalFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DecideApprovalFunction570642CF"
+          }
+        ],
+        "/AlquimistaStack-dev/GetApprovalFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetApprovalFunctionServiceRole2FF49C1C"
+          }
+        ],
+        "/AlquimistaStack-dev/GetApprovalFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetApprovalFunctionServiceRoleDefaultPolicy25B032BB"
+          }
+        ],
+        "/AlquimistaStack-dev/GetApprovalFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetApprovalFunctionF985B0F2"
+          }
+        ],
+        "/AlquimistaStack-dev/ListApprovalsFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListApprovalsFunctionServiceRole3ECA45FF"
+          }
+        ],
+        "/AlquimistaStack-dev/ListApprovalsFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListApprovalsFunctionServiceRoleDefaultPolicy0B5C5186"
+          }
+        ],
+        "/AlquimistaStack-dev/ListApprovalsFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListApprovalsFunction43A2259E"
+          }
+        ],
+        "/AlquimistaStack-dev/CancelApprovalFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CancelApprovalFunctionServiceRole55078AE2"
+          }
+        ],
+        "/AlquimistaStack-dev/CancelApprovalFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CancelApprovalFunctionServiceRoleDefaultPolicy7C37236E"
+          }
+        ],
+        "/AlquimistaStack-dev/CancelApprovalFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CancelApprovalFunctionCFDDA663"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApi0A9CF539"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiDefaultStageF52EEFDE"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents/ListAgentsIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsListAgentsIntegration2F9E5C0F"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents/ListAgentsIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsListAgentsIntegrationPermissionD838AECD"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagents7CE36CE3"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--activate/ActivateAgentIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiagentsidactivateActivateAgentIntegration6B00FE76"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--activate/ActivateAgentIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiagentsidactivateActivateAgentIntegrationPermission16395F19"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--activate/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiagentsidactivateCC04327F"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/CognitoAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiCognitoAuthorizerE194F12E"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--deactivate/DeactivateAgentIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiagentsiddeactivateDeactivateAgentIntegration7F5F13FD"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--deactivate/DeactivateAgentIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiagentsiddeactivateDeactivateAgentIntegrationPermission7493DE49"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--agents--{id}--deactivate/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiagentsiddeactivate76EF878D"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--audit-logs/AuditLogIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiauditlogsAuditLogIntegrationC732EEF5"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--audit-logs/AuditLogIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiauditlogsAuditLogIntegrationPermission0336AB86"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--audit-logs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiauditlogsD003DF5C"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents--{id}--metrics/AgentMetricsIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsidmetricsAgentMetricsIntegrationF13FE741"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents--{id}--metrics/AgentMetricsIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsidmetricsAgentMetricsIntegrationPermission7774268F"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents--{id}--metrics/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsidmetricsFC7B6DD3"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents--metrics/AgentMetricsIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsmetricsAgentMetricsIntegrationPermission548D3592"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--agents--metrics/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiagentsmetrics936AA137"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--approvals/CreateApprovalIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiapprovalsCreateApprovalIntegrationFCD6CBF6"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--approvals/CreateApprovalIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiapprovalsCreateApprovalIntegrationPermissionDF15641F"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--approvals/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiapprovalsFCD0609E"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--approvals/ListApprovalsIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiapprovalsListApprovalsIntegration1A3C83D3"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--approvals/ListApprovalsIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiapprovalsListApprovalsIntegrationPermissionA756288E"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--approvals/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiapprovalsB1C61B9E"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--approvals--{id}/GetApprovalIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiapprovalsidGetApprovalIntegration833A25E8"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--approvals--{id}/GetApprovalIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiapprovalsidGetApprovalIntegrationPermission9C082BD7"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/GET--api--approvals--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiGETapiapprovalsid9C193D22"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--approvals--{id}--decide/DecideApprovalIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiapprovalsiddecideDecideApprovalIntegration38DE62E6"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--approvals--{id}--decide/DecideApprovalIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiapprovalsiddecideDecideApprovalIntegrationPermission84614CBD"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/POST--api--approvals--{id}--decide/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiPOSTapiapprovalsiddecide8BE02AE3"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/DELETE--api--approvals--{id}/CancelApprovalIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiDELETEapiapprovalsidCancelApprovalIntegration13ECB907"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/DELETE--api--approvals--{id}/CancelApprovalIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiDELETEapiapprovalsidCancelApprovalIntegrationPermission57F10033"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApi/DELETE--api--approvals--{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiDELETEapiapprovalsid21806FF2"
+          }
+        ],
+        "/AlquimistaStack-dev/StackName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StackName"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiUrl"
+          }
+        ],
+        "/AlquimistaStack-dev/PlatformApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlatformApiId"
+          }
+        ],
+        "/AlquimistaStack-dev/ListAgentsFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListAgentsFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/ActivateAgentFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ActivateAgentFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/DeactivateAgentFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeactivateAgentFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/AuditLogFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuditLogFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/AgentMetricsFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentMetricsFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/CreateApprovalFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateApprovalFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/DecideApprovalFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DecideApprovalFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/GetApprovalFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetApprovalFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/ListApprovalsFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListApprovalsFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/CancelApprovalFunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CancelApprovalFunctionName"
+          }
+        ],
+        "/AlquimistaStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/AlquimistaStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/AlquimistaStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "AlquimistaStack-dev"
+    },
+    "ObservabilityDashboardStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "ObservabilityDashboardStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "ObservabilityDashboardStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "ObservabilityDashboardStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "component": "observability-dashboards",
+          "Component": "Observability-Dashboard",
+          "costcenter": "core",
+          "env": "dev",
+          "Environment": "dev",
+          "managed-by": "cdk",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core",
+          "Project": "AlquimistaAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/bff7f52818dca7b642392db4d8390676b81f0273cdf51c7945486bc06ec44b6e.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "ObservabilityDashboardStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "FibonacciStack-dev",
+        "NigredoStack-dev",
+        "ObservabilityDashboardStack-dev.assets"
+      ],
+      "metadata": {
+        "/ObservabilityDashboardStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "component",
+                "Value": "observability-dashboards"
+              },
+              {
+                "Key": "Component",
+                "Value": "Observability-Dashboard"
+              },
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              },
+              {
+                "Key": "Project",
+                "Value": "AlquimistaAI"
+              }
+            ]
+          }
+        ],
+        "/ObservabilityDashboardStack-dev/OverviewDashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OverviewDashboard4DD322D9"
+          }
+        ],
+        "/ObservabilityDashboardStack-dev/DashboardName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DashboardName"
+          }
+        ],
+        "/ObservabilityDashboardStack-dev/DashboardUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DashboardUrl"
+          }
+        ],
+        "/ObservabilityDashboardStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/ObservabilityDashboardStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/ObservabilityDashboardStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "ObservabilityDashboardStack-dev"
+    },
+    "FrontendStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "FrontendStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "FrontendStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://207933152643/us-east-1",
+      "properties": {
+        "templateFile": "FrontendStack-dev.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "component": "frontend-web",
+          "Component": "Frontend",
+          "costcenter": "core",
+          "env": "dev",
+          "Environment": "dev",
+          "managed-by": "cdk",
+          "ManagedBy": "CDK",
+          "owner": "alquimista.ai",
+          "project": "fibonacci-core",
+          "Project": "AlquimistaAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-deploy-role-207933152643-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-cfn-exec-role-207933152643-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-207933152643-us-east-1/24185ae497483173732fc8a2e0aba1c371279fa00085cdc7c6bdea0368995584.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "FrontendStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::207933152643:role/cdk-hnb659fds-lookup-role-207933152643-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "WAFStack-dev",
+        "FibonacciStack-dev",
+        "NigredoStack-dev",
+        "FrontendStack-dev.assets"
+      ],
+      "metadata": {
+        "/FrontendStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "component",
+                "Value": "frontend-web"
+              },
+              {
+                "Key": "Component",
+                "Value": "Frontend"
+              },
+              {
+                "Key": "costcenter",
+                "Value": "core"
+              },
+              {
+                "Key": "env",
+                "Value": "dev"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "managed-by",
+                "Value": "cdk"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "owner",
+                "Value": "alquimista.ai"
+              },
+              {
+                "Key": "project",
+                "Value": "fibonacci-core"
+              },
+              {
+                "Key": "Project",
+                "Value": "AlquimistaAI"
+              }
+            ]
+          }
+        ],
+        "/FrontendStack-dev/FrontendBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketEFE2E19C"
+          }
+        ],
+        "/FrontendStack-dev/FrontendBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketPolicy1DFF75D9"
+          }
+        ],
+        "/FrontendStack-dev/FrontendBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketAutoDeleteObjectsCustomResourceDB860B32"
+          }
+        ],
+        "/FrontendStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/FrontendStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/FrontendStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/FrontendStack-dev/OAC/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OAC5B452445"
+          }
+        ],
+        "/FrontendStack-dev/Distribution/Origin1/S3Origin/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DistributionOrigin1S3Origin5F5C0696"
+          }
+        ],
+        "/FrontendStack-dev/Distribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Distribution830FAC52"
+          }
+        ],
+        "/FrontendStack-dev/FrontendUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendUrl"
+          }
+        ],
+        "/FrontendStack-dev/BucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketName"
+          }
+        ],
+        "/FrontendStack-dev/DistributionId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DistributionId"
+          }
+        ],
+        "/FrontendStack-dev/DistributionDomainName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DistributionDomainName"
+          }
+        ],
+        "/FrontendStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/FrontendStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/FrontendStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "FrontendStack-dev"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "aws-cdk-lib/feature-flag-report": {
+      "type": "cdk:feature-flag-report",
+      "properties": {
+        "module": "aws-cdk-lib",
+        "flags": {
+          "@aws-cdk/aws-signer:signingProfileNamePassedToCfn": {
+            "recommendedValue": true,
+            "explanation": "Pass signingProfileName to CfnSigningProfile"
+          },
+          "@aws-cdk/core:newStyleStackSynthesis": {
+            "recommendedValue": true,
+            "explanation": "Switch to new stack synthesis method which enables CI/CD",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/core:stackRelativeExports": {
+            "recommendedValue": true,
+            "explanation": "Name exports based on the construct paths relative to the stack, rather than the global construct path",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-ecs-patterns:secGroupsDisablesImplicitOpenListener": {
+            "recommendedValue": true,
+            "explanation": "Disable implicit openListener when custom security groups are provided"
+          },
+          "@aws-cdk/aws-rds:lowercaseDbIdentifier": {
+            "recommendedValue": true,
+            "explanation": "Force lowercasing of RDS Cluster names in CDK",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": {
+            "recommendedValue": true,
+            "explanation": "Allow adding/removing multiple UsagePlanKeys independently",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-lambda:recognizeVersionProps": {
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to opt in to the updated logical id calculation for Lambda Version created using the  `fn.currentVersion`.",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-lambda:recognizeLayerVersion": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to opt in to the updated logical id calculation for Lambda Version created using the `fn.currentVersion`."
+          },
+          "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": {
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to have cloudfront distributions use the security policy TLSv1.2_2021 by default.",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/core:checkSecretUsage": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this flag to make it impossible to accidentally use SecretValues in unsafe locations"
+          },
+          "@aws-cdk/core:target-partitions": {
+            "userValue": [
+              "aws",
+              "aws-cn"
+            ],
+            "recommendedValue": [
+              "aws",
+              "aws-cn"
+            ],
+            "explanation": "What regions to include in lookup tables of environment agnostic stacks"
+          },
+          "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "ECS extensions will automatically add an `awslogs` driver if no logging is specified"
+          },
+          "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to have Launch Templates generated by the `InstanceRequireImdsv2Aspect` use unique names."
+          },
+          "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "ARN format used by ECS. In the new ARN format, the cluster name is part of the resource ID."
+          },
+          "@aws-cdk/aws-iam:minimizePolicies": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Minimize IAM policies by combining Statements"
+          },
+          "@aws-cdk/core:validateSnapshotRemovalPolicy": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Error on snapshot removal policies on resources that do not support it."
+          },
+          "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Generate key aliases that include the stack name"
+          },
+          "@aws-cdk/aws-s3:createDefaultLoggingPolicy": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to create an S3 bucket policy by default in cases where an AWS service would automatically create the Policy if one does not exist."
+          },
+          "@aws-cdk/aws-sns-subscriptions:restrictSqsDescryption": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Restrict KMS key policy for encrypted Queues a bit more"
+          },
+          "@aws-cdk/aws-apigateway:disableCloudWatchRole": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Make default CloudWatch Role behavior safe for multiple API Gateways in one environment"
+          },
+          "@aws-cdk/core:enablePartitionLiterals": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Make ARNs concrete if AWS partition is known"
+          },
+          "@aws-cdk/aws-events:eventsTargetQueueSameAccount": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Event Rules may only push to encrypted SQS queues in the same account"
+          },
+          "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Avoid setting the \"ECS\" deployment controller when adding a circuit breaker"
+          },
+          "@aws-cdk/aws-iam:importedRoleStackSafeDefaultPolicyName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature to create default policy names for imported roles that depend on the stack the role is in."
+          },
+          "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Use S3 Bucket Policy instead of ACLs for Server Access Logging"
+          },
+          "@aws-cdk/aws-route53-patters:useCertificate": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Use the official `Certificate` resource instead of `DnsValidatedCertificate`"
+          },
+          "@aws-cdk/customresources:installLatestAwsSdkDefault": {
+            "userValue": false,
+            "recommendedValue": false,
+            "explanation": "Whether to install the latest SDK by default in AwsCustomResource"
+          },
+          "@aws-cdk/aws-rds:databaseProxyUniqueResourceName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Use unique resource name for Database Proxy"
+          },
+          "@aws-cdk/aws-codedeploy:removeAlarmsFromDeploymentGroup": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Remove CloudWatch alarms from deployment group"
+          },
+          "@aws-cdk/aws-apigateway:authorizerChangeDeploymentLogicalId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Include authorizer configuration in the calculation of the API deployment logical ID."
+          },
+          "@aws-cdk/aws-ec2:launchTemplateDefaultUserData": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Define user data for a launch template by default when a machine image is provided."
+          },
+          "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "SecretTargetAttachments uses the ResourcePolicy of the attached Secret."
+          },
+          "@aws-cdk/aws-redshift:columnId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Whether to use an ID to track Redshift column changes"
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:enableEmrServicePolicyV2": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable AmazonEMRServicePolicy_v2 managed policies"
+          },
+          "@aws-cdk/aws-ec2:restrictDefaultSecurityGroup": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Restrict access to the VPC default security group"
+          },
+          "@aws-cdk/aws-apigateway:requestValidatorUniqueId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Generate a unique id for each RequestValidator added to a method"
+          },
+          "@aws-cdk/aws-kms:aliasNameRef": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "KMS Alias name and keyArn will have implicit reference to KMS Key"
+          },
+          "@aws-cdk/aws-kms:applyImportedAliasPermissionsToPrincipal": {
+            "recommendedValue": true,
+            "explanation": "Enable grant methods on Aliases imported by name to use kms:ResourceAliases condition"
+          },
+          "@aws-cdk/aws-autoscaling:generateLaunchTemplateInsteadOfLaunchConfig": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Generate a launch template when creating an AutoScalingGroup"
+          },
+          "@aws-cdk/core:includePrefixInUniqueNameGeneration": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Include the stack prefix in the stack name generation process"
+          },
+          "@aws-cdk/aws-efs:denyAnonymousAccess": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "EFS denies anonymous clients accesses"
+          },
+          "@aws-cdk/aws-opensearchservice:enableOpensearchMultiAzWithStandby": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enables support for Multi-AZ with Standby deployment for opensearch domains"
+          },
+          "@aws-cdk/aws-lambda-nodejs:useLatestRuntimeVersion": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enables aws-lambda-nodejs.Function to use the latest available NodeJs runtime as the default"
+          },
+          "@aws-cdk/aws-efs:mountTargetOrderInsensitiveLogicalId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, mount targets will have a stable logicalId that is linked to the associated subnet."
+          },
+          "@aws-cdk/aws-rds:auroraClusterChangeScopeOfInstanceParameterGroupWithEachParameters": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, a scope of InstanceParameterGroup for AuroraClusterInstance with each parameters will change."
+          },
+          "@aws-cdk/aws-appsync:useArnForSourceApiAssociationIdentifier": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, will always use the arn for identifiers for CfnSourceApiAssociation in the GraphqlApi construct rather than id."
+          },
+          "@aws-cdk/aws-rds:preventRenderingDeprecatedCredentials": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, creating an RDS database cluster from a snapshot will only render credentials for snapshot credentials."
+          },
+          "@aws-cdk/aws-codepipeline-actions:useNewDefaultBranchForCodeCommitSource": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, the CodeCommit source action is using the default branch name 'main'."
+          },
+          "@aws-cdk/aws-cloudwatch-actions:changeLambdaPermissionLogicalIdForLambdaAction": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, the logical ID of a Lambda permission for a Lambda action includes an alarm ID."
+          },
+          "@aws-cdk/aws-codepipeline:crossAccountKeysDefaultValueToFalse": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enables Pipeline to set the default value for crossAccountKeys to false."
+          },
+          "@aws-cdk/aws-codepipeline:defaultPipelineTypeToV2": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enables Pipeline to set the default pipeline type to V2."
+          },
+          "@aws-cdk/aws-kms:reduceCrossAccountRegionPolicyScope": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, IAM Policy created from KMS key grant will reduce the resource scope to this key only."
+          },
+          "@aws-cdk/pipelines:reduceAssetRoleTrustScope": {
+            "recommendedValue": true,
+            "explanation": "Remove the root account principal from PipelineAssetsFileRole trust policy",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-eks:nodegroupNameAttribute": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, nodegroupName attribute of the provisioned EKS NodeGroup will not have the cluster name prefix."
+          },
+          "@aws-cdk/aws-ec2:ebsDefaultGp3Volume": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, the default volume type of the EBS volume will be GP3"
+          },
+          "@aws-cdk/aws-ecs:removeDefaultDeploymentAlarm": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "When enabled, remove default deployment alarm settings"
+          },
+          "@aws-cdk/custom-resources:logApiResponseDataPropertyTrueDefault": {
+            "userValue": false,
+            "recommendedValue": false,
+            "explanation": "When enabled, the custom resource used for `AwsCustomResource` will configure the `logApiResponseData` property as true by default"
+          },
+          "@aws-cdk/aws-s3:keepNotificationInImportedBucket": {
+            "userValue": false,
+            "recommendedValue": false,
+            "explanation": "When enabled, Adding notifications to a bucket in the current stack will not remove notification from imported stack."
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:useNewS3UriParametersForBedrockInvokeModelTask": {
+            "recommendedValue": true,
+            "explanation": "When enabled, use new props for S3 URI field in task definition of state machine for bedrock invoke model.",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/core:explicitStackTags": {
+            "recommendedValue": true,
+            "explanation": "When enabled, stack tags need to be assigned explicitly on a Stack."
+          },
+          "@aws-cdk/aws-ecs:enableImdsBlockingDeprecatedFeature": {
+            "recommendedValue": false,
+            "explanation": "When set to true along with canContainersAccessInstanceRole=false in ECS cluster, new updated commands will be added to UserData to block container accessing IMDS. **Applicable to Linux only. IMPORTANT: See [details.](#aws-cdkaws-ecsenableImdsBlockingDeprecatedFeature)**"
+          },
+          "@aws-cdk/aws-ecs:disableEcsImdsBlocking": {
+            "recommendedValue": true,
+            "explanation": "When set to true, CDK synth will throw exception if canContainersAccessInstanceRole is false. **IMPORTANT: See [details.](#aws-cdkaws-ecsdisableEcsImdsBlocking)**"
+          },
+          "@aws-cdk/aws-ecs:reduceEc2FargateCloudWatchPermissions": {
+            "recommendedValue": true,
+            "explanation": "When enabled, we will only grant the necessary permissions when users specify cloudwatch log group through logConfiguration"
+          },
+          "@aws-cdk/aws-dynamodb:resourcePolicyPerReplica": {
+            "recommendedValue": true,
+            "explanation": "When enabled will allow you to specify a resource policy per replica, and not copy the source table policy to all replicas"
+          },
+          "@aws-cdk/aws-ec2:ec2SumTImeoutEnabled": {
+            "recommendedValue": true,
+            "explanation": "When enabled, initOptions.timeout and resourceSignalTimeout values will be summed together."
+          },
+          "@aws-cdk/aws-appsync:appSyncGraphQLAPIScopeLambdaPermission": {
+            "recommendedValue": true,
+            "explanation": "When enabled, a Lambda authorizer Permission created when using GraphqlApi will be properly scoped with a SourceArn."
+          },
+          "@aws-cdk/aws-rds:setCorrectValueForDatabaseInstanceReadReplicaInstanceResourceId": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the value of property `instanceResourceId` in construct `DatabaseInstanceReadReplica` will be set to the correct value which is `DbiResourceId` instead of currently `DbInstanceArn`"
+          },
+          "@aws-cdk/core:cfnIncludeRejectComplexResourceUpdateCreatePolicyIntrinsics": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CFN templates added with `cfn-include` will error if the template contains Resource Update or Create policies with CFN Intrinsics that include non-primitive values."
+          },
+          "@aws-cdk/aws-lambda-nodejs:sdkV3ExcludeSmithyPackages": {
+            "recommendedValue": true,
+            "explanation": "When enabled, both `@aws-sdk` and `@smithy` packages will be excluded from the Lambda Node.js 18.x runtime to prevent version mismatches in bundled applications."
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:fixRunEcsTaskPolicy": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the resource of IAM Run Ecs policy generated by SFN EcsRunTask will reference the definition, instead of constructing ARN."
+          },
+          "@aws-cdk/aws-ec2:bastionHostUseAmazonLinux2023ByDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the BastionHost construct will use the latest Amazon Linux 2023 AMI, instead of Amazon Linux 2."
+          },
+          "@aws-cdk/core:aspectStabilization": {
+            "recommendedValue": true,
+            "explanation": "When enabled, a stabilization loop will be run when invoking Aspects during synthesis.",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-route53-targets:userPoolDomainNameMethodWithoutCustomResource": {
+            "recommendedValue": true,
+            "explanation": "When enabled, use a new method for DNS Name of user pool domain target without creating a custom resource."
+          },
+          "@aws-cdk/aws-elasticloadbalancingV2:albDualstackWithoutPublicIpv4SecurityGroupRulesDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the default security group ingress rules will allow IPv6 ingress from anywhere"
+          },
+          "@aws-cdk/aws-iam:oidcRejectUnauthorizedConnections": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the default behaviour of OIDC provider will reject unauthorized connections"
+          },
+          "@aws-cdk/core:enableAdditionalMetadataCollection": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CDK will expand the scope of usage data collected to better inform CDK development and improve communication for security concerns and emerging issues."
+          },
+          "@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy": {
+            "recommendedValue": false,
+            "explanation": "[Deprecated] When enabled, Lambda will create new inline policies with AddToRolePolicy instead of adding to the Default Policy Statement"
+          },
+          "@aws-cdk/aws-s3:setUniqueReplicationRoleName": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CDK will automatically generate a unique role name that is used for s3 object replication."
+          },
+          "@aws-cdk/pipelines:reduceStageRoleTrustScope": {
+            "recommendedValue": true,
+            "explanation": "Remove the root account principal from Stage addActions trust policy",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-events:requireEventBusPolicySid": {
+            "recommendedValue": true,
+            "explanation": "When enabled, grantPutEventsTo() will use resource policies with Statement IDs for service principals."
+          },
+          "@aws-cdk/core:aspectPrioritiesMutating": {
+            "recommendedValue": true,
+            "explanation": "When set to true, Aspects added by the construct library on your behalf will be given a priority of MUTATING."
+          },
+          "@aws-cdk/aws-dynamodb:retainTableReplica": {
+            "recommendedValue": true,
+            "explanation": "When enabled, table replica will be default to the removal policy of source table unless specified otherwise."
+          },
+          "@aws-cdk/cognito:logUserPoolClientSecretValue": {
+            "recommendedValue": false,
+            "explanation": "When disabled, the value of the user pool client secret will not be logged in the custom resource lambda function logs."
+          },
+          "@aws-cdk/pipelines:reduceCrossAccountActionRoleTrustScope": {
+            "recommendedValue": true,
+            "explanation": "When enabled, scopes down the trust policy for the cross-account action role",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-stepfunctions:useDistributedMapResultWriterV2": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the resultWriterV2 property of DistributedMap will be used insted of resultWriter"
+          },
+          "@aws-cdk/s3-notifications:addS3TrustKeyPolicyForSnsSubscriptions": {
+            "recommendedValue": true,
+            "explanation": "Add an S3 trust policy to a KMS key resource policy for SNS subscriptions."
+          },
+          "@aws-cdk/aws-ec2:requirePrivateSubnetsForEgressOnlyInternetGateway": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the EgressOnlyGateway resource is only created if private subnets are defined in the dual-stack VPC."
+          },
+          "@aws-cdk/aws-ec2-alpha:useResourceIdForVpcV2Migration": {
+            "recommendedValue": false,
+            "explanation": "When enabled, use resource IDs for VPC V2 migration"
+          },
+          "@aws-cdk/aws-s3:publicAccessBlockedByDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, setting any combination of options for BlockPublicAccess will automatically set true for any options not defined."
+          },
+          "@aws-cdk/aws-lambda:useCdkManagedLogGroup": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CDK creates and manages loggroup for the lambda function"
+          },
+          "@aws-cdk/aws-elasticloadbalancingv2:networkLoadBalancerWithSecurityGroupByDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, Network Load Balancer will be created with a security group by default."
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:httpInvokeDynamicJsonPathEndpoint": {
+            "recommendedValue": true,
+            "explanation": "When enabled, allows using a dynamic apiEndpoint with JSONPath format in HttpInvoke tasks.",
+            "unconfiguredBehavesLike": {
+              "v2": true
+            }
+          },
+          "@aws-cdk/aws-ecs-patterns:uniqueTargetGroupId": {
+            "recommendedValue": true,
+            "explanation": "When enabled, ECS patterns will generate unique target group IDs to prevent conflicts during load balancer replacement"
+          }
+        }
+      }
+    }
+  },
+  "minimumCliVersion": "2.1031.2"
+}

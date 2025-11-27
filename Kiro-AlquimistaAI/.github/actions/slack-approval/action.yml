@@ -1,0 +1,103 @@
+name: 'Slack Approval Notification'
+description: 'Send manual approval request notifications to Slack'
+inputs:
+  webhook-url:
+    description: 'Slack webhook URL'
+    required: true
+  environment:
+    description: 'Environment name (prod)'
+    required: true
+  branch:
+    description: 'Git branch name'
+    required: true
+  commit:
+    description: 'Git commit SHA'
+    required: true
+  actor:
+    description: 'GitHub actor who triggered the deployment'
+    required: true
+  approval-url:
+    description: 'GitHub Actions approval URL'
+    required: true
+  pr-title:
+    description: 'Pull request title (optional)'
+    required: false
+  pr-url:
+    description: 'Pull request URL (optional)'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send Slack approval notification
+      shell: bash
+      run: |
+        # Build the message
+        MESSAGE="🔒 *Manual approval required* for production deployment"
+        
+        # Build fields array
+        FIELDS='[
+          {
+            "title": "Environment",
+            "value": "${{ inputs.environment }}",
+            "short": true
+          },
+          {
+            "title": "Branch",
+            "value": "${{ inputs.branch }}",
+            "short": true
+          },
+          {
+            "title": "Commit",
+            "value": "<https://github.com/${{ github.repository }}/commit/${{ inputs.commit }}|$(echo ${{ inputs.commit }} | cut -c1-8)>",
+            "short": true
+          },
+          {
+            "title": "Requested by",
+            "value": "${{ inputs.actor }}",
+            "short": true
+          },
+          {
+            "title": "Approval Required",
+            "value": "<${{ inputs.approval-url }}|Click here to review and approve>",
+            "short": false
+          }'
+        
+        # Add PR info if provided
+        if [ -n "${{ inputs.pr-title }}" ] && [ -n "${{ inputs.pr-url }}" ]; then
+          FIELDS="$FIELDS,
+          {
+            \"title\": \"Pull Request\",
+            \"value\": \"<${{ inputs.pr-url }}|${{ inputs.pr-title }}>\",
+            \"short\": false
+          }"
+        fi
+        
+        FIELDS="$FIELDS]"
+        
+        # Create the payload
+        PAYLOAD=$(cat <<EOF
+        {
+          "username": "Fibonacci Deploy Bot",
+          "icon_emoji": ":lock:",
+          "attachments": [
+            {
+              "color": "warning",
+              "fallback": "$MESSAGE",
+              "pretext": "$MESSAGE",
+              "text": "A production deployment is waiting for manual approval. Please review the changes and approve if ready to proceed.",
+              "fields": $FIELDS,
+              "footer": "Fibonacci CI/CD",
+              "ts": $(date +%s)
+            }
+          ]
+        }
+        EOF
+        )
+        
+        # Send to Slack
+        curl -X POST -H 'Content-type: application/json' \
+          --data "$PAYLOAD" \
+          "${{ inputs.webhook-url }}"
+        
+        echo "Slack approval notification sent for ${{ inputs.environment }} deployment"

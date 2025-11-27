@@ -1,0 +1,786 @@
+{
+ "Description": "Security Guardrails - CloudTrail, GuardDuty, SNS Alerts",
+ "Resources": {
+  "CloudTrailBucket98B0BFE1": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "BucketName": "alquimista-cloudtrail-logs-207933152643-dev",
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "ExpirationInDays": 90,
+       "Id": "DeleteOldLogs",
+       "Status": "Enabled"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     },
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CloudTrailBucket/Resource"
+   }
+  },
+  "CloudTrailBucketPolicy2A856177": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "CloudTrailBucket98B0BFE1"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CloudTrailBucket98B0BFE1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CloudTrailBucket98B0BFE1",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetBucketAcl",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "CloudTrailBucket98B0BFE1",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "s3:PutObject",
+       "Condition": {
+        "StringEquals": {
+         "s3:x-amz-acl": "bucket-owner-full-control"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudtrail.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "CloudTrailBucket98B0BFE1",
+            "Arn"
+           ]
+          },
+          "/AWSLogs/207933152643/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CloudTrailBucket/Policy/Resource"
+   }
+  },
+  "CloudTrailBucketAutoDeleteObjectsCustomResource4283719F": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "CloudTrailBucket98B0BFE1"
+    }
+   },
+   "DependsOn": [
+    "CloudTrailBucketPolicy2A856177"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CloudTrailBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "CloudTrailBucket98B0BFE1"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "AuditTrailFF0F2BB5": {
+   "Type": "AWS::CloudTrail::Trail",
+   "Properties": {
+    "EnableLogFileValidation": true,
+    "EventSelectors": [
+     {
+      "IncludeManagementEvents": true,
+      "ReadWriteType": "All"
+     }
+    ],
+    "IncludeGlobalServiceEvents": true,
+    "IsLogging": true,
+    "IsMultiRegionTrail": false,
+    "S3BucketName": {
+     "Ref": "CloudTrailBucket98B0BFE1"
+    },
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "TrailName": "alquimista-audit-trail-dev"
+   },
+   "DependsOn": [
+    "CloudTrailBucketPolicy2A856177"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/AuditTrail/Resource"
+   }
+  },
+  "GuardDutyDetector": {
+   "Type": "AWS::GuardDuty::Detector",
+   "Properties": {
+    "Enable": true,
+    "FindingPublishingFrequency": "FIFTEEN_MINUTES",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/GuardDutyDetector"
+   }
+  },
+  "SecurityAlertTopic8D84EA7A": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "AlquimistaAI Security Alerts",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "TopicName": "alquimista-security-alerts-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/SecurityAlertTopic/Resource"
+   }
+  },
+  "SecurityAlertTopicPolicyDF3E5DDE": {
+   "Type": "AWS::SNS::TopicPolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sns:Publish",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Ref": "SecurityAlertTopic8D84EA7A"
+       },
+       "Sid": "0"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Topics": [
+     {
+      "Ref": "SecurityAlertTopic8D84EA7A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/SecurityAlertTopic/Policy/Resource"
+   }
+  },
+  "GuardDutyHighSeverityRule8982E7BD": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Notifica sobre achados HIGH/CRITICAL do GuardDuty",
+    "EventPattern": {
+     "source": [
+      "aws.guardduty"
+     ],
+     "detail-type": [
+      "GuardDuty Finding"
+     ],
+     "detail": {
+      "severity": [
+       7,
+       7,
+       7.1,
+       7.2,
+       7.3,
+       7.4,
+       7.5,
+       7.6,
+       7.7,
+       7.8,
+       7.9,
+       8,
+       8,
+       8.1,
+       8.2,
+       8.3,
+       8.4,
+       8.5,
+       8.6,
+       8.7,
+       8.8,
+       8.9
+      ]
+     }
+    },
+    "Name": "alquimista-guardduty-high-severity-dev",
+    "State": "ENABLED",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "Targets": [
+     {
+      "Arn": {
+       "Ref": "SecurityAlertTopic8D84EA7A"
+      },
+      "Id": "Target0",
+      "InputTransformer": {
+       "InputPathsMap": {
+        "detail-type": "$.detail.type",
+        "detail-severity": "$.detail.severity",
+        "region": "$.region",
+        "account": "$.account",
+        "detail-description": "$.detail.description",
+        "detail-resource-resourceType": "$.detail.resource.resourceType"
+       },
+       "InputTemplate": "\"🚨 ALERTA DE SEGURANÇA - GuardDuty\\n\\nTipo: <detail-type>\\nSeveridade: <detail-severity>\\nRegião: <region>\\nConta: <account>\\nDescrição: <detail-description>\\nRecurso: <detail-resource-resourceType>\\n\\nAção recomendada: Revisar o achado no console do GuardDuty.\""
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/GuardDutyHighSeverityRule/Resource"
+   }
+  },
+  "CostAlertTopic839A4E50": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "AlquimistaAI Cost Alerts",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "TopicName": "alquimista-cost-alerts-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CostAlertTopic/Resource"
+   }
+  },
+  "MonthlyBudget": {
+   "Type": "AWS::Budgets::Budget",
+   "Properties": {
+    "Budget": {
+     "BudgetLimit": {
+      "Amount": 500,
+      "Unit": "USD"
+     },
+     "BudgetName": "alquimista-monthly-budget-dev",
+     "BudgetType": "COST",
+     "TimeUnit": "MONTHLY"
+    },
+    "NotificationsWithSubscribers": [
+     {
+      "Notification": {
+       "ComparisonOperator": "GREATER_THAN",
+       "NotificationType": "FORECASTED",
+       "Threshold": 80,
+       "ThresholdType": "PERCENTAGE"
+      },
+      "Subscribers": [
+       {
+        "Address": {
+         "Ref": "CostAlertTopic839A4E50"
+        },
+        "SubscriptionType": "SNS"
+       }
+      ]
+     },
+     {
+      "Notification": {
+       "ComparisonOperator": "GREATER_THAN",
+       "NotificationType": "ACTUAL",
+       "Threshold": 100,
+       "ThresholdType": "PERCENTAGE"
+      },
+      "Subscribers": [
+       {
+        "Address": {
+         "Ref": "CostAlertTopic839A4E50"
+        },
+        "SubscriptionType": "SNS"
+       }
+      ]
+     },
+     {
+      "Notification": {
+       "ComparisonOperator": "GREATER_THAN",
+       "NotificationType": "ACTUAL",
+       "Threshold": 120,
+       "ThresholdType": "PERCENTAGE"
+      },
+      "Subscribers": [
+       {
+        "Address": {
+         "Ref": "CostAlertTopic839A4E50"
+        },
+        "SubscriptionType": "SNS"
+       }
+      ]
+     }
+    ]
+   },
+   "DependsOn": [
+    "CostAlertTopic839A4E50"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/MonthlyBudget"
+   }
+  },
+  "CostAnomalyMonitor": {
+   "Type": "AWS::CE::AnomalyMonitor",
+   "Properties": {
+    "MonitorDimension": "SERVICE",
+    "MonitorName": "alquimista-cost-monitor-dev",
+    "MonitorType": "DIMENSIONAL",
+    "ResourceTags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CostAnomalyMonitor"
+   }
+  },
+  "CostAnomalySubscription": {
+   "Type": "AWS::CE::AnomalySubscription",
+   "Properties": {
+    "Frequency": "DAILY",
+    "MonitorArnList": [
+     {
+      "Fn::GetAtt": [
+       "CostAnomalyMonitor",
+       "MonitorArn"
+      ]
+     }
+    ],
+    "ResourceTags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "Subscribers": [
+     {
+      "Address": {
+       "Ref": "CostAlertTopic839A4E50"
+      },
+      "Type": "SNS"
+     }
+    ],
+    "SubscriptionName": "alquimista-cost-anomaly-alerts-dev",
+    "Threshold": 50
+   },
+   "DependsOn": [
+    "CostAlertTopic839A4E50",
+    "CostAnomalyMonitor"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CostAnomalySubscription"
+   }
+  },
+  "OpsAlertTopicA45431CF": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "AlquimistaAI Operational Alerts",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Security-Cost-Guardrails"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "Alquimista"
+     }
+    ],
+    "TopicName": "alquimista-ops-alerts-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/OpsAlertTopic/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WOTW6DMBCFz5K9My2kF0jotmoE2VfGniAHsJFnTIQs370yVKXdzPve/JdQlid4PcgnHZXuj4NpITYsVS/kk74inSBeguqRRXW3P7TJ1Q1GLXt680mowQXNXpoB4i1LblkhiS5Ir3XgBaq7fUdGxc4LsgTx5iaj1tYV1rif+GOTwBktE8Q6DJiLWZNog+6QCdaHMgqFEKu7PVs3ymH5cNbka3umCS0pbyY2zqYkqkDsxhrJBa+2xb/8r3T1bjYa/UUSijMRcsOyM7bLM5+Bp8BJWKcRHvQyl29QFFAcHmTM0QfLZkSoN/0GMNMyKn8BAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecurityStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "CloudTrailBucketName": {
+   "Description": "Nome do bucket S3 para logs do CloudTrail",
+   "Value": {
+    "Ref": "CloudTrailBucket98B0BFE1"
+   },
+   "Export": {
+    "Name": "dev-CloudTrailBucketName"
+   }
+  },
+  "CloudTrailName": {
+   "Description": "ARN do CloudTrail",
+   "Value": {
+    "Fn::GetAtt": [
+     "AuditTrailFF0F2BB5",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "dev-CloudTrailArn"
+   }
+  },
+  "GuardDutyDetectorId": {
+   "Description": "ID do detector GuardDuty",
+   "Value": {
+    "Ref": "GuardDutyDetector"
+   },
+   "Export": {
+    "Name": "dev-GuardDutyDetectorId"
+   }
+  },
+  "SecurityAlertTopicArn": {
+   "Description": "ARN do tópico SNS para alertas de segurança",
+   "Value": {
+    "Ref": "SecurityAlertTopic8D84EA7A"
+   },
+   "Export": {
+    "Name": "dev-SecurityAlertTopicArn"
+   }
+  },
+  "CostAlertTopicArn": {
+   "Description": "ARN do tópico SNS para alertas de custo",
+   "Value": {
+    "Ref": "CostAlertTopic839A4E50"
+   },
+   "Export": {
+    "Name": "dev-CostAlertTopicArn"
+   }
+  },
+  "MonthlyBudgetName": {
+   "Description": "Nome do AWS Budget mensal",
+   "Value": "alquimista-monthly-budget-dev"
+  },
+  "MonthlyBudgetAmount": {
+   "Description": "Valor do orçamento mensal em USD",
+   "Value": "500"
+  },
+  "CostAnomalyMonitorArn": {
+   "Description": "ARN do Cost Anomaly Monitor",
+   "Value": {
+    "Fn::GetAtt": [
+     "CostAnomalyMonitor",
+     "MonitorArn"
+    ]
+   }
+  },
+  "OpsAlertTopicArn": {
+   "Description": "ARN do tópico SNS para alertas operacionais",
+   "Value": {
+    "Ref": "OpsAlertTopicA45431CF"
+   },
+   "Export": {
+    "Name": "dev-OpsAlertTopicArn"
+   }
+  },
+  "ExportsOutputRefSecurityAlertTopic8D84EA7A77A8D013": {
+   "Value": {
+    "Ref": "SecurityAlertTopic8D84EA7A"
+   },
+   "Export": {
+    "Name": "SecurityStack-dev:ExportsOutputRefSecurityAlertTopic8D84EA7A77A8D013"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,125 @@
+name: 🤖 Solicitar Assistência do Kiro AI
+description: Solicite ajuda do assistente Kiro AI para desenvolvimento, deploy ou troubleshooting
+title: "[KIRO] "
+labels: ["kiro-ai", "assistance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🤖 Assistência do Kiro AI
+        
+        Use este template para solicitar ajuda do assistente Kiro AI. Forneça o máximo de detalhes possível para uma assistência mais precisa.
+
+  - type: dropdown
+    id: assistance_type
+    attributes:
+      label: Tipo de Assistência
+      description: Que tipo de ajuda você precisa?
+      options:
+        - 🏗️ Infraestrutura AWS (CDK, CloudFormation)
+        - 🤖 Agentes Nigredo (Lambda Functions)
+        - 🔧 CI/CD e GitHub Actions
+        - 🐛 Debugging e Troubleshooting
+        - 📊 Monitoramento e Alertas
+        - 🔐 Segurança e Compliance
+        - 📚 Documentação
+        - 💡 Otimização de Performance
+        - 💰 Otimização de Custos
+        - 🆘 Suporte Geral
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Em qual ambiente você está trabalhando?
+      options:
+        - 🔧 Desenvolvimento (dev)
+        - 🧪 Staging
+        - 🚀 Produção
+        - 💻 Local
+        - 🌐 Todos os ambientes
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do Problema/Solicitação
+      description: Descreva detalhadamente o que você precisa
+      placeholder: |
+        Exemplo:
+        - Estou tentando implementar um novo agente Nigredo
+        - O deploy para staging está falando
+        - Preciso otimizar os custos da AWS
+        - Como configurar um novo alarme no CloudWatch
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto Adicional
+      description: Forneça informações adicionais que podem ajudar
+      placeholder: |
+        - Logs de erro
+        - Configurações atuais
+        - Passos já tentados
+        - URLs relevantes
+        - Screenshots (se aplicável)
+
+  - type: textarea
+    id: expected_outcome
+    attributes:
+      label: Resultado Esperado
+      description: O que você espera que aconteça após a assistência?
+      placeholder: |
+        Exemplo:
+        - Deploy funcionando corretamente
+        - Novo agente implementado e testado
+        - Custos reduzidos em 20%
+        - Alertas configurados e funcionais
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist Pré-Assistência
+      description: Marque os itens que você já verificou
+      options:
+        - label: Li a documentação relevante
+        - label: Verifiquei os logs de erro
+        - label: Testei em ambiente local
+        - label: Verifiquei se há issues similares
+        - label: Tenho as permissões necessárias
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridade
+      description: Qual a urgência desta solicitação?
+      options:
+        - 🔥 Crítica (produção parada)
+        - ⚡ Alta (impacta desenvolvimento)
+        - 📋 Normal (melhoria/nova feature)
+        - 💡 Baixa (otimização/dúvida)
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 📚 Recursos Úteis
+        
+        Antes de solicitar assistência, verifique estes recursos:
+        
+        - 📖 [README Principal](../README.md)
+        - 🚀 [Guia de Setup](../SETUP.md)
+        - 🔧 [Documentação de Deploy](../Docs/Deploy/)
+        - 🤖 [Documentação dos Agentes](../lambda/agents/)
+        - 🔐 [Configuração de Secrets](../Docs/Deploy/GITHUB-SECRETS-CONFIGURATION.md)
+        - 📊 [Monitoramento](../Docs/Deploy/CLOUDWATCH-DASHBOARDS.md)
+        
+        ---
+        
+        **🤖 O Kiro AI analisará automaticamente sua solicitação e fornecerá assistência personalizada!**

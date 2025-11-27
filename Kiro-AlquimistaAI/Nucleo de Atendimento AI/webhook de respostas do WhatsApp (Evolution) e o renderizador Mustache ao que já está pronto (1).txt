@@ -1,0 +1,300 @@
+﻿webhook de respostas do WhatsApp (Evolution) e o renderizador Mustache ao que já está pronto. Tudo “cola-e-usa” para Replit (Node/TS).
+novos pacotes: npm i mustache body-parser
+ reuso: /shared/http.ts, /shared/db.ts, /shared/worker.ts
+________________
+
+
+1) Renderização robusta com Mustache
+Substitui o render() simples para suportar fallbacks, uppercase, etc.
+// /shared/render.ts
+import Mustache from "mustache";
+
+
+// Helpers simples: {{UP text}} / {{LOW text}} / {{FALL a b}}
+const viewHelpers = {
+  UP: () => (text: string) => String(text ?? "").toUpperCase(),
+  LOW: () => (text: string) => String(text ?? "").toLowerCase(),
+  FALL: () => (a?: any, b?: any) => (a ?? b ?? "")
+};
+
+
+/** Render Mustache com helpers e tolerância a faltas */
+export function renderTemplate(tpl: string, data: Record<string, any> = {}) {
+  const view = { ...data, ...viewHelpers };
+  return Mustache.render(tpl, view);
+}
+
+
+Atualize os disparadores para usar Mustache
+// /agents/disparo/whatsapp.ts  (troque a função render)
+import { renderTemplate } from "../../shared/render";
+// ...
+const text = renderTemplate(mm.rows[0].template, dataRender||{});
+
+
+// /agents/disparo/email.ts  (idem)
+import { renderTemplate } from "../../shared/render";
+// ...
+const html = renderTemplate(mm.rows[0].template, dataRender||{});
+
+
+________________
+
+
+2) Tabelas de inbound + opt-out (SQL)
+Cria um registro das mensagens recebidas e uma “lista de não contatar”.
+-- Mensagens inbound (WA/e-mail)
+create table if not exists inbound_msgs (
+  id bigserial primary key,
+  canal text not null,              -- 'whatsapp' | 'email'
+  from_e164 text,                   -- telefone normalizado
+  from_email text,
+  lead_id uuid,                     -- se conseguirmos resolver
+  texto text not null,
+  ts timestamptz not null default now(),
+  raw jsonb not null default '{}'
+);
+
+
+-- Do Not Contact (opt-out)
+create table if not exists dnc (
+  id bigserial primary key,
+  canal text not null,              -- 'whatsapp' | 'email'
+  chave text not null,              -- e164 ou email normalizado
+  motivo text default 'opt-out',
+  ts timestamptz not null default now(),
+  unique (canal, chave)
+);
+
+
+________________
+
+
+3) Palavras-chave e normalização
+// /shared/inbound.ts
+export const OPT_OUT_PATTERNS = [
+  "pare", "parar", "nao quero", "não quero", "remover", "unsubscribe", "sair", "stop", "cancelar"
+];
+
+
+export function isOptOut(text?: string){
+  const t = (text||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  return OPT_OUT_PATTERNS.some(p => t.includes(p));
+}
+
+
+export function toE164FromWa(raw?: string){
+  // Evolution costuma mandar "5511999998888" sem '+'
+  if (!raw) return undefined;
+  const digits = raw.replace(/\D+/g,"");
+  const e164 = digits.startsWith("55") ? `+${digits}` : `+55${digits}`;
+  return e164;
+}
+
+
+________________
+
+
+4) Webhook Evolution → resposta.recebida@v1
+Cria o agente Atendimento para receber webhooks, registrar inbound, resolver lead por telefone e emitir eventos para a classificação/agenda.
+// /agents/atendimento/index.ts
+import { makeApp } from "../../shared/http";
+import express from "express";
+import { pool } from "../../shared/db";
+import { isOptOut, toE164FromWa } from "../../shared/inbound";
+
+
+const app = makeApp();
+// como o HMAC do Evolution varia por vendor, aqui usamos JSON padrão:
+app.use(express.json({ limit: "1mb" }));
+
+
+/**
+ * Ex.: payload comum Evolution:
+ * {
+ *   "event":"message:in",
+ *   "data": { "from":"5511999998888", "to":"seuNumero", "message":{"text":"..."} }
+ * }
+ * Aceitamos variações: data.msg?.text, data.message?.text, body?.text
+ */
+app.post("/webhook/evolution", async (req, res) => {
+  try {
+    const body = req.body || {};
+    const data = body.data || body || {};
+    const fromRaw = data.from || data.remoteJid || data.number || data.phone;
+    const text = (data?.message?.text) || (data?.msg?.text) || data?.text || "";
+    const from_e164 = toE164FromWa(String(fromRaw));
+    if (!from_e164 || !text) return res.status(200).json({ ok: true, noContent: true });
+
+
+    // Opt-out?
+    if (isOptOut(text)) {
+      await pool.query(
+        `insert into dnc(canal, chave, motivo) values ('whatsapp',$1,'opt-out')
+         on conflict (canal, chave) do nothing`,
+        [from_e164]
+      );
+    }
+
+
+    // Resolver lead por telefone → contato → lead mais recente
+    const contact = await pool.query(
+      `select c.id as contato_id, l.id as lead_id
+         from contatos c
+         left join leads l on l.contato_id = c.id
+        where c.telefone_e164=$1
+        order by l.created_at desc
+        limit 1`, [from_e164]
+    );
+    const lead_id = contact.rows[0]?.lead_id || null;
+
+
+    // Persistir inbound
+    await pool.query(
+      `insert into inbound_msgs(canal, from_e164, lead_id, texto, raw)
+       values ('whatsapp', $1, $2, $3, $4)`,
+      [from_e164, lead_id, text, body]
+    );
+
+
+    // Emitir evento canônico → classificação/roteamento
+    await pool.query(
+      `insert into event_log(event_type, payload, idempotency_key, trace_id)
+       values ($1,$2, md5($2::text), gen_random_uuid())`,
+      ["resposta.recebida@v1", { canal:"whatsapp", from_e164, lead_id, text }, /* idempotency md5 */]
+    );
+
+
+    // Opcional: mandar para o outbox de classificação de intenção/sentimento
+    await pool.query(
+      `insert into outbox(event_id, consumer)
+       select id, 'agents.sentimento' from event_log
+       where event_type='resposta.recebida@v1'
+       order by id desc limit 1`
+    );
+
+
+    return res.json({ ok: true });
+  } catch (err:any) {
+    console.error("evolution webhook error:", err?.message || err);
+    return res.status(200).json({ ok: true }); // Nunca 4xx p/ não perder reentrega
+  }
+});
+
+
+app.listen(process.env.PORT || 3003, () => console.log("atendimento (webhook) up"));
+
+
+Obs.: se o seu Evolution tiver assinatura HMAC, troque o app.use(express.json(...)) por app.use(express.text(...)) (como em /shared/http.ts), valide x-signature e depois JSON.parse(req.body) para montar body.
+________________
+
+
+5) Classificador de Intenção/Sentimento (gancho pronto)
+Consome resposta.recebida@v1, rotula e devolve intencao.detectada@v1. (Você já tem o wrapper OpenAI; aqui fica o worker + prompt.)
+// /agents/sentimento/index.ts
+import { runOutbox } from "../../shared/worker";
+import { pool } from "../../shared/db";
+import { chat } from "../../shared/ai";
+
+
+const SYSTEM = `
+Você classifica mensagens B2B de leads em:
+- intencao: ['interesse','duvida','objeção','sem_interesse','agendamento','followup','indefinido']
+- sentimento: ['positivo','neutro','negativo']
+- confidencia: 0..1
+- extrair: {quando?:string, restricao?:string, cta?:string}
+Responda somente JSON.
+Regras: detectar 'opt-out' como sem_interesse; linguagem educada, sem julgamentos.`;
+
+
+runOutbox("agents.sentimento", async (payload)=>{
+  // payload vem de resposta.recebida@v1
+  const { text, lead_id, from_e164 } = payload || {};
+  if (!text) throw new Error("no_text");
+
+
+  const resp = await chat(SYSTEM, JSON.stringify({ text }));
+  const parsed = JSON.parse(resp);
+
+
+  // grava resultado
+  await pool.query(
+    `insert into event_log(event_type, payload, idempotency_key, trace_id)
+     values ($1,$2, md5($2::text), gen_random_uuid())`,
+    ["intencao.detectada@v1", { lead_id, from_e164, ...parsed }]
+  );
+
+
+  // opcional: empurrar p/ agendamento se intenção = 'agendamento' ou 'interesse' com quando
+  if (parsed.intencao === "agendamento" || (parsed.intencao==="interesse" && parsed.extrair?.quando)){
+    await pool.query(
+      `insert into outbox(event_id, consumer)
+       select id, 'agents.agendamento' from event_log
+       where event_type='intencao.detectada@v1'
+       order by id desc limit 1`
+    );
+  }
+});
+
+
+________________
+
+
+6) Bloqueio de disparo para DNC
+Antes de enviar, checar a lista “do not contact”.
+// /shared/dnc.ts
+import { pool } from "./db";
+
+
+export async function isBlocked(canal: "whatsapp" | "email", chave: string){
+  const { rows } = await pool.query(
+    `select 1 from dnc where canal=$1 and chave=$2 limit 1`, [canal, chave]
+  );
+  return rows.length > 0;
+}
+
+
+Use nos disparadores:
+// /agents/disparo/whatsapp.ts
+import { isBlocked } from "../../shared/dnc";
+// ...
+if (await isBlocked("whatsapp", contato.telefone_e164)) throw new Error("dnc_blocked");
+
+
+// /agents/disparo/email.ts
+import { isBlocked } from "../../shared/dnc";
+// ...
+if (await isBlocked("email", contato.email)) throw new Error("dnc_blocked");
+
+
+________________
+
+
+7) Testes rápidos (curl)
+Webhook Evolution (simulado):
+curl -X POST http://localhost:3003/webhook/evolution \
+  -H "Content-Type: application/json" \
+  -d '{"event":"message:in","data":{"from":"5511988887777","message":{"text":"Quero saber preços amanhã"}}}'
+
+
+→ Deve inserir em inbound_msgs, gerar resposta.recebida@v1 e empurrar para agents.sentimento.
+Opt-out:
+curl -X POST http://localhost:3003/webhook/evolution \
+  -H "Content-Type: application/json" \
+  -d '{"event":"message:in","data":{"from":"5511988887777","message":{"text":"pare"}}}'
+
+
+→ Deve inserir em dnc e bloquear próximos disparos.
+________________
+
+
+Checklist de integração
+* Criar tabelas inbound_msgs e dnc.
+
+* Subir Atendimento (/agents/atendimento) e apontar o webhook no Evolution.
+
+* Garantir /metrics exposto (já entregue) e contabilizar inbound/outbound (adicione incrementos em pontos críticos).
+
+* Atualizar Disparo para renderTemplate() (Mustache) e checagem isBlocked().
+
+* Deixar o Sentimento rodando o runOutbox("agents.sentimento", ...).

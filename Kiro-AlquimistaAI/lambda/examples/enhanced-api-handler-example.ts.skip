@@ -1,0 +1,151 @@
+import { APIGatewayProxyResult } from 'aws-lambda';
+import { withEnhancedObservability, EnhancedContext } from '../shared/enhanced-middleware';
+
+/**
+ * Exemplo de handler de API usando o middleware de observabilidade avançada
+ */
+export const handler = withEnhancedObservability(
+  'example-api',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger, tracer, event } = ctx;
+
+    // Logger já tem trace_id e correlation_id automaticamente
+    logger.info('Processing request', {
+      operation: 'process.start',
+      customMetrics: {
+        pathParameters: event.pathParameters,
+        queryParameters: event.queryStringParameters
+      }
+    });
+
+    try {
+      // Exemplo: Chamada ao banco de dados com trace
+      const dbResult = await tracer.traceDatabaseQuery(
+        'SELECT',
+        async () => {
+          // Simular query ao banco
+          logger.logDatabaseQuery('SELECT * FROM users WHERE id = ?', 50, 1);
+          return { id: 1, name: 'Test User' };
+        }
+      );
+
+      // Exemplo: Chamada a API externa com trace
+      const externalData = await tracer.traceExternalCall(
+        'external-service',
+        'https://api.example.com/data',
+        async () => {
+          // Simular chamada externa
+          logger.logExternalApiCall('external-service', '/data', 200, 150);
+          return { data: 'example' };
+        }
+      );
+
+      // Exemplo: Operação de negócio com trace
+      const businessResult = await tracer.traceOperation(
+        'business-logic',
+        async () => {
+          logger.logBusinessEvent('user.action', {
+            action: 'view_profile',
+            userId: dbResult.id
+          });
+          return { success: true };
+        },
+        {
+          service: 'business',
+          operation: 'process.user.action',
+          annotations: {
+            userId: dbResult.id.toString()
+          }
+        }
+      );
+
+      // Métrica customizada
+      logger.logCustomMetric('BusinessOperationSuccess', 1, 'Count');
+
+      logger.info('Request processed successfully', {
+        operation: 'process.success',
+        customMetrics: {
+          resultCount: 1,
+          processingSteps: 3
+        }
+      });
+
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          success: true,
+          data: {
+            user: dbResult,
+            external: externalData,
+            business: businessResult
+          }
+        })
+      };
+    } catch (error) {
+      // Erro já é logado automaticamente pelo middleware
+      // Mas podemos adicionar contexto adicional
+      logger.error('Business logic error', error as Error, {
+        operation: 'process.error',
+        customMetrics: {
+          errorContext: 'business_logic'
+        }
+      });
+
+      logger.logCustomMetric('BusinessOperationError', 1, 'Count');
+
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          error: 'Failed to process request',
+          message: (error as Error).message
+        })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo com child logger para operações aninhadas
+ */
+export const handlerWithChildLogger = withEnhancedObservability(
+  'nested-operations',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger, tracer } = ctx;
+
+    logger.info('Starting nested operations');
+
+    // Criar child logger para operação específica
+    const childLogger = logger.child({
+      operation: 'nested.operation.1',
+      agentId: 'agent-123'
+    });
+
+    childLogger.info('Child operation started');
+
+    // Criar child tracer
+    const childTracer = tracer.child({
+      operation: 'nested.operation.1',
+      agentId: 'agent-123'
+    });
+
+    await childTracer.traceOperation(
+      'nested-operation',
+      async () => {
+        childLogger.info('Executing nested logic');
+        // Lógica aninhada aqui
+      }
+    );
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ success: true })
+    };
+  }
+);

@@ -1,0 +1,95 @@
+version: 2
+
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    
+    # Automatically merge minor and patch updates
+    open-pull-requests-limit: 10
+    
+    # Add reviewers and assignees
+    reviewers:
+      - "alquimista-ai/security-team"
+    
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "security"
+      - "automated"
+    
+    # Commit message prefix
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    
+    # Group updates by type
+    groups:
+      # Group AWS SDK updates together
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+          - "aws-sdk"
+          - "aws-cdk*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Group AWS Lambda Powertools updates
+      powertools:
+        patterns:
+          - "@aws-lambda-powertools/*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Group development dependencies
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Group TypeScript and related tools
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+          - "ts-*"
+        update-types:
+          - "minor"
+          - "patch"
+    
+    # Ignore specific dependencies (if needed)
+    ignore:
+      # Example: Ignore major version updates for stable packages
+      # - dependency-name: "aws-cdk-lib"
+      #   update-types: ["version-update:semver-major"]
+    
+    # Allow both direct and indirect dependencies
+    versioning-strategy: auto
+    
+    # Rebase strategy for PRs
+    rebase-strategy: "auto"
+
+  # Enable security updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    
+    labels:
+      - "github-actions"
+      - "security"
+      - "automated"
+    
+    commit-message:
+      prefix: "chore(ci)"

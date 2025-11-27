@@ -1,0 +1,142 @@
+﻿1) Parser Prometheus → JS/TS + mapa rápido para o dashboard
+1.1 Snippet “cola-e-usa” (TypeScript, zero dependências)
+// lib/metrics.ts
+export type Counter = Record<string, number>;
+export type Hist = { buckets: { le: number; value: number }[]; count: number; sum: number };
+export type Metrics = {
+  event_total: Counter;
+  inbound_total: Counter;
+  disparo_total: Record<string, number>;                 // "canal|status"
+  agendamento_proposta_total: Counter;                   // por canal
+  agendamento_confirmado_total: Counter;                 // por canal
+  agendamento_falha_total: Record<string, number>;       // "fase|erro"
+  latency_ms: Hist;                                      // histograma bruto
+  p50?: number;                                          // estimado
+  p95?: number;                                          // estimado
+};
+
+
+const RX = {
+  sample: /^([a-zA-Z_:][a-zA-Z0-9_:]*)\{?([^}]*)\}?\s+([+-]?\d+(\.\d+)?([eE][+-]?\d+)?)$/,
+  label: /(\w+)\s*=\s*"(.*?)"/g,
+};
+
+
+function parseLabels(s: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!s) return out;
+  let m: RegExpExecArray | null;
+  while ((m = RX.label.exec(s))) out[m[1]] = m[2];
+  return out;
+}
+
+
+function pushCounter(dst: Counter, key: string, v: number) {
+  dst[key] = (dst[key] ?? 0) + v;
+}
+
+
+export function parsePrometheus(text: string): Metrics {
+  const m: Metrics = {
+    event_total: {},
+    inbound_total: {},
+    disparo_total: {},
+    agendamento_proposta_total: {},
+    agendamento_confirmado_total: {},
+    agendamento_falha_total: {},
+    latency_ms: { buckets: [], count: 0, sum: 0 },
+  };
+
+
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line || line.startsWith("#")) continue;
+    const sm = RX.sample.exec(line.trim());
+    if (!sm) continue;
+    const [, name, rawLabels, valStr] = sm;
+    const val = Number(valStr);
+    const L = parseLabels(rawLabels);
+
+
+    // Histogram (latency_ms)
+    if (name === "latency_ms_bucket" && L.le) {
+      m.latency_ms.buckets.push({ le: Number(L.le), value: val });
+      continue;
+    }
+    if (name === "latency_ms_count") { m.latency_ms.count = val; continue; }
+    if (name === "latency_ms_sum")   { m.latency_ms.sum   = val; continue; }
+
+
+    // Counters canônicos
+    if (name === "event_total" && L.event_type) {
+      pushCounter(m.event_total, L.event_type, val); continue;
+    }
+    if (name === "inbound_total" && L.canal) {
+      pushCounter(m.inbound_total, L.canal, val); continue;
+    }
+    if (name === "disparo_total" && L.canal && L.status) {
+      const key = `${L.canal}|${L.status}`;
+      m.disparo_total[key] = val; continue;
+    }
+    if (name === "agendamento_proposta_total" && L.canal) {
+      pushCounter(m.agendamento_proposta_total, L.canal, val); continue;
+    }
+    if (name === "agendamento_confirmado_total" && L.canal) {
+      pushCounter(m.agendamento_confirmado_total, L.canal, val); continue;
+    }
+    if (name === "agendamento_falha_total" && L.fase && L.erro) {
+      const key = `${L.fase}|${L.erro}`;
+      m.agendamento_falha_total[key] = val; continue;
+    }
+  }
+
+
+  // ordenar buckets e estimar p50/p95 por interpolação acumulada
+  m.latency_ms.buckets.sort((a, b) => a.le - b.le);
+  const q = (p: number) => {
+    if (!m.latency_ms.count || m.latency_ms.buckets.length === 0) return undefined;
+    const target = m.latency_ms.count * p;
+    let prevLe = 0, prevC = 0;
+    for (const b of m.latency_ms.buckets) {
+      const c = b.value;
+      if (c >= target) {
+        const spanC = Math.max(c - prevC, 1);
+        const spanLe = Math.max(b.le - prevLe, 1);
+        const within = (target - prevC) / spanC;
+        return prevLe + within * spanLe; // aproximação linear
+      }
+      prevLe = b.le; prevC = c;
+    }
+    return m.latency_ms.buckets[m.latency_ms.buckets.length - 1].le;
+  };
+  m.p50 = q(0.5);
+  m.p95 = q(0.95);
+
+
+  return m;
+}
+
+
+// Exemplo de uso com React Query:
+// const { data, isLoading } = useQuery(['metrics'], async () => {
+//   const res = await fetch(`${import.meta.env.VITE_API_URL}/metrics`);
+//   return parsePrometheus(await res.text());
+// }, { refetchInterval: 15000 });
+
+
+1.2 Mapa rápido → Widgets do Dashboard
+* Cards KPI
+
+   * Higienizados: event_total['lead.higienizado@v1']
+
+   * Inbound WA/Email: inbound_total['whatsapp'], inbound_total['email']
+
+   * Envios OK/Fail: disparo_total['whatsapp|ok'], disparo_total['whatsapp|fail'], idem e-mail
+
+   * Propostas/Confirmados: somatórios em agendamento_proposta_total, agendamento_confirmado_total
+
+      * Funil T0→T7: derive de event_total[...] por etapa canônica
+
+      * Mapa de falhas (Agendamento): agregue agendamento_falha_total por fase e “top-erros”
+
+      * SLA (latência): use p50 e p95 retornados pelo parser

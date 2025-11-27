@@ -1,0 +1,716 @@
+{
+ "Description": "WAF + Edge Security - Proteção de APIs contra ataques",
+ "Resources": {
+  "AllowedIPs": {
+   "Type": "AWS::WAFv2::IPSet",
+   "Properties": {
+    "Addresses": [],
+    "Description": "Lista de IPs permitidos (allowlist) - escritórios, CI/CD, health checks",
+    "IPAddressVersion": "IPV4",
+    "Name": "alquimista-allowed-ips-dev",
+    "Scope": "REGIONAL",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/AllowedIPs"
+   }
+  },
+  "BlockedIPs": {
+   "Type": "AWS::WAFv2::IPSet",
+   "Properties": {
+    "Addresses": [],
+    "Description": "Lista de IPs bloqueados (blocklist) - IPs maliciosos identificados",
+    "IPAddressVersion": "IPV4",
+    "Name": "alquimista-blocked-ips-dev",
+    "Scope": "REGIONAL",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/BlockedIPs"
+   }
+  },
+  "WAFLogGroupDev48F60186": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/waf/alquimista-dev",
+    "RetentionInDays": 30,
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/WAFLogGroupDev/Resource"
+   }
+  },
+  "WAFLogGroupProd93923921": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/waf/alquimista-prod",
+    "RetentionInDays": 90,
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/WAFLogGroupProd/Resource"
+   }
+  },
+  "WebACLDev": {
+   "Type": "AWS::WAFv2::WebACL",
+   "Properties": {
+    "DefaultAction": {
+     "Allow": {}
+    },
+    "Description": "WAF Web ACL para APIs Dev - Modo observação",
+    "Name": "AlquimistaAI-WAF-Dev",
+    "Rules": [
+     {
+      "Action": {
+       "Block": {}
+      },
+      "Name": "BlockedIPsRule",
+      "Priority": 0,
+      "Statement": {
+       "IPSetReferenceStatement": {
+        "Arn": {
+         "Fn::GetAtt": [
+          "BlockedIPs",
+          "Arn"
+         ]
+        }
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "BlockedIPsRule-Dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesCommonRuleSet",
+      "OverrideAction": {
+       "Count": {}
+      },
+      "Priority": 1,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesCommonRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "AWSManagedRulesCommonRuleSet-Dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesKnownBadInputsRuleSet",
+      "OverrideAction": {
+       "Count": {}
+      },
+      "Priority": 2,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesKnownBadInputsRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "AWSManagedRulesKnownBadInputsRuleSet-Dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "Count": {}
+      },
+      "Priority": 3,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesSQLiRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "AWSManagedRulesSQLiRuleSet-Dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Action": {
+       "Count": {}
+      },
+      "Name": "RateLimitDev",
+      "Priority": 10,
+      "Statement": {
+       "RateBasedStatement": {
+        "AggregateKeyType": "IP",
+        "Limit": 2000,
+        "ScopeDownStatement": {
+         "NotStatement": {
+          "Statement": {
+           "IPSetReferenceStatement": {
+            "Arn": {
+             "Fn::GetAtt": [
+              "AllowedIPs",
+              "Arn"
+             ]
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "RateLimitDev",
+       "SampledRequestsEnabled": true
+      }
+     }
+    ],
+    "Scope": "REGIONAL",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ],
+    "VisibilityConfig": {
+     "CloudWatchMetricsEnabled": true,
+     "MetricName": "AlquimistaAI-WAF-Dev",
+     "SampledRequestsEnabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/WebACLDev"
+   }
+  },
+  "WebACLProd": {
+   "Type": "AWS::WAFv2::WebACL",
+   "Properties": {
+    "DefaultAction": {
+     "Allow": {}
+    },
+    "Description": "WAF Web ACL para APIs Prod - Modo bloqueio ativo",
+    "Name": "AlquimistaAI-WAF-Prod",
+    "Rules": [
+     {
+      "Action": {
+       "Block": {}
+      },
+      "Name": "BlockedIPsRule",
+      "Priority": 0,
+      "Statement": {
+       "IPSetReferenceStatement": {
+        "Arn": {
+         "Fn::GetAtt": [
+          "BlockedIPs",
+          "Arn"
+         ]
+        }
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "BlockedIPsRule-Prod",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesCommonRuleSet",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 1,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesCommonRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "AWSManagedRulesCommonRuleSet-Prod",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesKnownBadInputsRuleSet",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 2,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesKnownBadInputsRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "AWSManagedRulesKnownBadInputsRuleSet-Prod",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 3,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesSQLiRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "AWSManagedRulesSQLiRuleSet-Prod",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Action": {
+       "Block": {}
+      },
+      "Name": "RateLimitProd",
+      "Priority": 10,
+      "Statement": {
+       "RateBasedStatement": {
+        "AggregateKeyType": "IP",
+        "Limit": 1000,
+        "ScopeDownStatement": {
+         "NotStatement": {
+          "Statement": {
+           "IPSetReferenceStatement": {
+            "Arn": {
+             "Fn::GetAtt": [
+              "AllowedIPs",
+              "Arn"
+             ]
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "RateLimitProd",
+       "SampledRequestsEnabled": true
+      }
+     }
+    ],
+    "Scope": "REGIONAL",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ],
+    "VisibilityConfig": {
+     "CloudWatchMetricsEnabled": true,
+     "MetricName": "AlquimistaAI-WAF-Prod",
+     "SampledRequestsEnabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/WebACLProd"
+   }
+  },
+  "WAFLoggingDev": {
+   "Type": "AWS::WAFv2::LoggingConfiguration",
+   "Properties": {
+    "LogDestinationConfigs": [
+     {
+      "Fn::GetAtt": [
+       "WAFLogGroupDev48F60186",
+       "Arn"
+      ]
+     }
+    ],
+    "RedactedFields": [
+     {
+      "SingleHeader": {
+       "name": "authorization"
+      }
+     },
+     {
+      "SingleHeader": {
+       "name": "cookie"
+      }
+     }
+    ],
+    "ResourceArn": {
+     "Fn::GetAtt": [
+      "WebACLDev",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/WAFLoggingDev"
+   }
+  },
+  "WAFLoggingProd": {
+   "Type": "AWS::WAFv2::LoggingConfiguration",
+   "Properties": {
+    "LogDestinationConfigs": [
+     {
+      "Fn::GetAtt": [
+       "WAFLogGroupProd93923921",
+       "Arn"
+      ]
+     }
+    ],
+    "RedactedFields": [
+     {
+      "SingleHeader": {
+       "name": "authorization"
+      }
+     },
+     {
+      "SingleHeader": {
+       "name": "cookie"
+      }
+     }
+    ],
+    "ResourceArn": {
+     "Fn::GetAtt": [
+      "WebACLProd",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/WAFLoggingProd"
+   }
+  },
+  "HighBlockRateAlarm1D0DDB93": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Fn::ImportValue": "SecurityStack-dev:ExportsOutputRefSecurityAlertTopic8D84EA7A77A8D013"
+     }
+    ],
+    "AlarmDescription": "Alto volume de requisições bloqueadas pelo WAF - Possível ataque em andamento",
+    "AlarmName": "alquimista-waf-high-block-rate-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "Region",
+      "Value": "us-east-1"
+     },
+     {
+      "Name": "Rule",
+      "Value": "ALL"
+     },
+     {
+      "Name": "WebACL",
+      "Value": "AlquimistaAI-WAF-Prod"
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "BlockedRequests",
+    "Namespace": "AWS/WAFV2",
+    "Period": 600,
+    "Statistic": "Sum",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ],
+    "Threshold": 100,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/HighBlockRateAlarm/Resource"
+   }
+  },
+  "RateLimitTriggeredAlarmB46CC9DA": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Fn::ImportValue": "SecurityStack-dev:ExportsOutputRefSecurityAlertTopic8D84EA7A77A8D013"
+     }
+    ],
+    "AlarmDescription": "Rate limiting acionado - IP excedeu limite de requisições",
+    "AlarmName": "alquimista-waf-rate-limit-triggered-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "Region",
+      "Value": "us-east-1"
+     },
+     {
+      "Name": "Rule",
+      "Value": "RateLimitProd"
+     },
+     {
+      "Name": "WebACL",
+      "Value": "AlquimistaAI-WAF-Prod"
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "BlockedRequests",
+    "Namespace": "AWS/WAFV2",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "WAF"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Project",
+      "Value": "AlquimistaAI"
+     }
+    ],
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/RateLimitTriggeredAlarm/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/y3KvQ7CIBiF4Wtxp58WvYGGwZg00djB0VAKSEuh4acMhHs3rU7nSc6LAeMznA40+YoNU6VVD7kLlE2IJv/OiYoVQybC3B4dD4gI8+J9Q9pNrZVSGUmsEUpGR4OypiBtpYfcWnl1Ni7/bndBTNs4JBrYB3KjqZu3e0cpG+8xLDEUZOzAYfTHFV+grqE+jF6pykUT1Mzh+dsvvfq/A7wAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "WAFStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "WebAclDevArn": {
+   "Description": "ARN do Web ACL Dev",
+   "Value": {
+    "Fn::GetAtt": [
+     "WebACLDev",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "dev-WebAclDevArn"
+   }
+  },
+  "WebAclProdArn": {
+   "Description": "ARN do Web ACL Prod",
+   "Value": {
+    "Fn::GetAtt": [
+     "WebACLProd",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "dev-WebAclProdArn"
+   }
+  },
+  "AllowedIPsArn": {
+   "Description": "ARN do IP Set de IPs permitidos",
+   "Value": {
+    "Fn::GetAtt": [
+     "AllowedIPs",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "dev-AllowedIPsArn"
+   }
+  },
+  "BlockedIPsArn": {
+   "Description": "ARN do IP Set de IPs bloqueados",
+   "Value": {
+    "Fn::GetAtt": [
+     "BlockedIPs",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "dev-BlockedIPsArn"
+   }
+  },
+  "WAFLogGroupDevName": {
+   "Description": "Nome do Log Group WAF Dev",
+   "Value": {
+    "Ref": "WAFLogGroupDev48F60186"
+   }
+  },
+  "WAFLogGroupProdName": {
+   "Description": "Nome do Log Group WAF Prod",
+   "Value": {
+    "Ref": "WAFLogGroupProd93923921"
+   }
+  },
+  "ExportsOutputFnGetAttWebACLDevArn49673A89": {
+   "Value": {
+    "Fn::GetAtt": [
+     "WebACLDev",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "WAFStack-dev:ExportsOutputFnGetAttWebACLDevArn49673A89"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

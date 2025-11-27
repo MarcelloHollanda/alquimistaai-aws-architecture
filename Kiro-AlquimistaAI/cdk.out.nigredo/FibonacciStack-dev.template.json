@@ -1,0 +1,4241 @@
+{
+ "Description": "Fibonacci - Núcleo Orquestrador Central",
+ "Transform": "AWS::SecretsManager-2024-09-16",
+ "Resources": {
+  "FibonacciKmsKey4FDBC47E": {
+   "Type": "AWS::KMS::Key",
+   "Properties": {
+    "Description": "KMS key for Fibonacci encryption - dev",
+    "EnableKeyRotation": true,
+    "KeyPolicy": {
+     "Statement": [
+      {
+       "Action": "kms:*",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::207933152643:root"
+       },
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "s3.amazonaws.com"
+       },
+       "Resource": "*",
+       "Sid": "Allow AWS Services"
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "sqs.amazonaws.com"
+       },
+       "Resource": "*",
+       "Sid": "Allow SQS Service"
+      },
+      {
+       "Action": [
+        "kms:CreateGrant",
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "rds.amazonaws.com"
+       },
+       "Resource": "*",
+       "Sid": "Allow RDS Service"
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PendingWindowInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciKmsKey/Resource"
+   }
+  },
+  "FibonacciKmsKeyAlias0E1FF909": {
+   "Type": "AWS::KMS::Alias",
+   "Properties": {
+    "AliasName": "alias/fibonacci-encryption-key-dev",
+    "TargetKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciKmsKey/Alias/Resource"
+   }
+  },
+  "FibonacciVpcB997BDC3": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/Resource"
+   }
+  },
+  "FibonacciVpcPublicSubnet1SubnetE9415DB7": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.0.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet1/Subnet"
+   }
+  },
+  "FibonacciVpcPublicSubnet1RouteTable1FDEB4B1": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet1/RouteTable"
+   }
+  },
+  "FibonacciVpcPublicSubnet1RouteTableAssociationA26321EC": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "FibonacciVpcPublicSubnet1RouteTable1FDEB4B1"
+    },
+    "SubnetId": {
+     "Ref": "FibonacciVpcPublicSubnet1SubnetE9415DB7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "FibonacciVpcPublicSubnet1DefaultRoute967169FC": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "FibonacciVpcIGW6389DCD2"
+    },
+    "RouteTableId": {
+     "Ref": "FibonacciVpcPublicSubnet1RouteTable1FDEB4B1"
+    }
+   },
+   "DependsOn": [
+    "FibonacciVpcVPCGWB6162534"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "FibonacciVpcPublicSubnet2SubnetEAF9A033": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.0.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet2/Subnet"
+   }
+  },
+  "FibonacciVpcPublicSubnet2RouteTable723BB512": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet2/RouteTable"
+   }
+  },
+  "FibonacciVpcPublicSubnet2RouteTableAssociation1CF6F2F6": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "FibonacciVpcPublicSubnet2RouteTable723BB512"
+    },
+    "SubnetId": {
+     "Ref": "FibonacciVpcPublicSubnet2SubnetEAF9A033"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "FibonacciVpcPublicSubnet2DefaultRouteF174A0DB": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "FibonacciVpcIGW6389DCD2"
+    },
+    "RouteTableId": {
+     "Ref": "FibonacciVpcPublicSubnet2RouteTable723BB512"
+    }
+   },
+   "DependsOn": [
+    "FibonacciVpcVPCGWB6162534"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.0.2.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "PrivateIsolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1/Subnet"
+   }
+  },
+  "FibonacciVpcPrivateIsolatedSubnet1RouteTable2D23BEA5": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1/RouteTable"
+   }
+  },
+  "FibonacciVpcPrivateIsolatedSubnet1RouteTableAssociationE7AFA15D": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "FibonacciVpcPrivateIsolatedSubnet1RouteTable2D23BEA5"
+    },
+    "SubnetId": {
+     "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet1/RouteTableAssociation"
+   }
+  },
+  "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.0.3.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "PrivateIsolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2/Subnet"
+   }
+  },
+  "FibonacciVpcPrivateIsolatedSubnet2RouteTableF181CB21": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2/RouteTable"
+   }
+  },
+  "FibonacciVpcPrivateIsolatedSubnet2RouteTableAssociation4ADCA747": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "FibonacciVpcPrivateIsolatedSubnet2RouteTableF181CB21"
+    },
+    "SubnetId": {
+     "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/PrivateIsolatedSubnet2/RouteTableAssociation"
+   }
+  },
+  "FibonacciVpcIGW6389DCD2": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/IGW"
+   }
+  },
+  "FibonacciVpcVPCGWB6162534": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "FibonacciVpcIGW6389DCD2"
+    },
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/VPCGW"
+   }
+  },
+  "FibonacciVpcRestrictDefaultSecurityGroupCustomResourceC1528A4C": {
+   "Type": "Custom::VpcRestrictDefaultSG",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+      "Arn"
+     ]
+    },
+    "DefaultSecurityGroupId": {
+     "Fn::GetAtt": [
+      "FibonacciVpcB997BDC3",
+      "DefaultSecurityGroup"
+     ]
+    },
+    "Account": "207933152643"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/RestrictDefaultSecurityGroupCustomResource/Default"
+   }
+  },
+  "FibonacciVpcS3Endpoint8300220D": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "RouteTableIds": [
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet1RouteTable2D23BEA5"
+     },
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet2RouteTableF181CB21"
+     },
+     {
+      "Ref": "FibonacciVpcPublicSubnet1RouteTable1FDEB4B1"
+     },
+     {
+      "Ref": "FibonacciVpcPublicSubnet2RouteTable723BB512"
+     }
+    ],
+    "ServiceName": {
+     "Fn::Join": [
+      "",
+      [
+       "com.amazonaws.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".s3"
+      ]
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ],
+    "VpcEndpointType": "Gateway",
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/S3Endpoint/Resource"
+   }
+  },
+  "FibonacciVpcSecretsManagerEndpointSecurityGroup2603E8CC": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/SecurityGroup/Resource"
+   }
+  },
+  "FibonacciVpcSecretsManagerEndpointSecurityGroupfromFibonacciStackdevLambdaSg4C2F05B444331827B6A": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Lambda access to Secrets Manager endpoint",
+    "FromPort": 443,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "FibonacciVpcSecretsManagerEndpointSecurityGroup2603E8CC",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "LambdaSg30A6108C",
+      "GroupId"
+     ]
+    },
+    "ToPort": 443
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/SecurityGroup/from FibonacciStackdevLambdaSg4C2F05B4:443"
+   }
+  },
+  "FibonacciVpcSecretsManagerEndpoint9776A8FB": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "PrivateDnsEnabled": true,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "FibonacciVpcSecretsManagerEndpointSecurityGroup2603E8CC",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServiceName": "com.amazonaws.us-east-1.secretsmanager",
+    "SubnetIds": [
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+     },
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ],
+    "VpcEndpointType": "Interface",
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/SecretsManagerEndpoint/Resource"
+   }
+  },
+  "FibonacciVpcEventBridgeEndpointSecurityGroupCB38502F": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/SecurityGroup/Resource"
+   }
+  },
+  "FibonacciVpcEventBridgeEndpointSecurityGroupfromFibonacciStackdevLambdaSg4C2F05B44432D01A0B1": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Lambda access to EventBridge endpoint",
+    "FromPort": 443,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "FibonacciVpcEventBridgeEndpointSecurityGroupCB38502F",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "LambdaSg30A6108C",
+      "GroupId"
+     ]
+    },
+    "ToPort": 443
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/SecurityGroup/from FibonacciStackdevLambdaSg4C2F05B4:443"
+   }
+  },
+  "FibonacciVpcEventBridgeEndpoint21DDD643": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "PrivateDnsEnabled": true,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "FibonacciVpcEventBridgeEndpointSecurityGroupCB38502F",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServiceName": "com.amazonaws.us-east-1.events",
+    "SubnetIds": [
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+     },
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "FibonacciStack-dev/FibonacciVpc"
+     }
+    ],
+    "VpcEndpointType": "Interface",
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciVpc/EventBridgeEndpoint/Resource"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress"
+         ],
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:ec2:us-east-1:207933152643:security-group/",
+             {
+              "Fn::GetAtt": [
+               "FibonacciVpcB997BDC3",
+               "DefaultSecurityGroup"
+              ]
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group"
+   },
+   "DependsOn": [
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+    "aws:asset:property": "Code"
+   }
+  },
+  "LambdaSg30A6108C": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Security group for Lambda functions",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/LambdaSg/Resource"
+   }
+  },
+  "DbSg495F8305": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Security group for Aurora cluster",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "255.255.255.255/32",
+      "Description": "Disallow all traffic",
+      "FromPort": 252,
+      "IpProtocol": "icmp",
+      "ToPort": 86
+     }
+    ],
+    "VpcId": {
+     "Ref": "FibonacciVpcB997BDC3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DbSg/Resource"
+   }
+  },
+  "DbSgfromFibonacciStackdevLambdaSg4C2F05B45432495034CC": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow Lambda access to Aurora",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "DbSg495F8305",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "LambdaSg30A6108C",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DbSg/from FibonacciStackdevLambdaSg4C2F05B4:5432"
+   }
+  },
+  "DbSecret685A0FA5": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Generated by the CDK for stack: ",
+       {
+        "Ref": "AWS::StackName"
+       }
+      ]
+     ]
+    },
+    "GenerateSecretString": {
+     "ExcludeCharacters": " %+~`#$&*()|[]{}:;<>?!'/@\"\\",
+     "GenerateStringKey": "password",
+     "PasswordLength": 30,
+     "SecretStringTemplate": "{\"username\":\"dbadmin\"}"
+    },
+    "Name": "fibonacci/db/credentials-dev"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DbSecret/Resource"
+   }
+  },
+  "DbSecretAttachment0609CE05": {
+   "Type": "AWS::SecretsManager::SecretTargetAttachment",
+   "Properties": {
+    "SecretId": {
+     "Ref": "DbSecret685A0FA5"
+    },
+    "TargetId": {
+     "Ref": "AuroraCluster23D869C0"
+    },
+    "TargetType": "AWS::RDS::DBCluster"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DbSecret/Attachment/Resource"
+   }
+  },
+  "DbSecretRotationSchedule0F97D85A": {
+   "Type": "AWS::SecretsManager::RotationSchedule",
+   "Properties": {
+    "HostedRotationLambda": {
+     "ExcludeCharacters": " %+~`#$&*()|[]{}:;<>?!'/@\"\\",
+     "RotationLambdaName": "fibonacci-secret-rotation-dev",
+     "RotationType": "PostgreSQLSingleUser",
+     "VpcSecurityGroupIds": {
+      "Fn::GetAtt": [
+       "LambdaSg30A6108C",
+       "GroupId"
+      ]
+     },
+     "VpcSubnetIds": {
+      "Fn::Join": [
+       "",
+       [
+        {
+         "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+        },
+        ",",
+        {
+         "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+        }
+       ]
+      ]
+     }
+    },
+    "RotateImmediatelyOnUpdate": false,
+    "RotationRules": {
+     "ScheduleExpression": "rate(30 days)"
+    },
+    "SecretId": {
+     "Ref": "DbSecret685A0FA5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DbSecret/RotationSchedule/Resource"
+   }
+  },
+  "DbSecretPolicyAD0422AC": {
+   "Type": "AWS::SecretsManager::ResourcePolicy",
+   "Properties": {
+    "ResourcePolicy": {
+     "Statement": [
+      {
+       "Action": "secretsmanager:DeleteSecret",
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "arn:aws:iam::207933152643:root"
+       },
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "SecretId": {
+     "Ref": "DbSecret685A0FA5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DbSecret/Policy/Resource"
+   }
+  },
+  "AuroraClusterSubnetsF3E9E6AD": {
+   "Type": "AWS::RDS::DBSubnetGroup",
+   "Properties": {
+    "DBSubnetGroupDescription": "Subnets for AuroraCluster database",
+    "SubnetIds": [
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+     },
+     {
+      "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/AuroraCluster/Subnets/Default"
+   }
+  },
+  "AuroraCluster23D869C0": {
+   "Type": "AWS::RDS::DBCluster",
+   "Properties": {
+    "BackupRetentionPeriod": 7,
+    "CopyTagsToSnapshot": true,
+    "DBClusterParameterGroupName": "default.aurora-postgresql15",
+    "DBSubnetGroupName": {
+     "Ref": "AuroraClusterSubnetsF3E9E6AD"
+    },
+    "DatabaseName": "fibonacci",
+    "DeletionProtection": false,
+    "Engine": "aurora-postgresql",
+    "EngineVersion": "15.8",
+    "KmsKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "MasterUserPassword": {
+     "Fn::Join": [
+      "",
+      [
+       "{{resolve:secretsmanager:",
+       {
+        "Ref": "DbSecret685A0FA5"
+       },
+       ":SecretString:password::}}"
+      ]
+     ]
+    },
+    "MasterUsername": {
+     "Fn::Join": [
+      "",
+      [
+       "{{resolve:secretsmanager:",
+       {
+        "Ref": "DbSecret685A0FA5"
+       },
+       ":SecretString:username::}}"
+      ]
+     ]
+    },
+    "Port": 5432,
+    "PreferredBackupWindow": "03:00-04:00",
+    "ServerlessV2ScalingConfiguration": {
+     "MaxCapacity": 1,
+     "MinCapacity": 0.5
+    },
+    "StorageEncrypted": true,
+    "VpcSecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "DbSg495F8305",
+       "GroupId"
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/AuroraCluster/Resource"
+   }
+  },
+  "AuroraClusterwriter499C523E": {
+   "Type": "AWS::RDS::DBInstance",
+   "Properties": {
+    "DBClusterIdentifier": {
+     "Ref": "AuroraCluster23D869C0"
+    },
+    "DBInstanceClass": "db.serverless",
+    "Engine": "aurora-postgresql",
+    "PromotionTier": 0,
+    "PubliclyAccessible": false
+   },
+   "DependsOn": [
+    "FibonacciVpcPrivateIsolatedSubnet1RouteTableAssociationE7AFA15D",
+    "FibonacciVpcPrivateIsolatedSubnet2RouteTableAssociation4ADCA747"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/AuroraCluster/writer/Resource"
+   }
+  },
+  "FibonacciBus476BDCEA": {
+   "Type": "AWS::Events::EventBus",
+   "Properties": {
+    "Name": "fibonacci-bus-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciBus/Resource"
+   }
+  },
+  "DeadLetterQueue9F481546": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "fibonacci-dlq-dev"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DeadLetterQueue/Resource"
+   }
+  },
+  "MainQueueD24C6076": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-main-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/MainQueue/Resource"
+   }
+  },
+  "MainQueuePolicy7EC89565": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:SourceAccount": "207933152643"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "MainQueueD24C6076",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "MainQueueD24C6076"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/MainQueue/Policy/Resource"
+   }
+  },
+  "recebimentoQueue4D4DA6BB": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-recebimento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/recebimentoQueue/Resource"
+   }
+  },
+  "estrategiaQueueE6DA45F3": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-estrategia-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/estrategiaQueue/Resource"
+   }
+  },
+  "disparoQueue6A7B4E4F": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-disparo-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/disparoQueue/Resource"
+   }
+  },
+  "atendimentoQueue9007AAA7": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-atendimento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/atendimentoQueue/Resource"
+   }
+  },
+  "sentimentoQueue97C535CB": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-sentimento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/sentimentoQueue/Resource"
+   }
+  },
+  "agendamentoQueue4667B75A": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-agendamento-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/agendamentoQueue/Resource"
+   }
+  },
+  "relatoriosQueue740D4E5C": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "KmsMasterKeyId": {
+     "Fn::GetAtt": [
+      "FibonacciKmsKey4FDBC47E",
+      "Arn"
+     ]
+    },
+    "QueueName": "fibonacci-relatorios-dev",
+    "ReceiveMessageWaitTimeSeconds": 10,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "DeadLetterQueue9F481546",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 30
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/relatoriosQueue/Resource"
+   }
+  },
+  "NigredoRoutingRule00BB606C": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route Nigredo events to appropriate queues",
+    "EventBusName": {
+     "Ref": "FibonacciBus476BDCEA"
+    },
+    "EventPattern": {
+     "source": [
+      "nigredo"
+     ]
+    },
+    "Name": "nigredo-routing-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "MainQueueD24C6076",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/NigredoRoutingRule/Resource"
+   }
+  },
+  "AlquimistaRoutingRule08F00E17": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Route Alquimista events to appropriate queues",
+    "EventBusName": {
+     "Ref": "FibonacciBus476BDCEA"
+    },
+    "EventPattern": {
+     "source": [
+      "alquimista"
+     ]
+    },
+    "Name": "alquimista-routing-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "MainQueueD24C6076",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/AlquimistaRoutingRule/Resource"
+   }
+  },
+  "DemoRuleC8625E3C": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Demo rule for testing",
+    "EventBusName": {
+     "Ref": "FibonacciBus476BDCEA"
+    },
+    "EventPattern": {
+     "source": [
+      "fibonacci.demo"
+     ]
+    },
+    "Name": "demo-rule-dev",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "MainQueueD24C6076",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DemoRule/Resource"
+   }
+  },
+  "SiteBucket397A1860": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "BucketKeyEnabled": true,
+       "ServerSideEncryptionByDefault": {
+        "KMSMasterKeyID": {
+         "Fn::GetAtt": [
+          "FibonacciKmsKey4FDBC47E",
+          "Arn"
+         ]
+        },
+        "SSEAlgorithm": "aws:kms"
+       }
+      }
+     ]
+    },
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "fibonacci-site-dev-",
+       {
+        "Ref": "AWS::AccountId"
+       }
+      ]
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ],
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/SiteBucket/Resource"
+   }
+  },
+  "SiteBucketPolicy3AC1D0F8": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "SiteBucket397A1860"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "SiteBucket397A1860",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SiteBucket397A1860",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "SiteBucket397A1860",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "SiteBucket397A1860",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Principal": {
+        "CanonicalUser": {
+         "Fn::GetAtt": [
+          "DistributionOrigin1S3Origin5F5C0696",
+          "S3CanonicalUserId"
+         ]
+        }
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "SiteBucket397A1860",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": "s3:GetObject",
+       "Condition": {
+        "StringEquals": {
+         "AWS:SourceArn": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:cloudfront::",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":distribution/",
+            {
+             "Ref": "Distribution830FAC52"
+            }
+           ]
+          ]
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "SiteBucket397A1860",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/SiteBucket/Policy/Resource"
+   }
+  },
+  "SiteBucketAutoDeleteObjectsCustomResource9585E968": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "SiteBucket397A1860"
+    }
+   },
+   "DependsOn": [
+    "SiteBucketPolicy3AC1D0F8"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/SiteBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "SiteBucket397A1860"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "StackVersionsBucket900BB24B": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "BucketKeyEnabled": true,
+       "ServerSideEncryptionByDefault": {
+        "KMSMasterKeyID": {
+         "Fn::GetAtt": [
+          "FibonacciKmsKey4FDBC47E",
+          "Arn"
+         ]
+        },
+        "SSEAlgorithm": "aws:kms"
+       }
+      }
+     ]
+    },
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "fibonacci-stack-versions-dev-",
+       {
+        "Ref": "AWS::AccountId"
+       }
+      ]
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 1
+       },
+       "Id": "DeleteOldVersions",
+       "NoncurrentVersionExpiration": {
+        "NoncurrentDays": 90
+       },
+       "Status": "Enabled"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ],
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/StackVersionsBucket/Resource"
+   }
+  },
+  "StackVersionsBucketPolicy5158ED61": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "StackVersionsBucket900BB24B"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "StackVersionsBucket900BB24B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "StackVersionsBucket900BB24B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "StackVersionsBucket900BB24B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "StackVersionsBucket900BB24B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/StackVersionsBucket/Policy/Resource"
+   }
+  },
+  "StackVersionsBucketAutoDeleteObjectsCustomResource2D51B08C": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "StackVersionsBucket900BB24B"
+    }
+   },
+   "DependsOn": [
+    "StackVersionsBucketPolicy5158ED61"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/StackVersionsBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CloudFrontWebACL": {
+   "Type": "AWS::WAFv2::WebACL",
+   "Properties": {
+    "CustomResponseBodies": {
+     "rate-limit-response": {
+      "Content": "{\"error\":\"Rate limit exceeded\",\"message\":\"Too many requests. Please try again later.\",\"code\":\"RATE_LIMIT_EXCEEDED\"}",
+      "ContentType": "APPLICATION_JSON"
+     }
+    },
+    "DefaultAction": {
+     "Allow": {}
+    },
+    "Description": "WAF Web ACL for Fibonacci CloudFront Distribution - dev",
+    "Name": "fibonacci-cloudfront-waf-dev",
+    "Rules": [
+     {
+      "Action": {
+       "Block": {
+        "CustomResponse": {
+         "CustomResponseBodyKey": "rate-limit-response",
+         "ResponseCode": 429
+        }
+       }
+      },
+      "Name": "RateLimitRule",
+      "Priority": 1,
+      "Statement": {
+       "RateBasedStatement": {
+        "AggregateKeyType": "IP",
+        "Limit": 2000,
+        "ScopeDownStatement": {
+         "NotStatement": {
+          "Statement": {
+           "ByteMatchStatement": {
+            "FieldToMatch": {
+             "UriPath": {}
+            },
+            "PositionalConstraint": "STARTS_WITH",
+            "SearchString": "/health",
+            "TextTransformations": [
+             {
+              "Priority": 0,
+              "Type": "LOWERCASE"
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "RateLimitRule-dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "SQLInjectionProtection",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 2,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "ExcludedRules": [],
+        "Name": "AWSManagedRulesSQLiRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "SQLInjectionProtection-dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "XSSProtection",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 3,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "ExcludedRules": [],
+        "Name": "AWSManagedRulesKnownBadInputsRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "XSSProtection-dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "CoreRuleSet",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 4,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "ExcludedRules": [
+         {
+          "Name": "SizeRestrictions_BODY"
+         },
+         {
+          "Name": "GenericRFI_BODY"
+         }
+        ],
+        "Name": "AWSManagedRulesCommonRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "CoreRuleSet-dev",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "BotProtection",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 5,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "ManagedRuleGroupConfigs": [
+         {
+          "AWSManagedRulesBotControlRuleSet": {
+           "InspectionLevel": "COMMON"
+          }
+         }
+        ],
+        "Name": "AWSManagedRulesBotControlRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "BotProtection-dev",
+       "SampledRequestsEnabled": true
+      }
+     }
+    ],
+    "Scope": "CLOUDFRONT",
+    "VisibilityConfig": {
+     "CloudWatchMetricsEnabled": true,
+     "MetricName": "FibonacciCloudFrontWAF-dev",
+     "SampledRequestsEnabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/CloudFrontWebACL"
+   }
+  },
+  "WAFBlockedRequestsAlarm74585045": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmDescription": "Alto número de requisições bloqueadas pelo WAF - Possível ataque em andamento",
+    "AlarmName": "fibonacci-waf-blocked-requests-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "Region",
+      "Value": "us-east-1"
+     },
+     {
+      "Name": "Rule",
+      "Value": "ALL"
+     },
+     {
+      "Name": "WebACL",
+      "Value": "fibonacci-cloudfront-waf-dev"
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "BlockedRequests",
+    "Namespace": "AWS/WAFV2",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 100,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/WAFBlockedRequestsAlarm/Resource"
+   }
+  },
+  "WAFRateLimitAlarm90DB5E0E": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmDescription": "Rate limiting ativado - IPs excedendo limite de requisições",
+    "AlarmName": "fibonacci-waf-rate-limit-dev",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "Region",
+      "Value": "us-east-1"
+     },
+     {
+      "Name": "Rule",
+      "Value": "RateLimitRule"
+     },
+     {
+      "Name": "WebACL",
+      "Value": "fibonacci-cloudfront-waf-dev"
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "BlockedRequests",
+    "Namespace": "AWS/WAFV2",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/WAFRateLimitAlarm/Resource"
+   }
+  },
+  "OAC": {
+   "Type": "AWS::CloudFront::OriginAccessControl",
+   "Properties": {
+    "OriginAccessControlConfig": {
+     "Name": "fibonacci-oac-dev",
+     "OriginAccessControlOriginType": "s3",
+     "SigningBehavior": "always",
+     "SigningProtocol": "sigv4"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/OAC"
+   }
+  },
+  "DistributionOrigin1S3Origin5F5C0696": {
+   "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+   "Properties": {
+    "CloudFrontOriginAccessIdentityConfig": {
+     "Comment": "Identity for FibonacciStackdevDistributionOrigin1FBD7EA0E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/Distribution/Origin1/S3Origin/Resource"
+   }
+  },
+  "Distribution830FAC52": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "Comment": "Fibonacci Front-End Distribution - dev",
+     "CustomErrorResponses": [
+      {
+       "ErrorCachingMinTTL": 300,
+       "ErrorCode": 404,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      },
+      {
+       "ErrorCachingMinTTL": 300,
+       "ErrorCode": 403,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      }
+     ],
+     "DefaultCacheBehavior": {
+      "AllowedMethods": [
+       "GET",
+       "HEAD",
+       "OPTIONS"
+      ],
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "CachedMethods": [
+       "GET",
+       "HEAD",
+       "OPTIONS"
+      ],
+      "Compress": true,
+      "TargetOriginId": "FibonacciStackdevDistributionOrigin1FBD7EA0E",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "DefaultRootObject": "index.html",
+     "Enabled": true,
+     "HttpVersion": "http2",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "DomainName": {
+        "Fn::GetAtt": [
+         "SiteBucket397A1860",
+         "RegionalDomainName"
+        ]
+       },
+       "Id": "FibonacciStackdevDistributionOrigin1FBD7EA0E",
+       "S3OriginConfig": {
+        "OriginAccessIdentity": {
+         "Fn::Join": [
+          "",
+          [
+           "origin-access-identity/cloudfront/",
+           {
+            "Ref": "DistributionOrigin1S3Origin5F5C0696"
+           }
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "PriceClass": "PriceClass_100",
+     "WebACLId": {
+      "Fn::GetAtt": [
+       "CloudFrontWebACL",
+       "Arn"
+      ]
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/Distribution/Resource"
+   }
+  },
+  "UserPoolsmsRole4EA729DD": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Condition": {
+        "StringEquals": {
+         "sts:ExternalId": "FibonacciStackdevUserPool015169EC"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "cognito-idp.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "sns:Publish",
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "sns-publish"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/UserPool/smsRole/Resource"
+   }
+  },
+  "UserPool6BA7E5F2": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "EnabledMfas": [
+     "SMS_MFA",
+     "SOFTWARE_TOKEN_MFA"
+    ],
+    "MfaConfiguration": "OPTIONAL",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": false,
+      "RequireUppercase": true
+     }
+    },
+    "Schema": [
+     {
+      "Mutable": false,
+      "Name": "email",
+      "Required": true
+     },
+     {
+      "AttributeDataType": "String",
+      "Mutable": false,
+      "Name": "tenant_id"
+     },
+     {
+      "AttributeDataType": "String",
+      "Mutable": true,
+      "Name": "company_name"
+     },
+     {
+      "AttributeDataType": "String",
+      "Mutable": true,
+      "Name": "user_role"
+     }
+    ],
+    "SmsConfiguration": {
+     "ExternalId": "FibonacciStackdevUserPool015169EC",
+     "SnsCallerArn": {
+      "Fn::GetAtt": [
+       "UserPoolsmsRole4EA729DD",
+       "Arn"
+      ]
+     }
+    },
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "fibonacci-users-dev",
+    "UsernameAttributes": [
+     "email"
+    ],
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/UserPool/Resource"
+   }
+  },
+  "UserPoolWebClient4C9370B0": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AccessTokenValidity": 60,
+    "AllowedOAuthFlows": [
+     "implicit",
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "profile",
+     "phone",
+     "email",
+     "openid",
+     "aws.cognito.signin.user.admin"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "ClientName": "fibonacci-web-client-dev",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_PASSWORD_AUTH",
+     "ALLOW_USER_SRP_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "GenerateSecret": false,
+    "IdTokenValidity": 60,
+    "RefreshTokenValidity": 43200,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "TokenValidityUnits": {
+     "AccessToken": "minutes",
+     "IdToken": "minutes",
+     "RefreshToken": "minutes"
+    },
+    "UserPoolId": {
+     "Ref": "UserPool6BA7E5F2"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/UserPool/WebClient/Resource"
+   }
+  },
+  "UserPoolUserPoolAuthorizerClient680A88B6": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AllowedOAuthFlows": [
+     "implicit",
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "profile",
+     "phone",
+     "email",
+     "openid",
+     "aws.cognito.signin.user.admin"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "UserPoolId": {
+     "Ref": "UserPool6BA7E5F2"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/UserPool/UserPoolAuthorizerClient/Resource"
+   }
+  },
+  "ApiHandlerServiceRole592E70E9": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiHandler/ServiceRole/Resource"
+   }
+  },
+  "ApiHandlerServiceRoleDefaultPolicy10321D87": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "FibonacciBus476BDCEA",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "DbSecret685A0FA5"
+       }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "MainQueueD24C6076",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "FibonacciKmsKey4FDBC47E",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ApiHandlerServiceRoleDefaultPolicy10321D87",
+    "Roles": [
+     {
+      "Ref": "ApiHandlerServiceRole592E70E9"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiHandler/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ApiHandler5E7490E8": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "d6282263f012b4d1e91794d6cb10ea2590b84c432dfee003c3383a069735d32b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "DB_SECRET_ARN": {
+       "Ref": "DbSecret685A0FA5"
+      },
+      "EVENT_BUS_NAME": {
+       "Ref": "FibonacciBus476BDCEA"
+      },
+      "NODE_OPTIONS": "--enable-source-maps",
+      "POWERTOOLS_SERVICE_NAME": "fibonacci-api",
+      "USER_POOL_ID": {
+       "Ref": "UserPool6BA7E5F2"
+      }
+     }
+    },
+    "FunctionName": "fibonacci-api-handler-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "ApiHandlerServiceRole592E70E9",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    }
+   },
+   "DependsOn": [
+    "ApiHandlerServiceRoleDefaultPolicy10321D87",
+    "ApiHandlerServiceRole592E70E9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiHandler/Resource",
+    "aws:asset:path": "asset.d6282263f012b4d1e91794d6cb10ea2590b84c432dfee003c3383a069735d32b",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ApiHandlerCurrentVersion5C7F0A60d661fb25a0c22558dda85ecb5ea616ce": {
+   "Type": "AWS::Lambda::Version",
+   "Properties": {
+    "FunctionName": {
+     "Ref": "ApiHandler5E7490E8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiHandler/CurrentVersion/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "ApiHandlerLogRetention907E318F": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiHandler/LogRetention/Resource"
+   }
+  },
+  "ApiHandlerAlias005E4CA0": {
+   "Type": "AWS::Lambda::Alias",
+   "Properties": {
+    "Description": "Alias para blue-green deployment",
+    "FunctionName": {
+     "Ref": "ApiHandler5E7490E8"
+    },
+    "FunctionVersion": {
+     "Fn::GetAtt": [
+      "ApiHandlerCurrentVersion5C7F0A60d661fb25a0c22558dda85ecb5ea616ce",
+      "Version"
+     ]
+    },
+    "Name": "LIVE"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiHandlerAlias/Resource"
+   }
+  },
+  "NigredoWebhookHandlerServiceRole1CEC625D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "DependsOn": [
+    "FibonacciVpcPrivateIsolatedSubnet1RouteTableAssociationE7AFA15D",
+    "FibonacciVpcPrivateIsolatedSubnet2RouteTableAssociation4ADCA747"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/NigredoWebhookHandler/ServiceRole/Resource"
+   }
+  },
+  "NigredoWebhookHandlerServiceRoleDefaultPolicy52DBC0A5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "events:PutEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "FibonacciBus476BDCEA",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "DbSecret685A0FA5"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "NigredoWebhookHandlerServiceRoleDefaultPolicy52DBC0A5",
+    "Roles": [
+     {
+      "Ref": "NigredoWebhookHandlerServiceRole1CEC625D"
+     }
+    ]
+   },
+   "DependsOn": [
+    "FibonacciVpcPrivateIsolatedSubnet1RouteTableAssociationE7AFA15D",
+    "FibonacciVpcPrivateIsolatedSubnet2RouteTableAssociation4ADCA747"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/NigredoWebhookHandler/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "NigredoWebhookHandler1C5E581A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "930c6b6154394ce4fcb0f0733d5123b65a5659dbfc4a307e726a1910e1415fee.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "fibonacci-nigredo-webhook",
+      "EVENT_BUS_NAME": {
+       "Ref": "FibonacciBus476BDCEA"
+      },
+      "DB_SECRET_ARN": {
+       "Ref": "DbSecret685A0FA5"
+      },
+      "NIGREDO_WEBHOOK_SECRET": "change-me-in-production",
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "fibonacci-nigredo-webhook-dev",
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "NigredoWebhookHandlerServiceRole1CEC625D",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10,
+    "TracingConfig": {
+     "Mode": "Active"
+    },
+    "VpcConfig": {
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "LambdaSg30A6108C",
+        "GroupId"
+       ]
+      }
+     ],
+     "SubnetIds": [
+      {
+       "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+      },
+      {
+       "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "FibonacciVpcPrivateIsolatedSubnet1RouteTableAssociationE7AFA15D",
+    "FibonacciVpcPrivateIsolatedSubnet2RouteTableAssociation4ADCA747",
+    "NigredoWebhookHandlerServiceRoleDefaultPolicy52DBC0A5",
+    "NigredoWebhookHandlerServiceRole1CEC625D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/NigredoWebhookHandler/Resource",
+    "aws:asset:path": "asset.930c6b6154394ce4fcb0f0733d5123b65a5659dbfc4a307e726a1910e1415fee",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "HttpApiF5A9A8A7": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "Content-Type",
+      "Authorization"
+     ],
+     "AllowMethods": [
+      "GET",
+      "POST",
+      "OPTIONS"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 86400
+    },
+    "Description": "Fibonacci API Gateway - Orquestrador Central",
+    "Name": "fibonacci-api-dev",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/Resource"
+   }
+  },
+  "HttpApiDefaultStage3EEB07D6": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "HttpApiF5A9A8A7"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/DefaultStage/Resource"
+   }
+  },
+  "HttpApiGEThealthLambdaIntegrationCBB2D3F6": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "HttpApiF5A9A8A7"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Ref": "ApiHandlerAlias005E4CA0"
+    },
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/GET--health/LambdaIntegration/Resource"
+   }
+  },
+  "HttpApiGEThealthLambdaIntegrationPermission150A73BA": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Ref": "ApiHandlerAlias005E4CA0"
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "/*/*/health"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/GET--health/LambdaIntegration-Permission"
+   }
+  },
+  "HttpApiGEThealthAB1F4856": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "HttpApiF5A9A8A7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /health",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "HttpApiGEThealthLambdaIntegrationCBB2D3F6"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/GET--health/Resource"
+   }
+  },
+  "HttpApiPOSTeventsLambdaIntegrationPermissionFBE6126E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Ref": "ApiHandlerAlias005E4CA0"
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "/*/*/events"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/POST--events/LambdaIntegration-Permission"
+   }
+  },
+  "HttpApiPOSTevents936A6091": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "HttpApiF5A9A8A7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /events",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "HttpApiGEThealthLambdaIntegrationCBB2D3F6"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/POST--events/Resource"
+   }
+  },
+  "HttpApiPOSTpublicnigredoeventNigredoWebhookIntegration8B405DD9": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "HttpApiF5A9A8A7"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "NigredoWebhookHandler1C5E581A",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/POST--public--nigredo-event/NigredoWebhookIntegration/Resource"
+   }
+  },
+  "HttpApiPOSTpublicnigredoeventNigredoWebhookIntegrationPermission4E6A0BFF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "NigredoWebhookHandler1C5E581A",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:207933152643:",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "/*/*/public/nigredo-event"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/POST--public--nigredo-event/NigredoWebhookIntegration-Permission"
+   }
+  },
+  "HttpApiPOSTpublicnigredoeventB1D1481C": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "HttpApiF5A9A8A7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /public/nigredo-event",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "HttpApiPOSTpublicnigredoeventNigredoWebhookIntegration8B405DD9"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HttpApi/POST--public--nigredo-event/Resource"
+   }
+  },
+  "FibonacciCoreDashboard66926EE0": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"periodOverride\":\"auto\",\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Gateway - Requests/min\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Count\",\"ApiId\",\"",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Gateway - Errors\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"4XXError\",\"ApiId\",\"",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}],[\"AWS/ApiGateway\",\"5XXError\",\"ApiId\",\"",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"API Gateway - Latency (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "\",{\"period\":60}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "\",{\"period\":60,\"stat\":\"p95\"}],[\"AWS/ApiGateway\",\"Latency\",\"ApiId\",\"",
+       {
+        "Ref": "HttpApiF5A9A8A7"
+       },
+       "\",{\"period\":60,\"stat\":\"p99\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Lambda - Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Invocations\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":8,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Lambda - Errors & Throttles\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Errors\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}],[\"AWS/Lambda\",\"Throttles\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":16,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Lambda - Concurrent Executions\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"ConcurrentExecutions\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60,\"stat\":\"Maximum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":18,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Lambda - Duration (ms)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60,\"stat\":\"p95\"}],[\"AWS/Lambda\",\"Duration\",\"FunctionName\",\"",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       },
+       "\",{\"period\":60,\"stat\":\"p99\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":24,\"properties\":{\"view\":\"timeSeries\",\"title\":\"EventBridge - Events Published\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Events\",\"Invocations\",\"EventBusName\",\"",
+       {
+        "Ref": "FibonacciBus476BDCEA"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":24,\"properties\":{\"view\":\"timeSeries\",\"title\":\"EventBridge - Failed Invocations\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Events\",\"FailedInvocations\",\"EventBusName\",\"",
+       {
+        "Ref": "FibonacciBus476BDCEA"
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":0,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"SQS Main Queue - Messages In Flight\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/SQS\",\"ApproximateNumberOfMessagesVisible\",\"QueueName\",\"",
+       {
+        "Fn::GetAtt": [
+         "MainQueueD24C6076",
+         "QueueName"
+        ]
+       },
+       "\",{\"period\":60}]],\"yAxis\":{\"left\":{\"min\":0}}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":8,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"SQS Main Queue - Messages Sent\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/SQS\",\"NumberOfMessagesSent\",\"QueueName\",\"",
+       {
+        "Fn::GetAtt": [
+         "MainQueueD24C6076",
+         "QueueName"
+        ]
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":8,\"height\":6,\"x\":16,\"y\":30,\"properties\":{\"view\":\"timeSeries\",\"title\":\"SQS Main Queue - Messages Received\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/SQS\",\"NumberOfMessagesReceived\",\"QueueName\",\"",
+       {
+        "Fn::GetAtt": [
+         "MainQueueD24C6076",
+         "QueueName"
+        ]
+       },
+       "\",{\"period\":60,\"stat\":\"Sum\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":36,\"properties\":{\"view\":\"singleValue\",\"title\":\"DLQ - Message Count (ALERT IF > 0)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/SQS\",\"ApproximateNumberOfMessagesVisible\",\"QueueName\",\"",
+       {
+        "Fn::GetAtt": [
+         "DeadLetterQueue9F481546",
+         "QueueName"
+        ]
+       },
+       "\",{\"period\":60,\"stat\":\"Maximum\"}]],\"setPeriodToTimeRange\":false}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "Fibonacci-Core-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/FibonacciCoreDashboard/Dashboard/Resource"
+   }
+  },
+  "AlarmTopicD01E77F9": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "Fibonacci CloudWatch Alarms",
+    "TopicName": "fibonacci-alarms-dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/AlarmTopic/Resource"
+   }
+  },
+  "HighErrorRateAlarm9E2FAEE9": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Taxa de erro acima de 10 em 2 minutos - Requer investigação imediata",
+    "AlarmName": "fibonacci-high-error-rate-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "ApiHandler5E7490E8"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "Errors",
+    "Namespace": "AWS/Lambda",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Sum",
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HighErrorRateAlarm/Resource"
+   }
+  },
+  "HighLatencyAlarm61213652": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "P95 latência acima de 3 segundos - Performance degradada",
+    "AlarmName": "fibonacci-high-latency-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "ApiHandler5E7490E8"
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "ExtendedStatistic": "p95",
+    "MetricName": "Duration",
+    "Namespace": "AWS/Lambda",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 300,
+    "Threshold": 3000,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/HighLatencyAlarm/Resource"
+   }
+  },
+  "DLQNotEmptyAlarm3601BB2F": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Mensagens na DLQ - Falhas recorrentes detectadas",
+    "AlarmName": "fibonacci-dlq-not-empty-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 1,
+    "Dimensions": [
+     {
+      "Name": "QueueName",
+      "Value": {
+       "Fn::GetAtt": [
+        "DeadLetterQueue9F481546",
+        "QueueName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "ApproximateNumberOfMessagesVisible",
+    "Namespace": "AWS/SQS",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Maximum",
+    "Threshold": 1,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/DLQNotEmptyAlarm/Resource"
+   }
+  },
+  "AuroraCpuAlarm999C031F": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Aurora CPU acima de 80% - Considerar escalar capacidade",
+    "AlarmName": "fibonacci-aurora-cpu-high-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "DBClusterIdentifier",
+      "Value": {
+       "Ref": "AuroraCluster23D869C0"
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/RDS",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Average",
+    "Threshold": 80,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/AuroraCpuAlarm/Resource"
+   }
+  },
+  "EstimatedCostAlarm41904A99": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Invocações Lambda acima do esperado - Custos podem exceder budget",
+    "AlarmName": "fibonacci-estimated-cost-high-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "ApiHandler5E7490E8"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "Invocations",
+    "Namespace": "AWS/Lambda",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 3600,
+    "Statistic": "Sum",
+    "Threshold": 10000,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/EstimatedCostAlarm/Resource"
+   }
+  },
+  "ApiGateway5xxAlarm4F808175": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "API Gateway retornando erros 5xx - Problema no servidor",
+    "AlarmName": "fibonacci-api-5xx-errors-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "ApiId",
+      "Value": {
+       "Ref": "HttpApiF5A9A8A7"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "5XXError",
+    "Namespace": "AWS/ApiGateway",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Sum",
+    "Threshold": 5,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/ApiGateway5xxAlarm/Resource"
+   }
+  },
+  "LambdaThrottleAlarmA29C5C15": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Lambda sendo throttled - Considerar aumentar reserved concurrency",
+    "AlarmName": "fibonacci-lambda-throttles-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "FunctionName",
+      "Value": {
+       "Ref": "ApiHandler5E7490E8"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "Throttles",
+    "Namespace": "AWS/Lambda",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/LambdaThrottleAlarm/Resource"
+   }
+  },
+  "OldMessagesAlarm7AA47467": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Mensagens antigas na fila - Possível problema de processamento",
+    "AlarmName": "fibonacci-old-messages-dev",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "DatapointsToAlarm": 2,
+    "Dimensions": [
+     {
+      "Name": "QueueName",
+      "Value": {
+       "Fn::GetAtt": [
+        "MainQueueD24C6076",
+        "QueueName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "ApproximateAgeOfOldestMessage",
+    "Namespace": "AWS/SQS",
+    "OKActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Maximum",
+    "Threshold": 300,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/OldMessagesAlarm/Resource"
+   }
+  },
+  "CriticalSystemAlarmCA2EB036": {
+   "Type": "AWS::CloudWatch::CompositeAlarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "CRÍTICO: Múltiplos alarmes ativos - Sistema em estado degradado",
+    "AlarmName": "fibonacci-critical-system-dev",
+    "AlarmRule": {
+     "Fn::Join": [
+      "",
+      [
+       "(ALARM(\"",
+       {
+        "Fn::GetAtt": [
+         "HighErrorRateAlarm9E2FAEE9",
+         "Arn"
+        ]
+       },
+       "\") OR (ALARM(\"",
+       {
+        "Fn::GetAtt": [
+         "HighLatencyAlarm61213652",
+         "Arn"
+        ]
+       },
+       "\") AND ALARM(\"",
+       {
+        "Fn::GetAtt": [
+         "DLQNotEmptyAlarm3601BB2F",
+         "Arn"
+        ]
+       },
+       "\")))"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/CriticalSystemAlarm/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:DeleteRetentionPolicy",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "Roles": [
+     {
+      "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Handler": "index.handler",
+    "Runtime": "nodejs22.x",
+    "Timeout": 900,
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-207933152643-us-east-1",
+     "S3Key": "2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+    "aws:asset:path": "asset.2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "InsightsQueriesErrorsByAgentQuery9BA4EA2D": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "ApiHandlerLogRetention907E318F",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/errors-by-agent",
+    "QueryString": "fields @timestamp, agent, message, error.message, error.name, error.stack, traceId, leadId\n| filter level = \"ERROR\"\n| stats count() as errorCount by agent\n| sort errorCount desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/InsightsQueries/ErrorsByAgentQuery"
+   }
+  },
+  "InsightsQueriesLatencyByEndpointQuery984D6B47": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "ApiHandlerLogRetention907E318F",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/latency-by-endpoint",
+    "QueryString": "fields @timestamp, requestContext.http.path as endpoint, duration, requestContext.http.method as method\n| filter requestContext.http.path like /api/\n| stats \n    count() as requestCount,\n    avg(duration) as avgDuration,\n    min(duration) as minDuration,\n    max(duration) as maxDuration,\n    pct(duration, 50) as p50,\n    pct(duration, 95) as p95,\n    pct(duration, 99) as p99\n  by endpoint, method\n| sort p95 desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/InsightsQueries/LatencyByEndpointQuery"
+   }
+  },
+  "InsightsQueriesFunnelConversionQuery88828D05": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "ApiHandlerLogRetention907E318F",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/funnel-conversion",
+    "QueryString": "fields @timestamp, leadId, agent, classification.intent, proposedAction\n| filter agent in [\"recebimento\", \"estrategia\", \"disparo\", \"atendimento\", \"agendamento\"]\n| stats \n    count() as totalLeads by agent\n| sort agent asc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/InsightsQueries/FunnelConversionQuery"
+   }
+  },
+  "InsightsQueriesMCPCallsQuery527C041F": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "ApiHandlerLogRetention907E318F",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/mcp-calls-analysis",
+    "QueryString": "fields @timestamp, metadata.mcpServer as server, metadata.mcpMethod as method, duration, level, message\n| filter metadata.mcpServer like /.+/\n| stats \n    count() as callCount,\n    avg(duration) as avgDuration,\n    sum(level = \"ERROR\") as errorCount,\n    (sum(level = \"ERROR\") / count()) * 100 as errorRate\n  by server, method\n| sort errorRate desc, callCount desc"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/InsightsQueries/MCPCallsQuery"
+   }
+  },
+  "InsightsQueriesLeadProcessingTimeQuery9FC7F99E": {
+   "Type": "AWS::Logs::QueryDefinition",
+   "Properties": {
+    "LogGroupNames": [
+     {
+      "Fn::GetAtt": [
+       "ApiHandlerLogRetention907E318F",
+       "LogGroupName"
+      ]
+     }
+    ],
+    "Name": "dev/fibonacci/lead-processing-time",
+    "QueryString": "fields @timestamp, leadId, agent, duration, classification.priority\n| filter leadId like /.+/\n| stats \n    min(@timestamp) as startTime,\n    max(@timestamp) as endTime,\n    (max(@timestamp) - min(@timestamp)) / 1000 as totalProcessingSeconds,\n    count() as stepsCompleted,\n    latest(classification.priority) as priority\n  by leadId\n| sort totalProcessingSeconds desc\n| limit 100"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/InsightsQueries/LeadProcessingTimeQuery"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31U23LaMBD9lrwrakP6A8YkKdNMQyClj4wsL0bBllztCobR+N87kowNybQv3nOOj1ba1WXCJ5N7/vVGHPFWlvvbWhXcr0jIPRNH3Ph9g9z/gBPLtzqErFYCA4mgYyAn3K9bGaT1ImcLV9RKrlyhgYI2oqVxBG+iqGHURy1DNFIJUkYPZraw6iAIxhxzTWA10JMgOIpTP2nPMiIhdw1oYr2ybuWDLlujNPXWgcZMWyHh0rMC6ayi05M1ro2r/K8w15UFxI7ZErmfCRKFQFiBtEDsTPPaIYFlqYgh0Wz6STg7I5lrJKEldAxjPmyEFhVY7tMqwhQpvAlbAV0UPxg+/Vkaih1eyR2ULm3EJ20JaJyVsDC1krHF10rH4ACakPuHEKcuHocBL895XR0W/we5f3XgopZA/I7ZL2jH8J77qZP7tN09SmEcccUTmQqEjh3F9jDh+Vb/hiLLn5msjSuPguSO+6wWtkkHN4CZwF1hhC1ju0dimtagIhjs10qXcm6t0RS34sWqSulMSkDMjSZrajZTSFYVLh7mS8O8BE2KYhF5yPMY8vzLcZmmY9JUWpHh/heCXRhTB8uAzyCvVX8ErpWOKdFwvzTnTa+BjQ09d78WTVGKjTYlvCP/GcOj0zIWgvcbgQiEPAuhN8cmDJ41WOxv8BlePxhxNrCNQoxV1aZC7p9NtQQKlaexrw7saQZbpVUqXrSqSlf6MOH+O1GbtSombRULdEWiSu9KBEFKT0hA4a5XdnhbPtDo6xhq5P7NtCo+ZRF03XAZWO6QTDPS8VZ8+LWw5qBKsOFEstipsCSlqzDmxVHrqGOhw/wdvxwm3/jdHb+7eUelbq3TpBrgyxT/Akzb8nWbBQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "FibonacciStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "VpcId": {
+   "Description": "VPC ID",
+   "Value": {
+    "Ref": "FibonacciVpcB997BDC3"
+   },
+   "Export": {
+    "Name": "FibonacciVpcId-dev"
+   }
+  },
+  "S3EndpointId": {
+   "Description": "S3 VPC Gateway Endpoint ID",
+   "Value": {
+    "Ref": "FibonacciVpcS3Endpoint8300220D"
+   },
+   "Export": {
+    "Name": "FibonacciS3EndpointId-dev"
+   }
+  },
+  "SecretsManagerEndpointId": {
+   "Description": "Secrets Manager VPC Interface Endpoint ID",
+   "Value": {
+    "Ref": "FibonacciVpcSecretsManagerEndpoint9776A8FB"
+   },
+   "Export": {
+    "Name": "FibonacciSecretsManagerEndpointId-dev"
+   }
+  },
+  "EventBridgeEndpointId": {
+   "Description": "EventBridge VPC Interface Endpoint ID",
+   "Value": {
+    "Ref": "FibonacciVpcEventBridgeEndpoint21DDD643"
+   },
+   "Export": {
+    "Name": "FibonacciEventBridgeEndpointId-dev"
+   }
+  },
+  "DbClusterArn": {
+   "Description": "Aurora Cluster ARN",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "arn:aws:rds:us-east-1:207933152643:cluster:",
+      {
+       "Ref": "AuroraCluster23D869C0"
+      }
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciDbClusterArn-dev"
+   }
+  },
+  "DbSecretName": {
+   "Description": "Database Secret Name",
+   "Value": {
+    "Fn::Join": [
+     "-",
+     [
+      {
+       "Fn::Select": [
+        0,
+        {
+         "Fn::Split": [
+          "-",
+          {
+           "Fn::Select": [
+            6,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "DbSecret685A0FA5"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "-",
+          {
+           "Fn::Select": [
+            6,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "DbSecret685A0FA5"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciDbSecretName-dev"
+   }
+  },
+  "EventBusName": {
+   "Description": "EventBridge Bus Name",
+   "Value": {
+    "Ref": "FibonacciBus476BDCEA"
+   },
+   "Export": {
+    "Name": "FibonacciEventBusName-dev"
+   }
+  },
+  "EventBusArn": {
+   "Description": "EventBridge Bus ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "FibonacciBus476BDCEA",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciEventBusArn-dev"
+   }
+  },
+  "MainQueueUrl": {
+   "Description": "Main Queue URL",
+   "Value": {
+    "Ref": "MainQueueD24C6076"
+   },
+   "Export": {
+    "Name": "FibonacciMainQueueUrl-dev"
+   }
+  },
+  "DlqUrl": {
+   "Description": "Dead Letter Queue URL",
+   "Value": {
+    "Ref": "DeadLetterQueue9F481546"
+   },
+   "Export": {
+    "Name": "FibonacciDlqUrl-dev"
+   }
+  },
+  "UserPoolId": {
+   "Description": "Cognito User Pool ID",
+   "Value": {
+    "Ref": "UserPool6BA7E5F2"
+   },
+   "Export": {
+    "Name": "FibonacciUserPoolId-dev"
+   }
+  },
+  "UserPoolArn": {
+   "Description": "Cognito User Pool ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "UserPool6BA7E5F2",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciUserPoolArn-dev"
+   }
+  },
+  "SiteBucketName": {
+   "Description": "S3 Bucket Name for Front-End",
+   "Value": {
+    "Ref": "SiteBucket397A1860"
+   },
+   "Export": {
+    "Name": "FibonacciSiteBucketName-dev"
+   }
+  },
+  "CloudFrontUrl": {
+   "Description": "CloudFront Distribution URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Fn::GetAtt": [
+        "Distribution830FAC52",
+        "DomainName"
+       ]
+      }
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciCloudFrontUrl-dev"
+   }
+  },
+  "DistributionId": {
+   "Description": "CloudFront Distribution ID",
+   "Value": {
+    "Ref": "Distribution830FAC52"
+   },
+   "Export": {
+    "Name": "FibonacciDistributionId-dev"
+   }
+  },
+  "WebAclId": {
+   "Description": "WAF Web ACL ID",
+   "Value": {
+    "Fn::GetAtt": [
+     "CloudFrontWebACL",
+     "Id"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciWebAclId-dev"
+   }
+  },
+  "WebAclArn": {
+   "Description": "WAF Web ACL ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "CloudFrontWebACL",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciWebAclArn-dev"
+   }
+  },
+  "StackVersionsBucketName": {
+   "Description": "S3 Bucket Name for Stack Versions",
+   "Value": {
+    "Ref": "StackVersionsBucket900BB24B"
+   },
+   "Export": {
+    "Name": "FibonacciStackVersionsBucketName-dev"
+   }
+  },
+  "WebAclName": {
+   "Description": "WAF Web ACL Name",
+   "Value": "fibonacci-cloudfront-waf-dev",
+   "Export": {
+    "Name": "FibonacciWebAclName-dev"
+   }
+  },
+  "ApiUrl": {
+   "Description": "API Gateway URL",
+   "Value": {
+    "Fn::GetAtt": [
+     "HttpApiF5A9A8A7",
+     "ApiEndpoint"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciApiUrl-dev"
+   }
+  },
+  "ApiId": {
+   "Description": "API Gateway ID",
+   "Value": {
+    "Ref": "HttpApiF5A9A8A7"
+   },
+   "Export": {
+    "Name": "FibonacciApiId-dev"
+   }
+  },
+  "LambdaFunctionName": {
+   "Description": "Lambda Function Name",
+   "Value": {
+    "Ref": "ApiHandler5E7490E8"
+   },
+   "Export": {
+    "Name": "FibonacciLambdaFunctionName-dev"
+   }
+  },
+  "KmsKeyId": {
+   "Description": "KMS Key ID for encryption",
+   "Value": {
+    "Ref": "FibonacciKmsKey4FDBC47E"
+   },
+   "Export": {
+    "Name": "FibonacciKmsKeyId-dev"
+   }
+  },
+  "KmsKeyArn": {
+   "Description": "KMS Key ARN for encryption",
+   "Value": {
+    "Fn::GetAtt": [
+     "FibonacciKmsKey4FDBC47E",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciKmsKeyArn-dev"
+   }
+  },
+  "DashboardName": {
+   "Description": "CloudWatch Dashboard Name",
+   "Value": {
+    "Ref": "FibonacciCoreDashboard66926EE0"
+   },
+   "Export": {
+    "Name": "FibonacciDashboardName-dev"
+   }
+  },
+  "InsightsQueriesErrorsByAgentQueryNameCC097A8B": {
+   "Description": "Nome da query de erros por agente",
+   "Value": "dev/fibonacci/errors-by-agent",
+   "Export": {
+    "Name": "Fibonacci-dev-ErrorsByAgentQuery"
+   }
+  },
+  "InsightsQueriesLatencyByEndpointQueryName5A026071": {
+   "Description": "Nome da query de latência por endpoint",
+   "Value": "dev/fibonacci/latency-by-endpoint",
+   "Export": {
+    "Name": "Fibonacci-dev-LatencyByEndpointQuery"
+   }
+  },
+  "InsightsQueriesFunnelConversionQueryName6934F727": {
+   "Description": "Nome da query de conversão do funil",
+   "Value": "dev/fibonacci/funnel-conversion",
+   "Export": {
+    "Name": "Fibonacci-dev-FunnelConversionQuery"
+   }
+  },
+  "AlarmTopicArn": {
+   "Description": "SNS Topic ARN para notificações de alarmes",
+   "Value": {
+    "Ref": "AlarmTopicD01E77F9"
+   },
+   "Export": {
+    "Name": "FibonacciAlarmTopicArn-dev"
+   }
+  },
+  "AlarmTopicName": {
+   "Description": "SNS Topic Name para notificações de alarmes",
+   "Value": {
+    "Fn::GetAtt": [
+     "AlarmTopicD01E77F9",
+     "TopicName"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciAlarmTopicName-dev"
+   }
+  },
+  "HighErrorRateAlarmName": {
+   "Description": "Nome do alarme de taxa de erro alta",
+   "Value": {
+    "Ref": "HighErrorRateAlarm9E2FAEE9"
+   }
+  },
+  "HighLatencyAlarmName": {
+   "Description": "Nome do alarme de latência alta",
+   "Value": {
+    "Ref": "HighLatencyAlarm61213652"
+   }
+  },
+  "DLQNotEmptyAlarmName": {
+   "Description": "Nome do alarme de DLQ não vazia",
+   "Value": {
+    "Ref": "DLQNotEmptyAlarm3601BB2F"
+   }
+  },
+  "AuroraCpuAlarmName": {
+   "Description": "Nome do alarme de CPU alta do Aurora",
+   "Value": {
+    "Ref": "AuroraCpuAlarm999C031F"
+   }
+  },
+  "InsightsQueryErrorsByAgent": {
+   "Description": "CloudWatch Insights Query: Erros por Agente",
+   "Value": "dev/fibonacci/errors-by-agent",
+   "Export": {
+    "Name": "FibonacciInsightsQueryErrorsByAgent-dev"
+   }
+  },
+  "InsightsQueryLatencyByEndpoint": {
+   "Description": "CloudWatch Insights Query: Latência por Endpoint",
+   "Value": "dev/fibonacci/latency-by-endpoint",
+   "Export": {
+    "Name": "FibonacciInsightsQueryLatencyByEndpoint-dev"
+   }
+  },
+  "InsightsQueryFunnelConversion": {
+   "Description": "CloudWatch Insights Query: Taxa de Conversão do Funil",
+   "Value": "dev/fibonacci/funnel-conversion",
+   "Export": {
+    "Name": "FibonacciInsightsQueryFunnelConversion-dev"
+   }
+  },
+  "InsightsQueryMCPCalls": {
+   "Description": "CloudWatch Insights Query: Análise de Chamadas MCP",
+   "Value": "dev/fibonacci/mcp-calls-analysis",
+   "Export": {
+    "Name": "FibonacciInsightsQueryMCPCalls-dev"
+   }
+  },
+  "InsightsQueryLeadProcessingTime": {
+   "Description": "CloudWatch Insights Query: Tempo de Processamento de Leads",
+   "Value": "dev/fibonacci/lead-processing-time",
+   "Export": {
+    "Name": "FibonacciInsightsQueryLeadProcessingTime-dev"
+   }
+  },
+  "ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE": {
+   "Value": {
+    "Fn::GetAtt": [
+     "FibonacciKmsKey4FDBC47E",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciKmsKey4FDBC47EArnEBA57FFE"
+   }
+  },
+  "ExportsOutputRefFibonacciBus476BDCEA864F6572": {
+   "Value": {
+    "Ref": "FibonacciBus476BDCEA"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefFibonacciBus476BDCEA864F6572"
+   }
+  },
+  "ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72": {
+   "Value": {
+    "Fn::GetAtt": [
+     "FibonacciBus476BDCEA",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputFnGetAttFibonacciBus476BDCEAArnB772AB72"
+   }
+  },
+  "ExportsOutputRefDbSecret685A0FA57881E1C6": {
+   "Value": {
+    "Ref": "DbSecret685A0FA5"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefDbSecret685A0FA57881E1C6"
+   }
+  },
+  "ExportsOutputRefFibonacciVpcB997BDC36C512D91": {
+   "Value": {
+    "Ref": "FibonacciVpcB997BDC3"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcB997BDC36C512D91"
+   }
+  },
+  "ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751": {
+   "Value": {
+    "Ref": "FibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet1Subnet0A47AF0D46C97751"
+   }
+  },
+  "ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A": {
+   "Value": {
+    "Ref": "FibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAF"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefFibonacciVpcPrivateIsolatedSubnet2Subnet912A3FAFC541533A"
+   }
+  },
+  "ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8": {
+   "Value": {
+    "Fn::GetAtt": [
+     "DbSg495F8305",
+     "GroupId"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputFnGetAttDbSg495F8305GroupIdA39418C8"
+   }
+  },
+  "ExportsOutputFnGetAttHttpApiF5A9A8A7ApiEndpoint082134F8": {
+   "Value": {
+    "Fn::GetAtt": [
+     "HttpApiF5A9A8A7",
+     "ApiEndpoint"
+    ]
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputFnGetAttHttpApiF5A9A8A7ApiEndpoint082134F8"
+   }
+  },
+  "ExportsOutputRefUserPool6BA7E5F296FD7236": {
+   "Value": {
+    "Ref": "UserPool6BA7E5F2"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefUserPool6BA7E5F296FD7236"
+   }
+  },
+  "ExportsOutputRefUserPoolUserPoolAuthorizerClient680A88B611CBC378": {
+   "Value": {
+    "Ref": "UserPoolUserPoolAuthorizerClient680A88B6"
+   },
+   "Export": {
+    "Name": "FibonacciStack-dev:ExportsOutputRefUserPoolUserPoolAuthorizerClient680A88B611CBC378"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,372 @@
+import * as cdk from 'aws-cdk-lib';
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { Construct } from 'constructs';
+
+export interface LatencyDashboardProps {
+  envName: string;
+  lambdaFunctions: {
+    apiHandler: lambda.Function;
+    agentHandlers: lambda.Function[];
+    internalHandlers: lambda.Function[];
+  };
+  customMetrics?: {
+    namespace: string;
+    metricName: string;
+    dimensions?: Record<string, string>;
+  }[];
+}
+
+export class LatencyDashboard extends Construct {
+  public readonly dashboard: cloudwatch.Dashboard;
+
+  constructor(scope: Construct, id: string, props: LatencyDashboardProps) {
+    super(scope, id);
+
+    this.dashboard = new cloudwatch.Dashboard(this, 'LatencyDashboard', {
+      dashboardName: `fibonacci-latency-${props.envName}`,
+      widgets: this.createWidgets(props)
+    });
+  }
+
+  private createWidgets(props: LatencyDashboardProps): cloudwatch.IWidget[][] {
+    return [
+      // Primeira linha: Métricas gerais de latência
+      [
+        this.createLatencyOverviewWidget(props),
+        this.createLatencyPercentilesWidget(props)
+      ],
+      
+      // Segunda linha: Latência por função Lambda
+      [
+        this.createApiHandlerLatencyWidget(props),
+        this.createAgentLatencyWidget(props)
+      ],
+      
+      // Terceira linha: Distribuição de latência e tendências
+      [
+        this.createLatencyDistributionWidget(props),
+        this.createLatencyTrendsWidget(props)
+      ],
+      
+      // Quarta linha: Métricas customizadas e correlações
+      [
+        this.createCustomMetricsWidget(props),
+        this.createLatencyCorrelationWidget(props)
+      ],
+      
+      // Quinta linha: Alertas e SLA tracking
+      [
+        this.createSLATrackingWidget(props),
+        this.createLatencyAlertsWidget(props)
+      ]
+    ];
+  }
+
+  private createLatencyOverviewWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    const allFunctions = [
+      props.lambdaFunctions.apiHandler,
+      ...props.lambdaFunctions.agentHandlers,
+      ...props.lambdaFunctions.internalHandlers
+    ];
+
+    return new cloudwatch.GraphWidget({
+      title: 'Latência Geral - P50, P90, P99',
+      width: 12,
+      height: 6,
+      left: allFunctions.map(fn => fn.metricDuration({
+        statistic: 'p50',
+        period: cdk.Duration.minutes(5),
+        label: `${fn.functionName} P50`
+      })),
+      right: [
+        ...allFunctions.map(fn => fn.metricDuration({
+          statistic: 'p90',
+          period: cdk.Duration.minutes(5),
+          label: `${fn.functionName} P90`
+        })),
+        ...allFunctions.map(fn => fn.metricDuration({
+          statistic: 'p99',
+          period: cdk.Duration.minutes(5),
+          label: `${fn.functionName} P99`
+        }))
+      ],
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      stacked: false,
+      region: cdk.Stack.of(this).region,
+      yAxis: {
+        left: {
+          min: 0,
+          label: 'Latência P50 (ms)'
+        },
+        right: {
+          min: 0,
+          label: 'Latência P90/P99 (ms)'
+        }
+      }
+    });
+  }
+
+  private createLatencyPercentilesWidget(props: LatencyDashboardProps): cloudwatch.SingleValueWidget {
+    return new cloudwatch.SingleValueWidget({
+      title: 'Latência Atual (Últimos 5min)',
+      width: 12,
+      height: 6,
+      metrics: [
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p50',
+          period: cdk.Duration.minutes(5),
+          label: 'API P50'
+        }),
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p90',
+          period: cdk.Duration.minutes(5),
+          label: 'API P90'
+        }),
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p99',
+          period: cdk.Duration.minutes(5),
+          label: 'API P99'
+        })
+      ],
+      region: cdk.Stack.of(this).region
+    });
+  }
+
+  private createApiHandlerLatencyWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    return new cloudwatch.GraphWidget({
+      title: 'API Handler - Latência Detalhada',
+      width: 12,
+      height: 6,
+      left: [
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'Average',
+          period: cdk.Duration.minutes(1),
+          label: 'Média'
+        }),
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p50',
+          period: cdk.Duration.minutes(1),
+          label: 'P50'
+        })
+      ],
+      right: [
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p90',
+          period: cdk.Duration.minutes(1),
+          label: 'P90'
+        }),
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p99',
+          period: cdk.Duration.minutes(1),
+          label: 'P99'
+        }),
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'Maximum',
+          period: cdk.Duration.minutes(1),
+          label: 'Máximo'
+        })
+      ],
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region
+    });
+  }
+
+  private createAgentLatencyWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    return new cloudwatch.GraphWidget({
+      title: 'Agentes - Latência P90',
+      width: 12,
+      height: 6,
+      left: props.lambdaFunctions.agentHandlers.map(fn => fn.metricDuration({
+        statistic: 'p90',
+        period: cdk.Duration.minutes(5),
+        label: fn.functionName.replace(/^.*-/, '')
+      })),
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region,
+      yAxis: {
+        left: {
+          min: 0,
+          label: 'Latência P90 (ms)'
+        }
+      }
+    });
+  }
+
+  private createLatencyDistributionWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    const percentiles = ['p50', 'p75', 'p90', 'p95', 'p99'];
+    
+    return new cloudwatch.GraphWidget({
+      title: 'Distribuição de Latência - API Handler',
+      width: 12,
+      height: 6,
+      left: percentiles.map(p => props.lambdaFunctions.apiHandler.metricDuration({
+        statistic: p,
+        period: cdk.Duration.minutes(5),
+        label: p.toUpperCase()
+      })),
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region,
+      yAxis: {
+        left: {
+          min: 0,
+          label: 'Latência (ms)'
+        }
+      }
+    });
+  }
+
+  private createLatencyTrendsWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    return new cloudwatch.GraphWidget({
+      title: 'Tendência de Latência (24h)',
+      width: 12,
+      height: 6,
+      left: [
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p90',
+          period: cdk.Duration.hours(1),
+          label: 'P90 por Hora'
+        })
+      ],
+      right: [
+        props.lambdaFunctions.apiHandler.metricInvocations({
+          statistic: 'Sum',
+          period: cdk.Duration.hours(1),
+          label: 'Invocações por Hora'
+        })
+      ],
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region,
+      setPeriodToTimeRange: true
+    });
+  }
+
+  private createCustomMetricsWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    const customMetrics = props.customMetrics || [];
+    
+    if (customMetrics.length === 0) {
+      return new cloudwatch.GraphWidget({
+        title: 'Métricas Customizadas',
+        width: 12,
+        height: 6,
+        left: [
+          new cloudwatch.Metric({
+            namespace: 'Fibonacci/Custom',
+            metricName: 'BusinessOperationLatency',
+            statistic: 'Average',
+            period: cdk.Duration.minutes(5),
+            label: 'Operações de Negócio'
+          }),
+          new cloudwatch.Metric({
+            namespace: 'Fibonacci/Custom',
+            metricName: 'DatabaseQueryLatency',
+            statistic: 'p90',
+            period: cdk.Duration.minutes(5),
+            label: 'Queries DB P90'
+          })
+        ],
+        view: cloudwatch.GraphWidgetView.TIME_SERIES,
+        region: cdk.Stack.of(this).region
+      });
+    }
+
+    return new cloudwatch.GraphWidget({
+      title: 'Métricas Customizadas',
+      width: 12,
+      height: 6,
+      left: customMetrics.map(metric => new cloudwatch.Metric({
+        namespace: metric.namespace,
+        metricName: metric.metricName,
+        dimensionsMap: metric.dimensions,
+        statistic: 'Average',
+        period: cdk.Duration.minutes(5)
+      })),
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region
+    });
+  }
+
+  private createLatencyCorrelationWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    return new cloudwatch.GraphWidget({
+      title: 'Correlação: Latência vs Erros',
+      width: 12,
+      height: 6,
+      left: [
+        props.lambdaFunctions.apiHandler.metricDuration({
+          statistic: 'p90',
+          period: cdk.Duration.minutes(5),
+          label: 'Latência P90'
+        })
+      ],
+      right: [
+        props.lambdaFunctions.apiHandler.metricErrors({
+          statistic: 'Sum',
+          period: cdk.Duration.minutes(5),
+          label: 'Erros'
+        }),
+        props.lambdaFunctions.apiHandler.metricThrottles({
+          statistic: 'Sum',
+          period: cdk.Duration.minutes(5),
+          label: 'Throttles'
+        })
+      ],
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region
+    });
+  }
+
+  private createSLATrackingWidget(props: LatencyDashboardProps): cloudwatch.GraphWidget {
+    const slaThreshold = 1000; // 1 segundo
+
+    return new cloudwatch.GraphWidget({
+      title: 'SLA Tracking - Requisições < 1s',
+      width: 12,
+      height: 6,
+      left: [
+        new cloudwatch.MathExpression({
+          expression: '(m1 / m2) * 100',
+          usingMetrics: {
+            m1: props.lambdaFunctions.apiHandler.metricDuration({
+              statistic: 'SampleCount',
+              period: cdk.Duration.minutes(5)
+            }),
+            m2: props.lambdaFunctions.apiHandler.metricInvocations({
+              statistic: 'Sum',
+              period: cdk.Duration.minutes(5)
+            })
+          },
+          label: '% Requisições dentro do SLA',
+          period: cdk.Duration.minutes(5)
+        })
+      ],
+      view: cloudwatch.GraphWidgetView.TIME_SERIES,
+      region: cdk.Stack.of(this).region,
+      yAxis: {
+        left: {
+          min: 0,
+          max: 100,
+          label: 'Percentual (%)'
+        }
+      },
+      annotations: [
+        {
+          value: 99.9,
+          label: 'Target SLA (99.9%)',
+          color: '#2ca02c'
+        }
+      ]
+    });
+  }
+
+  private createLatencyAlertsWidget(props: LatencyDashboardProps): cloudwatch.AlarmStatusWidget {
+    return new cloudwatch.AlarmStatusWidget({
+      title: 'Status de Alertas de Latência',
+      width: 12,
+      height: 6,
+      alarms: [
+        // Nota: Os alarmes precisam ser criados separadamente
+        // Este widget apenas mostra o status deles
+      ]
+    });
+  }
+}

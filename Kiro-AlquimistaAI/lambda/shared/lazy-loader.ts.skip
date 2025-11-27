@@ -1,0 +1,363 @@
+import { Logger } from './logger';
+import { addMetadata, addAnnotations } from './xray-tracer';
+
+const logger = new Logger('lazy-loader');
+
+/**
+ * Module loader with lazy loading and caching
+ */
+class LazyModuleLoader {
+  private moduleCache: Map<string, any> = new Map();
+  private loadingPromises: Map<string, Promise<any>> = new Map();
+  private loadTimes: Map<string, number> = new Map();
+
+  /**
+   * Load module lazily with caching
+   */
+  async load<T = any>(
+    modulePath: string,
+    exportName?: string
+  ): Promise<T> {
+    const cacheKey = `${modulePath}:${exportName || 'default'}`;
+
+    // Return from cache if available
+    if (this.moduleCache.has(cacheKey)) {
+      logger.debug('Module loaded from cache', { modulePath, exportName });
+      addAnnotations({ moduleCacheHit: true });
+      return this.moduleCache.get(cacheKey);
+    }
+
+    // Return existing loading promise if module is being loaded
+    if (this.loadingPromises.has(cacheKey)) {
+      logger.debug('Waiting for module to load', { modulePath, exportName });
+      return await this.loadingPromises.get(cacheKey);
+    }
+
+    // Load module
+    const loadPromise = this.loadModule<T>(modulePath, exportName, cacheKey);
+    this.loadingPromises.set(cacheKey, loadPromise);
+
+    try {
+      const module = await loadPromise;
+      return module;
+    } finally {
+      this.loadingPromises.delete(cacheKey);
+    }
+  }
+
+  /**
+   * Load module with timing
+   */
+  private async loadModule<T>(
+    modulePath: string,
+    exportName: string | undefined,
+    cacheKey: string
+  ): Promise<T> {
+    const startTime = Date.now();
+
+    try {
+      logger.debug('Loading module', { modulePath, exportName });
+
+      // Dynamic import
+      const module = await import(modulePath);
+
+      // Get specific export or default
+      const loadedModule = exportName ? module[exportName] : module.default || module;
+
+      // Cache the module
+      this.moduleCache.set(cacheKey, loadedModule);
+
+      const loadTime = Date.now() - startTime;
+      this.loadTimes.set(cacheKey, loadTime);
+
+      logger.info('Module loaded successfully', {
+        modulePath,
+        exportName,
+        loadTime,
+      });
+
+      addMetadata({
+        moduleLoadTime: loadTime,
+        modulePath,
+      }, 'lazy-loader');
+
+      // Warn on slow loads
+      if (loadTime > 1000) {
+        logger.warn('Slow module load detected', {
+          modulePath,
+          loadTime,
+        });
+        addAnnotations({ slowModuleLoad: true });
+      }
+
+      return loadedModule;
+    } catch (error) {
+      logger.error('Failed to load module', error as Error, {
+        modulePath,
+        exportName,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Preload modules for faster access
+   */
+  async preload(modules: Array<{ path: string; export?: string }>): Promise<void> {
+    logger.info('Preloading modules', { count: modules.length });
+
+    const startTime = Date.now();
+
+    try {
+      await Promise.all(
+        modules.map((m) => this.load(m.path, m.export))
+      );
+
+      const totalTime = Date.now() - startTime;
+
+      logger.info('Modules preloaded successfully', {
+        count: modules.length,
+        totalTime,
+        averageTime: totalTime / modules.length,
+      });
+    } catch (error) {
+      logger.error('Failed to preload modules', error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear module cache
+   */
+  clearCache(): void {
+    logger.info('Clearing module cache', {
+      size: this.moduleCache.size,
+    });
+    this.moduleCache.clear();
+    this.loadTimes.clear();
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats(): {
+    size: number;
+    modules: Array<{ key: string; loadTime: number }>;
+  } {
+    const modules: Array<{ key: string; loadTime: number }> = [];
+
+    this.loadTimes.forEach((loadTime, key) => {
+      modules.push({ key, loadTime });
+    });
+
+    return {
+      size: this.moduleCache.size,
+      modules: modules.sort((a, b) => b.loadTime - a.loadTime),
+    };
+  }
+}
+
+// Singleton instance
+const moduleLoader = new LazyModuleLoader();
+
+/**
+ * Load module lazily
+ */
+export async function lazyLoad<T = any>(
+  modulePath: string,
+  exportName?: string
+): Promise<T> {
+  return await moduleLoader.load<T>(modulePath, exportName);
+}
+
+/**
+ * Preload modules
+ */
+export async function preloadModules(
+  modules: Array<{ path: string; export?: string }>
+): Promise<void> {
+  return await moduleLoader.preload(modules);
+}
+
+/**
+ * Clear module cache
+ */
+export function clearModuleCache(): void {
+  moduleLoader.clearCache();
+}
+
+/**
+ * Get cache statistics
+ */
+export function getModuleCacheStats() {
+  return moduleLoader.getCacheStats();
+}
+
+/**
+ * Lazy class decorator for deferred initialization
+ */
+export function Lazy() {
+  return function <T extends { new (...args: any[]): {} }>(constructor: T) {
+    return class extends constructor {
+      private _initialized = false;
+
+      private async ensureInitialized() {
+        if (!this._initialized) {
+          logger.debug('Lazy initializing class', {
+            className: constructor.name,
+          });
+
+          // Call init method if exists
+          if (typeof (this as any).init === 'function') {
+            await (this as any).init();
+          }
+
+          this._initialized = true;
+        }
+      }
+
+      // Override all methods to ensure initialization
+      constructor(...args: any[]) {
+        super(...args);
+
+        const proto = Object.getPrototypeOf(this);
+        const methods = Object.getOwnPropertyNames(proto).filter(
+          (name) =>
+            name !== 'constructor' &&
+            typeof (this as any)[name] === 'function'
+        );
+
+        methods.forEach((method) => {
+          const original = (this as any)[method];
+          (this as any)[method] = async (...methodArgs: any[]) => {
+            await this.ensureInitialized();
+            return await original.apply(this, methodArgs);
+          };
+        });
+      }
+    };
+  };
+}
+
+/**
+ * Lazy property decorator for deferred loading
+ */
+export function LazyProperty(loader: () => Promise<any>) {
+  return function (target: any, propertyKey: string) {
+    let value: any;
+    let loading: Promise<any> | null = null;
+
+    Object.defineProperty(target, propertyKey, {
+      get: async function () {
+        if (value !== undefined) {
+          return value;
+        }
+
+        if (loading) {
+          return await loading;
+        }
+
+        loading = loader();
+        value = await loading;
+        loading = null;
+
+        return value;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+  };
+}
+
+/**
+ * Code splitting helper for Lambda handlers
+ */
+export class CodeSplitter {
+  private handlers: Map<string, () => Promise<any>> = new Map();
+
+  /**
+   * Register handler with lazy loading
+   */
+  register(name: string, loader: () => Promise<any>): void {
+    this.handlers.set(name, loader);
+    logger.debug('Handler registered', { name });
+  }
+
+  /**
+   * Get handler by name
+   */
+  async getHandler(name: string): Promise<any> {
+    const loader = this.handlers.get(name);
+
+    if (!loader) {
+      throw new Error(`Handler not found: ${name}`);
+    }
+
+    logger.debug('Loading handler', { name });
+    const startTime = Date.now();
+
+    try {
+      const handler = await loader();
+      const loadTime = Date.now() - startTime;
+
+      logger.info('Handler loaded', { name, loadTime });
+
+      addMetadata({
+        handlerName: name,
+        handlerLoadTime: loadTime,
+      }, 'code-splitter');
+
+      return handler;
+    } catch (error) {
+      logger.error('Failed to load handler', error as Error, { name });
+      throw error;
+    }
+  }
+
+  /**
+   * List registered handlers
+   */
+  listHandlers(): string[] {
+    return Array.from(this.handlers.keys());
+  }
+}
+
+/**
+ * Create code splitter instance
+ */
+export function createCodeSplitter(): CodeSplitter {
+  return new CodeSplitter();
+}
+
+/**
+ * Optimize cold start by preloading critical modules
+ */
+export async function optimizeColdStart(
+  criticalModules: Array<{ path: string; export?: string }>
+): Promise<void> {
+  logger.info('Optimizing cold start', {
+    moduleCount: criticalModules.length,
+  });
+
+  const startTime = Date.now();
+
+  try {
+    // Preload critical modules in parallel
+    await preloadModules(criticalModules);
+
+    const optimizationTime = Date.now() - startTime;
+
+    logger.info('Cold start optimized', {
+      optimizationTime,
+      moduleCount: criticalModules.length,
+    });
+
+    addMetadata({
+      coldStartOptimizationTime: optimizationTime,
+      preloadedModules: criticalModules.length,
+    }, 'cold-start');
+  } catch (error) {
+    logger.error('Cold start optimization failed', error as Error);
+    throw error;
+  }
+}

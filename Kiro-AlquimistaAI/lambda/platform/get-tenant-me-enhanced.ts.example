@@ -1,0 +1,313 @@
+/**
+ * Exemplo de handler com logging e observabilidade completos
+ * 
+ * Este é um exemplo de como implementar um handler com:
+ * - Structured logging
+ * - X-Ray tracing
+ * - Custom metrics
+ * - Error handling
+ * - Performance monitoring
+ */
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { createLogger } from '../shared/logger';
+import { traceSubsegment, addAnnotations, traceQuery } from '../shared/xray-tracer';
+import { emitTenantAPICall } from '../shared/metrics-emitter';
+import { extractAuthContext, requireTenantAccess } from '../shared/authorization-middleware';
+import { query } from '../shared/database';
+
+const logger = createLogger('tenant-api');
+
+/**
+ * GET /tenant/me
+ * 
+ * Retorna informações da empresa do tenant autenticado
+ */
+export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const startTime = Date.now();
+  let statusCode = 200;
+  
+  try {
+    // 1. Extrair contexto de autenticação
+    const context = extractAuthContext(event);
+    
+    // 2. Atualizar contexto do logger
+    logger.updateContext({
+      tenantId: context.tenantId,
+      userId: context.sub,
+      requestId: event.requestContext.requestId,
+      isInternal: context.isInternal
+    });
+    
+    // 3. Adicionar anotações X-Ray para filtragem
+    addAnnotations({
+      tenantId: context.tenantId || 'none',
+      userId: context.sub,
+      endpoint: '/tenant/me',
+      isInternal: context.isInternal.toString()
+    });
+    
+    // 4. Log início da requisição
+    logger.info('Processing GET /tenant/me request', {
+      tenantId: context.tenantId,
+      userId: context.sub,
+      userGroups: context.groups,
+      sourceIp: event.requestContext.identity?.sourceIp
+    });
+    
+    // 5. Validar tenant ID
+    if (!context.tenantId) {
+      statusCode = 400;
+      logger.warn('Missing tenant ID', {
+        userId: context.sub,
+        groups: context.groups
+      });
+      
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          error: 'Tenant ID required'
+        })
+      };
+    }
+    
+    // 6. Validar acesso ao tenant
+    try {
+      requireTenantAccess(context, context.tenantId);
+    } catch (error) {
+      statusCode = 403;
+      logger.warn('Access denied to tenant', {
+        userId: context.sub,
+        requestedTenantId: context.tenantId,
+        userTenantId: context.tenantId,
+        isInternal: context.isInternal
+      });
+      
+      return {
+        statusCode: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          error: 'Forbidden: Access denied to this tenant'
+        })
+      };
+    }
+    
+    // 7. Buscar dados do tenant com tracing
+    const tenant = await traceSubsegment(
+      'FetchTenantData',
+      async () => {
+        logger.debug('Querying tenant data', {
+          tenantId: context.tenantId
+        });
+        
+        // Query com tracing específico
+        const result = await traceQuery(
+          'GetTenantById',
+          async () => {
+            return await query(`
+              SELECT 
+                t.id,
+                t.name,
+                t.cnpj,
+                t.segment,
+                t.plan,
+                t.status,
+                t.mrr_estimate,
+                t.created_at,
+                t.max_agents,
+                t.max_users,
+                t.max_requests_per_month,
+                COUNT(DISTINCT ta.id) as active_agents,
+                COUNT(DISTINCT tu.id) as active_users,
+                COALESCE(SUM(tud.total_requests), 0) as requests_this_month
+              FROM tenants t
+              LEFT JOIN tenant_agents ta ON ta.tenant_id = t.id AND ta.status = 'active'
+              LEFT JOIN tenant_users tu ON tu.tenant_id = t.id
+              LEFT JOIN tenant_usage_daily tud ON tud.tenant_id = t.id 
+                AND tud.date >= DATE_TRUNC('month', CURRENT_DATE)
+              WHERE t.id = $1
+              GROUP BY t.id
+            `, [context.tenantId]);
+          },
+          { tenantId: context.tenantId }
+        );
+        
+        if (result.rows.length === 0) {
+          throw new Error('Tenant not found');
+        }
+        
+        return result.rows[0];
+      },
+      {
+        tenantId: context.tenantId,
+        operation: 'getTenantData'
+      },
+      {
+        query: 'GetTenantById',
+        tenantId: context.tenantId
+      }
+    );
+    
+    // 8. Formatar resposta
+    const response = {
+      id: tenant.id,
+      name: tenant.name,
+      cnpj: tenant.cnpj,
+      segment: tenant.segment,
+      plan: tenant.plan,
+      status: tenant.status,
+      mrr_estimate: parseFloat(tenant.mrr_estimate || 0),
+      created_at: tenant.created_at,
+      limits: {
+        max_agents: tenant.max_agents,
+        max_users: tenant.max_users,
+        max_requests_per_month: tenant.max_requests_per_month
+      },
+      usage: {
+        active_agents: parseInt(tenant.active_agents || 0),
+        active_users: parseInt(tenant.active_users || 0),
+        requests_this_month: parseInt(tenant.requests_this_month || 0)
+      }
+    };
+    
+    // 9. Calcular duração
+    const duration = Date.now() - startTime;
+    
+    // 10. Log sucesso
+    logger.info('Request completed successfully', {
+      tenantId: context.tenantId,
+      duration,
+      activeAgents: response.usage.active_agents,
+      activeUsers: response.usage.active_users
+    });
+    
+    // 11. Emitir métricas
+    await emitTenantAPICall(
+      context.tenantId,
+      '/tenant/me',
+      200,
+      duration
+    );
+    
+    // 12. Retornar resposta
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'X-Request-Duration': duration.toString()
+      },
+      body: JSON.stringify(response)
+    };
+    
+  } catch (error) {
+    // Calcular duração mesmo em caso de erro
+    const duration = Date.now() - startTime;
+    statusCode = 500;
+    
+    // Log erro com stack trace
+    logger.error('Request failed', error as Error, {
+      duration,
+      statusCode,
+      errorName: (error as Error).name,
+      errorMessage: (error as Error).message
+    });
+    
+    // Emitir métrica de erro
+    await emitTenantAPICall(
+      event.requestContext.authorizer?.claims?.['custom:tenant_id'] || 'unknown',
+      '/tenant/me',
+      500,
+      duration
+    );
+    
+    // Retornar erro genérico (não expor detalhes internos)
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        error: 'Internal server error',
+        requestId: event.requestContext.requestId
+      })
+    };
+  }
+}
+
+/**
+ * Exemplo de uso com cache
+ */
+export async function handlerWithCache(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const startTime = Date.now();
+  const context = extractAuthContext(event);
+  
+  logger.updateContext({
+    tenantId: context.tenantId,
+    userId: context.sub
+  });
+  
+  addAnnotations({
+    tenantId: context.tenantId || 'none',
+    endpoint: '/tenant/me'
+  });
+  
+  try {
+    // Tentar buscar do cache
+    const cacheKey = `tenant:${context.tenantId}:me`;
+    
+    const cachedData = await traceSubsegment(
+      'CheckCache',
+      async () => {
+        // Implementação de cache aqui
+        return null; // Exemplo: cache miss
+      },
+      { cacheKey }
+    );
+    
+    if (cachedData) {
+      logger.info('Cache hit', { cacheKey });
+      // Emitir métrica de cache hit
+      // await emitCacheHit(cacheKey);
+      
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cache': 'HIT'
+        },
+        body: JSON.stringify(cachedData)
+      };
+    }
+    
+    logger.info('Cache miss', { cacheKey });
+    // await emitCacheMiss(cacheKey);
+    
+    // Buscar do banco e armazenar no cache
+    // ... resto da implementação
+    
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Cache': 'MISS'
+      },
+      body: JSON.stringify({})
+    };
+    
+  } catch (error) {
+    logger.error('Request failed', error as Error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal server error' })
+    };
+  }
+}

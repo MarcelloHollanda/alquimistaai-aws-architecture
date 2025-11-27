@@ -1,0 +1,388 @@
+import { APIGatewayProxyResult } from 'aws-lambda';
+import { withEnhancedObservability, EnhancedContext } from '../shared/enhanced-middleware';
+import { createCache, InMemoryCache } from '../shared/cache-manager';
+import { cacheAside, writeThrough, Cached, CachePresets, MultiLevelCache } from '../shared/cache-strategies';
+
+/**
+ * Exemplo 1: Cache-Aside (Lazy Loading) para queries de banco
+ */
+export const cacheAsideHandler = withEnhancedObservability(
+  'cache-aside-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    // Criar cache com preset de query
+    const cache = createCache('query-cache', CachePresets.query, undefined, logger);
+
+    try {
+      // Usar cache-aside pattern
+      const users = await cacheAside(
+        cache,
+        'users:active',
+        async () => {
+          logger.info('Fetching users from database');
+          // Simular query ao banco
+          await new Promise(resolve => setTimeout(resolve, 100));
+          return [
+            { id: 1, name: 'User 1', active: true },
+            { id: 2, name: 'User 2', active: true }
+          ];
+        },
+        300, // 5 minutes TTL
+        logger
+      );
+
+      // Log metrics
+      const metrics = cache.getMetrics();
+      logger.info('Cache metrics', {
+        operation: 'cache.metrics',
+        customMetrics: metrics
+      });
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ users, cacheMetrics: metrics })
+      };
+    } catch (error) {
+      logger.error('Cache-aside failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to fetch users' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 2: Write-Through para atualizações
+ */
+export const writeThroughHandler = withEnhancedObservability(
+  'write-through-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger, event } = ctx;
+
+    const cache = createCache('user-cache', CachePresets.session, undefined, logger);
+
+    try {
+      const userData = JSON.parse(event.body || '{}');
+
+      // Write-through: escreve no banco e depois no cache
+      const user = await writeThrough(
+        cache,
+        `user:${userData.id}`,
+        userData,
+        async (data) => {
+          logger.info('Persisting user to database');
+          // Simular escrita no banco
+          await new Promise(resolve => setTimeout(resolve, 50));
+        },
+        3600, // 1 hour TTL
+        logger
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ success: true, user })
+      };
+    } catch (error) {
+      logger.error('Write-through failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to update user' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 3: Usando decorator @Cached
+ */
+class UserService {
+  constructor(
+    private cache: InMemoryCache,
+    private logger: EnhancedLogger
+  ) {}
+
+  @Cached({ ttl: 300, keyGenerator: (userId: string) => `user:${userId}` })
+  async getUser(userId: string): Promise<any> {
+    this.logger.info('Fetching user from database', {
+      operation: 'user.fetch',
+      customMetrics: { userId }
+    });
+
+    // Simular query ao banco
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    return {
+      id: userId,
+      name: `User ${userId}`,
+      email: `user${userId}@example.com`
+    };
+  }
+
+  @Cached({ ttl: 600, keyGenerator: (userId: string) => `user:${userId}:preferences` })
+  async getUserPreferences(userId: string): Promise<any> {
+    this.logger.info('Fetching user preferences', {
+      operation: 'user.preferences',
+      customMetrics: { userId }
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    return {
+      theme: 'dark',
+      language: 'pt-BR',
+      notifications: true
+    };
+  }
+}
+
+export const decoratorHandler = withEnhancedObservability(
+  'decorator-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger, event } = ctx;
+
+    const cache = new InMemoryCache('user-service', CachePresets.session, logger);
+    const userService = new UserService(cache, logger);
+
+    try {
+      const userId = event.pathParameters?.userId || '1';
+
+      // Primeira chamada: cache miss, busca do banco
+      const user1 = await userService.getUser(userId);
+      
+      // Segunda chamada: cache hit, retorna do cache
+      const user2 = await userService.getUser(userId);
+
+      // Buscar preferências (cache separado)
+      const preferences = await userService.getUserPreferences(userId);
+
+      const metrics = cache.getMetrics();
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          user: user1,
+          preferences,
+          cacheMetrics: metrics,
+          note: 'Second user fetch was from cache'
+        })
+      };
+    } catch (error) {
+      logger.error('Decorator example failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to fetch user' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 4: Multi-Level Cache (L1 in-memory + L2 Redis)
+ */
+export const multiLevelHandler = withEnhancedObservability(
+  'multi-level-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    // L1: In-memory cache (fast, small)
+    const l1Cache = new InMemoryCache('l1', { ttl: 60, prefix: 'l1' }, logger);
+    
+    // L2: Redis cache (slower, larger) - usando in-memory para exemplo
+    const l2Cache = new InMemoryCache('l2', { ttl: 300, prefix: 'l2' }, logger);
+
+    const multiCache = new MultiLevelCache(l1Cache, l2Cache, logger);
+
+    try {
+      // Primeira chamada: miss em ambos os níveis
+      const data1 = await multiCache.getOrSet(
+        'expensive-query',
+        async () => {
+          logger.info('Fetching from source (expensive operation)');
+          await new Promise(resolve => setTimeout(resolve, 200));
+          return { result: 'expensive data', timestamp: Date.now() };
+        },
+        300
+      );
+
+      // Segunda chamada: hit no L1 (muito rápido)
+      const data2 = await multiCache.getOrSet(
+        'expensive-query',
+        async () => {
+          // Não deve ser chamado
+          return { result: 'should not fetch', timestamp: Date.now() };
+        },
+        300
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          firstFetch: data1,
+          secondFetch: data2,
+          l1Metrics: l1Cache.getMetrics(),
+          l2Metrics: l2Cache.getMetrics()
+        })
+      };
+    } catch (error) {
+      logger.error('Multi-level cache failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Cache operation failed' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 5: Cache de resultados de agentes
+ */
+export const agentCacheHandler = withEnhancedObservability(
+  'agent-cache-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger, event } = ctx;
+
+    const cache = createCache('agent-cache', CachePresets.agent, undefined, logger);
+
+    try {
+      const leadId = event.pathParameters?.leadId || '1';
+      const agentType = event.queryStringParameters?.agent || 'qualification';
+
+      // Cache de resultado de agente
+      const result = await cache.getOrSet(
+        `agent:${agentType}:lead:${leadId}`,
+        async () => {
+          logger.info('Executing agent', {
+            operation: 'agent.execute',
+            customMetrics: { agentType, leadId }
+          });
+
+          // Simular execução de agente (operação cara)
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          return {
+            agentType,
+            leadId,
+            score: Math.random() * 100,
+            recommendation: 'qualified',
+            executedAt: new Date().toISOString()
+          };
+        },
+        1800 // 30 minutes
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          result,
+          cached: await cache.exists(`agent:${agentType}:lead:${leadId}`),
+          metrics: cache.getMetrics()
+        })
+      };
+    } catch (error) {
+      logger.error('Agent cache failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Agent execution failed' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 6: Rate Limiting com cache
+ */
+export const rateLimitHandler = withEnhancedObservability(
+  'rate-limit-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger, event } = ctx;
+
+    const cache = createCache('rate-limit', CachePresets.rateLimit, undefined, logger);
+
+    try {
+      const clientIp = event.requestContext.identity?.sourceIp || 'unknown';
+      const key = `rate:${clientIp}`;
+
+      // Get current count
+      const currentCount = await cache.get<number>(key) || 0;
+      const limit = 10; // 10 requests per minute
+
+      if (currentCount >= limit) {
+        logger.warn('Rate limit exceeded', {
+          operation: 'rate-limit.exceeded',
+          customMetrics: { clientIp, currentCount, limit }
+        });
+
+        return {
+          statusCode: 429,
+          body: JSON.stringify({
+            error: 'Rate limit exceeded',
+            limit,
+            retryAfter: 60
+          })
+        };
+      }
+
+      // Increment counter
+      await cache.set(key, currentCount + 1, 60);
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: true,
+          remaining: limit - currentCount - 1
+        })
+      };
+    } catch (error) {
+      logger.error('Rate limit check failed', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Rate limit check failed' })
+      };
+    }
+  }
+);
+
+/**
+ * Exemplo 7: Cache metrics endpoint
+ */
+export const cacheMetricsHandler = withEnhancedObservability(
+  'cache-metrics-example',
+  async (ctx: EnhancedContext): Promise<APIGatewayProxyResult> => {
+    const { logger } = ctx;
+
+    try {
+      const { CacheRegistry } = await import('../shared/cache-manager');
+      const registry = CacheRegistry.getInstance(logger);
+      
+      const allMetrics = registry.getAllMetrics();
+
+      logger.info('Cache metrics retrieved', {
+        operation: 'cache.metrics',
+        customMetrics: { cacheCount: Object.keys(allMetrics).length }
+      });
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ metrics: allMetrics })
+      };
+    } catch (error) {
+      logger.error('Failed to get cache metrics', error as Error);
+      
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to get metrics' })
+      };
+    }
+  }
+);
+
+// Import necessário
+import { EnhancedLogger } from '../shared/enhanced-logger';

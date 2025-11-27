@@ -1,0 +1,680 @@
+﻿Integração Frontend Lovable → Backend C3
+Frontend: https://lovable.dev/projects/cc2706e0-d8f3-4c2c-9968-d00080a1b8aa
+Backend: Replit C3 Middleware (Autoscale)
+Última atualização: 14 de outubro de 2025
+________________
+
+
+🔗 Configuração Base
+URL Base da API
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://[YOUR-REPLIT-URL].replit.app';
+Headers Obrigatórios
+const headers = {
+ 'Content-Type': 'application/json',
+ 'Authorization': `Bearer ${token}`, // Se autenticado
+ 'X-Trace-ID': crypto.randomUUID() // Para rastreamento
+};
+________________
+
+
+✅ CORS - Configuração Ativa
+O backend JÁ ESTÁ CONFIGURADO para aceitar requisições do Lovable:
+// Domínios permitidos (configurados no backend)
+- https://lovable.app
+- https://lovable.dev
+- https://*.lovable.app (subdomínios)
+- https://*.lovable.dev (subdomínios)
+- http://localhost:5173 (Vite dev)
+- http://localhost:3000 (React dev)
+Nenhuma configuração adicional necessária no frontend!
+________________
+
+
+📊 Endpoints Disponíveis
+1. Health & Status
+GET /health
+Verificar se o servidor está online.
+Request:
+fetch(`${API_BASE_URL}/health`)
+Response:
+{
+ "status": "healthy",
+ "timestamp": "2025-10-14T23:25:11.529Z"
+}
+________________
+
+
+GET /api/status
+Status detalhado da aplicação.
+Request:
+fetch(`${API_BASE_URL}/api/status`)
+Response:
+{
+ "status": "running",
+ "timestamp": "2025-10-14T23:25:47.712Z",
+ "version": "1.0.0",
+ "environment": "production"
+}
+________________
+
+
+2. Relatórios (T7)
+GET /api/relatorios/diario
+Gerar relatório diário de performance.
+Query Params:
+* data (opcional): Data no formato YYYY-MM-DD (padrão: hoje)
+Request:
+const response = await fetch(
+ `${API_BASE_URL}/api/relatorios/diario?data=2025-10-14`
+);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": {
+   "data": "2025-10-14",
+   "periodo": "diario",
+   "funil": {
+     "mensagens_planejadas": 150,
+     "mensagens_enviadas": 145,
+     "mensagens_entregues": 142,
+     "respostas_recebidas": 28,
+     "agendamentos_confirmados": 5,
+     "taxa_entrega": 97.9,
+     "taxa_resposta": 19.7,
+     "taxa_agendamento": 17.9
+   },
+   "performance_canais": {
+     "whatsapp": {
+       "enviadas": 100,
+       "entregues": 98,
+       "falhas": 2,
+       "taxa_entrega": 98.0
+     },
+     "email": {
+       "enviadas": 45,
+       "entregues": 44,
+       "falhas": 1,
+       "taxa_entrega": 97.8
+     }
+   },
+   "conversas": {
+     "iniciadas": 28,
+     "ativas": 15,
+     "intencoes": [
+       { "label": "agendar", "count": 12 },
+       { "label": "duvida", "count": 8 },
+       { "label": "interesse", "count": 5 }
+     ],
+     "sentimentos": [
+       { "label": "positivo", "count": 18 },
+       { "label": "neutro", "count": 7 },
+       { "label": "negativo", "count": 3 }
+     ]
+   },
+   "agendamentos": {
+     "confirmados": 5,
+     "remarcados": 1,
+     "cancelados": 0,
+     "distribuicao_horario": {
+       "09:00": 2,
+       "14:00": 2,
+       "16:00": 1
+     }
+   },
+   "objecoes": {
+     "total_objecoes": 12,
+     "top_3": [
+       {
+         "tipo": "preco",
+         "quantidade": 5,
+         "percentual": "41.7%",
+         "exemplos": ["Muito caro", "Qual o valor?"]
+       },
+       {
+         "tipo": "timing",
+         "quantidade": 4,
+         "percentual": "33.3%",
+         "exemplos": ["Depois", "Mês que vem"]
+       }
+     ],
+     "recomendacoes_treinamento": [
+       {
+         "categoria": "preco",
+         "acao": "Treinar equipe em argumentação de ROI..."
+       }
+     ]
+   },
+   "experimentos": {
+     "experimentos_ativos": 2,
+     "resultados_significativos": 1,
+     "vencedores_automaticos": 1
+   },
+   "insights": [
+     {
+       "tipo": "oportunidade",
+       "categoria": "canais",
+       "titulo": "WhatsApp performando melhor",
+       "descricao": "WhatsApp tem 15.2% mais entrega que email",
+       "impacto": "medio"
+     }
+   ],
+   "recomendacoes": [
+     {
+       "categoria": "otimizacao",
+       "titulo": "Revisar templates",
+       "descricao": "Taxa de agendamento pode melhorar",
+       "prioridade": "alta"
+     }
+   ]
+ }
+}
+________________
+
+
+GET /api/relatorios/semanal
+Relatório consolidado dos últimos 7 dias.
+Request:
+const response = await fetch(`${API_BASE_URL}/api/relatorios/semanal`);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": {
+   "periodo": "semanal",
+   "inicio": "2025-10-07",
+   "fim": "2025-10-14",
+   "consolidado": {
+     "total_enviadas": 1050,
+     "total_entregues": 1025,
+     "total_respostas": 210,
+     "total_agendamentos": 38
+   },
+   "tendencias": [
+     {
+       "metrica": "taxa_resposta",
+       "direcao": "subindo",
+       "magnitude": 3.5,
+       "significancia": "baixa"
+     }
+   ],
+   "recomendacoes": []
+ }
+}
+________________
+
+
+GET /api/relatorios/mensal
+Relatório consolidado dos últimos 30 dias.
+Request:
+const response = await fetch(`${API_BASE_URL}/api/relatorios/mensal`);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": {
+   "periodo": "mensal",
+   "inicio": "2025-09-14",
+   "fim": "2025-10-14",
+   "consolidado": {
+     "total_enviadas": 4500,
+     "total_entregues": 4410,
+     "total_respostas": 880,
+     "total_agendamentos": 162
+   },
+   "comparacao_mes_anterior": {
+     "crescimento_enviadas": 12.5,
+     "crescimento_respostas": 8.3,
+     "crescimento_agendamentos": 15.7
+   },
+   "performance_semanal": {
+     "semana_1": { "agendamentos": 35, "taxa_conversao": 18.2 },
+     "semana_2": { "agendamentos": 42, "taxa_conversao": 19.1 },
+     "semana_3": { "agendamentos": 38, "taxa_conversao": 17.8 },
+     "semana_4": { "agendamentos": 47, "taxa_conversao": 20.5 }
+   },
+   "destaques_mes": [
+     "Melhor semana: Semana 4 (47 agendamentos)",
+     "Taxa de conversão cresceu 2.3%"
+   ],
+   "recomendacoes_mensais": [
+     {
+       "categoria": "crescimento",
+       "titulo": "Manter estratégia da semana 4",
+       "descricao": "Melhor performance do mês"
+     }
+   ]
+ }
+}
+________________
+
+
+3. Agendamentos
+GET /api/agendamentos/:id
+Buscar detalhes de um agendamento específico.
+Request:
+const response = await fetch(
+ `${API_BASE_URL}/api/agendamentos/${appointmentId}`
+);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": {
+   "id": "550e8400-e29b-41d4-a716-446655440000",
+   "lead_id": "...",
+   "contato_nome": "João Silva",
+   "empresa_nome": "Indústria ABC",
+   "status": "confirmado",
+   "scheduled_at": "2025-10-15T14:00:00.000Z",
+   "resumo_comercial": {
+     "fit_comercial": {
+       "score": "A",
+       "pontos": 92,
+       "criterios": {
+         "segmento": { "valor": "Indústria", "pontos": 25 },
+         "porte": { "valor": "Grande", "pontos": 20 },
+         "regiao": { "valor": "Sudeste", "pontos": 15 }
+       }
+     },
+     "analise_sentimento_t5": {
+       "sentimento": "empolgado",
+       "tom": "profissional",
+       "intensidade": 9
+     },
+     "intencoes_detectadas_t4": [
+       { "intencao": "agendar", "confianca": 0.95 },
+       { "intencao": "interesse", "confianca": 0.88 }
+     ],
+     "historico_t3": {
+       "mensagens_enviadas": 3,
+       "ultimas_datas": ["2025-10-10", "2025-10-12", "2025-10-14"]
+     },
+     "estrategia_t2": {
+       "campanha": "Outbound Q4 2025",
+       "abm": true,
+       "touch_sequence": "alta_prioridade"
+     },
+     "total_interacoes": 5,
+     "eventos_recentes": [
+       "Lead respondeu positivamente à proposta",
+       "Confirmou interesse em reunião"
+     ],
+     "insights": [
+       "Lead PRIORITÁRIO - ICP perfeito",
+       "Alta energia detectada"
+     ],
+     "recomendacoes": [
+       "Capitalizar momentum",
+       "Preparar apresentação corporativa"
+     ]
+   }
+ }
+}
+________________
+
+
+4. Mensagens Inbound
+GET /api/inbound/messages
+Listar mensagens recebidas.
+Query Params:
+* limit (opcional): Máximo de mensagens (padrão: 50)
+* offset (opcional): Paginação (padrão: 0)
+* status (opcional): Filtrar por status (pending, processed, error)
+Request:
+const response = await fetch(
+ `${API_BASE_URL}/api/inbound/messages?limit=20&status=pending`
+);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": {
+   "messages": [
+     {
+       "id": "...",
+       "lead_id": "...",
+       "from": "+5511987654321",
+       "body": "Olá, tenho interesse!",
+       "channel": "whatsapp",
+       "received_at": "2025-10-14T15:30:00.000Z",
+       "status": "pending"
+     }
+   ],
+   "total": 45,
+   "limit": 20,
+   "offset": 0
+ }
+}
+________________
+
+
+GET /api/inbound/summary
+Resumo de mensagens inbound.
+Request:
+const response = await fetch(`${API_BASE_URL}/api/inbound/summary`);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": {
+   "total_pending": 12,
+   "total_processed": 156,
+   "total_error": 3,
+   "por_canal": {
+     "whatsapp": 98,
+     "email": 52,
+     "instagram": 15,
+     "facebook": 6
+   }
+ }
+}
+________________
+
+
+5. Aprovações (Human-in-the-Loop)
+GET /api/approvals
+Listar aprovações pendentes.
+Query Params:
+* status (opcional): pending, approved, rejected
+* tier (opcional): T1, T2, T3, T7
+Request:
+const response = await fetch(
+ `${API_BASE_URL}/api/approvals?status=pending`
+);
+const data = await response.json();
+Response:
+{
+ "success": true,
+ "data": [
+   {
+     "id": "...",
+     "tier": "T2",
+     "action": "criar_campanha",
+     "status": "pending",
+     "data": {
+       "campanha_nome": "Outbound Indústria Q4",
+       "leads_total": 150
+     },
+     "created_at": "2025-10-14T14:00:00.000Z"
+   }
+ ]
+}
+________________
+
+
+POST /api/approvals/:id/approve
+Aprovar uma ação pendente.
+Request:
+const response = await fetch(
+ `${API_BASE_URL}/api/approvals/${approvalId}/approve`,
+ {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json'
+   },
+   body: JSON.stringify({
+     approved_by: "user@example.com",
+     notes: "Aprovado para execução"
+   })
+ }
+);
+Response:
+{
+ "success": true,
+ "message": "Aprovação registrada e ação executada"
+}
+________________
+
+
+POST /api/approvals/:id/reject
+Rejeitar uma ação pendente.
+Request:
+const response = await fetch(
+ `${API_BASE_URL}/api/approvals/${approvalId}/reject`,
+ {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json'
+   },
+   body: JSON.stringify({
+     rejected_by: "user@example.com",
+     reason: "Campanha precisa de ajustes"
+   })
+ }
+);
+Response:
+{
+ "success": true,
+ "message": "Aprovação rejeitada"
+}
+________________
+
+
+6. WhatsApp Status
+GET /api/whatsapp/status
+Status da conexão WhatsApp.
+Request:
+const response = await fetch(`${API_BASE_URL}/api/whatsapp/status`);
+const data = await response.json();
+Response:
+{
+ "connected": true,
+ "phone": "+551198765432",
+ "status": "ready",
+ "last_seen": "2025-10-14T23:00:00.000Z"
+}
+________________
+
+
+7. Dashboard de Métricas
+GET /dashboard/
+Dashboard HTML interativo com gráficos Prometheus.
+URL Direta:
+https://[YOUR-REPLIT-URL].replit.app/dashboard/
+Visualização:
+* Funil de conversão (T0→T7)
+* Performance por canal (WhatsApp, Email)
+* Conversas ativas
+* Taxa de agendamento
+* Gráficos em tempo real
+________________
+
+
+🔒 Autenticação (Opcional)
+Se você precisar adicionar autenticação:
+// Login (exemplo - implementar no backend)
+const login = async (email, password) => {
+ const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ email, password })
+ });
+  const data = await response.json();
+  // Salvar token
+ localStorage.setItem('auth_token', data.token);
+  return data.token;
+};
+// Usar token em requisições
+const fetchWithAuth = async (url) => {
+ const token = localStorage.getItem('auth_token');
+  return fetch(url, {
+   headers: {
+     'Authorization': `Bearer ${token}`,
+     'Content-Type': 'application/json'
+   }
+ });
+};
+________________
+
+
+🚨 Tratamento de Erros
+Erros Comuns
+const handleApiError = (error) => {
+ if (error.status === 401) {
+   // Não autorizado - redirecionar para login
+   window.location.href = '/login';
+ } else if (error.status === 403) {
+   // Sem permissão
+   alert('Você não tem permissão para essa ação');
+ } else if (error.status === 404) {
+   // Recurso não encontrado
+   alert('Recurso não encontrado');
+ } else if (error.status === 500) {
+   // Erro do servidor
+   alert('Erro no servidor. Tente novamente.');
+ } else {
+   // Erro genérico
+   alert('Erro desconhecido');
+ }
+};
+// Wrapper de fetch com tratamento
+const apiFetch = async (url, options = {}) => {
+ try {
+   const response = await fetch(url, {
+     ...options,
+     headers: {
+       'Content-Type': 'application/json',
+       ...options.headers
+     }
+   });
+  
+   if (!response.ok) {
+     handleApiError(response);
+     throw new Error(`HTTP ${response.status}`);
+   }
+  
+   return await response.json();
+ } catch (error) {
+   console.error('API Error:', error);
+   throw error;
+ }
+};
+________________
+
+
+📊 Exemplo: Componente React de Dashboard
+// src/components/Dashboard.tsx
+import { useEffect, useState } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+interface DailyReport {
+ data: string;
+ funil: {
+   taxa_entrega: number;
+   taxa_resposta: number;
+   taxa_agendamento: number;
+ };
+ insights: Array<{
+   tipo: string;
+   titulo: string;
+   descricao: string;
+ }>;
+}
+export function Dashboard() {
+ const [report, setReport] = useState<DailyReport | null>(null);
+ const [loading, setLoading] = useState(true);
+ useEffect(() => {
+   const fetchReport = async () => {
+     try {
+       const response = await fetch(
+         `${API_BASE_URL}/api/relatorios/diario`
+       );
+       const data = await response.json();
+      
+       if (data.success) {
+         setReport(data.data);
+       }
+     } catch (error) {
+       console.error('Erro ao buscar relatório:', error);
+     } finally {
+       setLoading(false);
+     }
+   };
+   fetchReport();
+ }, []);
+ if (loading) return <div>Carregando...</div>;
+ if (!report) return <div>Erro ao carregar relatório</div>;
+ return (
+   <div className="dashboard">
+     <h1>Dashboard - {report.data}</h1>
+    
+     <div className="metrics">
+       <div className="metric">
+         <h3>Taxa de Entrega</h3>
+         <p>{report.funil.taxa_entrega.toFixed(1)}%</p>
+       </div>
+       <div className="metric">
+         <h3>Taxa de Resposta</h3>
+         <p>{report.funil.taxa_resposta.toFixed(1)}%</p>
+       </div>
+       <div className="metric">
+         <h3>Taxa de Agendamento</h3>
+         <p>{report.funil.taxa_agendamento.toFixed(1)}%</p>
+       </div>
+     </div>
+     <div className="insights">
+       <h2>Insights</h2>
+       {report.insights.map((insight, idx) => (
+         <div key={idx} className={`insight ${insight.tipo}`}>
+           <h4>{insight.titulo}</h4>
+           <p>{insight.descricao}</p>
+         </div>
+       ))}
+     </div>
+   </div>
+ );
+}
+________________
+
+
+🎯 Checklist de Integração
+Frontend (Lovable)
+*  Configurar VITE_API_URL com URL do Replit
+*  Implementar wrapper de fetch com tratamento de erros
+*  Criar componentes para:
+   *  Dashboard de métricas
+   *  Lista de aprovações pendentes
+   *  Visualização de agendamentos
+   *  Inbox de mensagens inbound
+*  Adicionar tratamento de CORS (já configurado no backend)
+*  Implementar autenticação (se necessário)
+Backend (Replit)
+*  Configuração CORS para Lovable
+*  Health checks (/health, /api/status)
+*  Endpoints de relatórios
+*  Endpoints de agendamentos
+*  Endpoints de aprovações
+*  Endpoints de mensagens inbound
+*  Dashboard HTML (/dashboard/)
+________________
+
+
+🚀 Deploy e Testes
+1. Obter URL do Backend
+# Após publicar no Replit Autoscale
+https://[your-project-name].replit.app
+2. Configurar no Lovable
+// .env.production no Lovable
+VITE_API_URL=https://[your-project-name].replit.app
+3. Testar Conexão
+// Teste simples
+const testConnection = async () => {
+ const response = await fetch(`${VITE_API_URL}/health`);
+ const data = await response.json();
+ console.log('Backend status:', data);
+};
+testConnection();
+________________
+
+
+📞 Suporte
+Se encontrar problemas:
+1. CORS Issues: Verifique se o domínio Lovable está na whitelist
+2. Timeout: Aumente o timeout do fetch (backend Autoscale pode hibernar)
+3. 500 Errors: Verifique logs do backend no Replit
+4. 404 Errors: Confirme se o endpoint existe nesta documentação
+________________
+
+
+Pronto para integrar! 🎉
+Todos os endpoints estão ativos e prontos para uso. CORS já está configurado.

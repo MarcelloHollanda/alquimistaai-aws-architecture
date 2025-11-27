@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agentes & Planos · AlquimistaAI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="images/logo-alquimistaai-glow.png"
+           alt="AlquimistaAI — Transmutando dados em ouro"
+           class="brand-logo" />
+      <div>
+        <div class="brand-text-main">AlquimistaAI</div>
+        <div class="brand-text-sub">Catálogo de agentes inteligentes</div>
+      </div>
+    </div>
+    <button class="nav-toggle" aria-label="Abrir menu">☰</button>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Início</a>
+      <a href="produtos.html" class="nav-link">Agentes & Planos</a>
+      <a href="fibonacci.html" class="nav-link">Fibonacci Orquestrador</a>
+      <a href="#" class="nav-cta">Entrar</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section>
+      <h1 class="section-title">Catálogo de agentes e planos</h1>
+      <p class="section-sub">
+        Aqui você visualiza os 32 agentes que podem ser ativados dentro do núcleo Fibonacci.
+        Use os filtros para separar por objetivo e veja em qual plano eles se encaixam melhor.
+      </p>
+
+      <div class="plans-grid" style="margin-bottom:20px;">
+        <div class="plan-card">
+          <div class="plan-name">Essentials</div>
+          <div class="plan-price">3 agentes</div>
+          <p>Comece com o básico de Conteúdo, Social e Agenda.</p>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Professional</div>
+          <div class="plan-price">8 agentes</div>
+          <p>Marketing e atendimento já rodando com governança.</p>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Scale</div>
+          <div class="plan-price">16 agentes</div>
+          <p>Equipes, múltiplos canais e subnúcleos coordenados.</p>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">32 agentes</div>
+          <p>Ecossistema completo com todos os subnúcleos ativos.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-soft">
+      <div class="section-sub" style="margin-bottom:10px;">Filtrar por objetivo</div>
+      <div class="filters-bar">
+        <button class="filter-chip active" data-filter="all">Todos</button>
+        <button class="filter-chip" data-filter="conteudo">Conteúdo</button>
+        <button class="filter-chip" data-filter="social">Social</button>
+        <button class="filter-chip" data-filter="vendas">Vendas</button>
+        <button class="filter-chip" data-filter="pesquisa">Pesquisa/Insights</button>
+        <button class="filter-chip" data-filter="agenda">Agenda/Operações</button>
+        <button class="filter-chip" data-filter="financas">Finanças</button>
+      </div>
+
+      <div id="agents-grid" class="agents-grid"></div>
+
+      <p class="section-sub" style="margin-top:12px;">
+        Dica: escolha 3–5 agentes alinhados ao gargalo atual (conteúdo, social, vendas,
+        agenda ou finanças) e depois expanda para outros subnúcleos.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    AlquimistaAI · Núcleo Fibonacci e subnúcleos Hermes, Sophia, Atlas, Oracle, Nigredo.
+  </footer>
+
+  <!-- MODAL -->
+  <div id="agent-modal" class="modal-backdrop">
+  <div class="modal">
+    <h2 id="agent-modal-name" class="section-title"></h2>
+    <p id="agent-modal-desc" class="section-sub"></p>
+
+    <label for="agent-contact" style="font-size:13px;color:var(--text-muted);">
+      E-mail ou WhatsApp para falar sobre este agente
+    </label>
+    <input
+      id="agent-contact"
+      type="text"
+      placeholder="ex.: seuemail@empresa.com ou (11) 99999-9999"
+      style="width:100%;margin:6px 0 10px;padding:8px 10px;font-size:13px;
+             border-radius:8px;border:1px solid var(--border-soft);"
+    />
+
+    <p id="agent-modal-feedback"
+       style="font-size:12px;color:var(--text-muted);margin-bottom:10px;"></p>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+      <button id="agent-modal-close" class="btn btn-outline">Fechar</button>
+      <button id="agent-modal-send" class="btn">Enviar interesse</button>
+      <a href="fibonacci.html" class="btn btn-outline">Ver núcleo Fibonacci</a>
+    </div>
+  </div>
+</div>
+
+
+  <script src="app.js"></script>
+</body>
+</html>

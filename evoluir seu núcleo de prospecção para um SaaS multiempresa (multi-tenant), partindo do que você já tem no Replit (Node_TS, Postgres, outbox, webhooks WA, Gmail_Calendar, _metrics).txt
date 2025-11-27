@@ -1,0 +1,197 @@
+﻿abaixo está um guia prático para evoluir seu núcleo de prospecção para um SaaS multiempresa (multi-tenant), partindo do que você já tem no Replit (Node/TS, Postgres, outbox, webhooks WA, Gmail/Calendar, /metrics).
+1) Visão de destino (arquitetura SaaS)
+* Camada API: serviços “Recebimento”, “Estratégia”, “Disparo”, “Atendimento”, “Sentimento”, “Agendamento”, “Relatórios” atrás de um API Gateway (um domínio) com RBAC e rate limit por tenant.
+
+* Banco: Postgres multi-tenant com RLS (Row Level Security) + chaves por inquilino.
+
+* Jobs/Workers: consumidores de outbox escaláveis (1 fila por consumidor; chave de partição = tenant).
+
+* Armazenamento: uploads/artefatos em S3-compatível (ex.: R2/S3).
+
+* Observabilidade: Prometheus/OpenTelemetry + dashboards por tenant.
+
+* Billing: Stripe (plano, trial, cobrança), webhooks assíncronos.
+
+* Integrações: WhatsApp (Evolution), Gmail, Calendar — separação de credenciais por tenant.
+
+* Painel Admin: onboarding, chaves de API, limites, auditoria, status.
+
+2) Modelo de multi-tenant (recomendado)
+Você tem 3 opções. Recomendo a linha B (RLS por linha): simples, segura e compatível com seu esquema atual.
+A) DB por tenant – isolamento máximo, alto custo/ops.
+B) Esquema único + tenant_id em todas as tabelas + RLS ✅
+C) Schema por tenant – complica migrações.
+Passos (linha B)
+   1. Crie tenants e adicione tenant_id uuid not null às tabelas de domínio:
+
+      * empresas, contatos, leads, lotes, leads_lotes, estrategias, mensagens_modelo, inbound_msgs, dnc, agendamentos, event_log, outbox, ...
+
+         2. Habilite RLS e políticas:
+
+alter table empresas enable row level security;
+create policy p_empresas_tenant on empresas
+  using (tenant_id = current_setting('app.tenant_id')::uuid);
+
+
+-- repita para as demais tabelas
+
+
+            3. No início de cada request/worker, setar o tenant:
+
+select set_config('app.tenant_id', $1, true); -- $1 = tenant_id do header/token
+
+
+3) Autenticação, RBAC e injeção do tenant
+               * Auth: OIDC/SAML (SSO) ou e-mail+senha; emita JWT com sub, roles[], tenant_id.
+
+               * RBAC: admin|gestor|operador|leitura.
+
+               * Middleware API (todos os serviços):
+
+// extrai tenant via JWT ou X-Tenant
+const tenantId = req.user?.tenant_id || req.header("x-tenant");
+if (!tenantId) return res.status(400).json({ error: "tenant required" });
+await db.query("select set_config('app.tenant_id',$1,true)", [tenantId]);
+req.context = { tenantId, roles: req.user?.roles || [] };
+
+
+                  * Rate limit por tenant (Redis/Memory): chave ratelimit:${tenantId}.
+
+                  * API keys: tabela tenant_api_keys(tenant_id, name, token_hash, scopes[]). HMAC por tenant nos webhooks.
+
+4) Configuração por empresa (segregrar credenciais)
+                     * Tabela tenant_integrations(tenant_id, kind, config jsonb, enabled bool) para:
+
+                        * WhatsApp Evolution (base_url, api_key, instance_id)
+
+                        * Gmail/Calendar (client_id, client_secret, refresh_token, user)
+
+                        * OpenAI (api_key)
+
+                           * Carregar on demand por tenant_id no disparo/agenda.
+
+                           * DNC por tenant (compartilhado apenas se você quiser blacklist global).
+
+5) Provisionamento e ciclo de vida do cliente
+                              1. Signup/Trial → cria tenant, owner, roles, limites default (ex.: envios/dia).
+
+                              2. Onboarding guiado (checklist UI): conectar WA/Gmail/Calendar, upload CSV de teste, aprovações, primeira campanha.
+
+                              3. Planos (Stripe): Starter | Pro | Enterprise. Limites: #leads/mês, #agendamentos, #usuários, #instâncias WA.
+
+                              4. Suspensão automática se billing falhar (webhook).
+
+6) Disparo, filas e escala
+                                 * Outbox atual já serve; adicione partição por tenant:
+
+create index on outbox(consumer, status, created_at, --particionamento lógico
+                       ((event_payload->>'tenant_id')));
+
+
+                                    * No runOutbox: filtre/ordene por tenant; rode N workers por consumidor.
+
+                                    * Idempotência: mantenha idempotency_key existente; inclua tenant_id na composição.
+
+7) Frontend empresarial (multi-tenant)
+                                       * Enviar X-Tenant em todas as chamadas.
+
+                                       * Branding leve: logo/cores do tenant.
+
+                                       * Aprovações (quatro-olhos) habilitadas por plano/permissão.
+
+                                       * Painéis por tenant: /metrics já pode expor labels com tenant (ou filtros server-side -> recomendo endpoint /metrics/tenant que agrega antes de devolver).
+
+8) Segurança & LGPD (Brasil)
+                                          * Contrato + DPA (encargos de operador/controlador).
+
+                                          * Consentimentos e opt-out (DNC) por tenant.
+
+                                          * Criptografia: TLS end-to-end; dados sensíveis em repouso (KMS)/pgcrypto se necessário.
+
+                                          * Logs/Auditoria: audit_log(tenant_id, user_id, action, entity, before/after, ts); retenção por plano.
+
+                                          * Backups versionados, testes de restauração, rota de exclusão por tenant (data erasure).
+
+9) Deploy & ambientes
+                                             * Containerize (Docker).
+
+                                             * Cloud: Cloud Run/Fly.io/Render/Railway (monosserviço) ou ECS/EKS (multi).
+
+                                             * Postgres gerenciado (Neon/Supabase/RDS).
+
+                                             * S3 para uploads.
+
+                                             * Ambientes: dev/stage/prod com feature flags (por tenant).
+
+                                             * Blue-green (ou canário) para zero downtime.
+
+10) Migração do que você tem hoje
+                                                1. Congelar esquema e criar tabela tenants.
+
+                                                2. Adicionar tenant_id nas tabelas; preencher tudo com um tenant padrão (“legacy”).
+
+                                                3. Habilitar RLS e políticas.
+
+                                                4. Adaptar serviços (middleware que seta app.tenant_id).
+
+                                                5. Refatorar integrações para ler de tenant_integrations.
+
+                                                6. Smoke (end-to-end) com um segundo tenant de teste.
+
+                                                7. Ativar billing + auto-provisionamento.
+
+                                                8. Separar dados antigos por tenant conforme seus clientes forem sendo criados (roteiro de backfill, se necessário).
+
+SQL de exemplo
+create table tenants (id uuid primary key default gen_random_uuid(), name text, slug text unique, created_at timestamptz default now());
+
+
+alter table empresas add column tenant_id uuid not null default '00000000-0000-0000-0000-000000000000';
+-- repita para demais tabelas…
+
+
+alter table empresas enable row level security;
+create policy p_emp_tenant on empresas using (tenant_id = current_setting('app.tenant_id')::uuid);
+
+
+11) Métricas e SLOs por tenant
+                                                   * Exponha métricas com label tenant (ou agregue server-side):
+
+                                                      * event_total{tenant=..., event_type=...}
+
+                                                      * disparo_total{tenant=..., canal=..., status=...}
+
+                                                      * inbound_total{tenant=..., canal=...}
+
+                                                      * agendamento_*_total{tenant=..., ...}
+
+                                                         * No Lovable, permita filtro de tenant (se o usuário for multi-tenant).
+
+12) Preços & planos (exemplo objetivo)
+                                                            * Starter: 3 usuários, 20k leads/mês, 1 WA, 100 agendamentos, 90 dias de retenção.
+
+                                                            * Pro: 10 usuários, 100k leads/mês, 3 WA, 500 agendamentos, 365 dias, SSO, aprovações.
+
+                                                            * Enterprise: ilimitado sob contrato, SLA, região/dados dedicados.
+
+________________
+
+
+Checklist “pé no chão”
+                                                               * tenant_id em todas as tabelas + RLS habilitado
+
+                                                               * Middleware que seta app.tenant_id por request/worker
+
+                                                               * tenant_integrations e carregamento por tenant
+
+                                                               * API keys + rate limit por tenant
+
+                                                               * RBAC e bloqueio quatro-olhos
+
+                                                               * Billing (Stripe) + webhooks
+
+                                                               * Observabilidade: métricas por tenant, logs e auditoria
+
+                                                               * Script de migração “legacy → tenant padrão”
+
+                                                               * Testes e rollout blue-green

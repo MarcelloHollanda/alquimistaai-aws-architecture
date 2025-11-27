@@ -1,0 +1,261 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult, SQSEvent } from 'aws-lambda';
+import { EnhancedConnectionPool, createEnhancedPool } from '../shared/connection-pool';
+import { QueryOptimizer, createQueryOptimizer } from '../shared/query-optimizer';
+import { lazyLoad, optimizeColdStart, Lazy } from '../shared/lazy-loader';
+import { processSQSBatch, createBatchWriter } from '../shared/batch-processor';
+import { Logger } from '../shared/logger';
+import { PoolConfig } from 'pg';
+
+const logger = new Logger('performance-handler');
+
+/**
+ * Example: Enhanced connection pool usage
+ */
+
+// Create enhanced pool with optimized settings
+const poolConfig: PoolConfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME,
+  max: 10, // Will be auto-optimized based on Lambda memory
+  min: 2, // Keep 2 connections warm
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+  ssl: { rejectUnauthorized: false },
+};
+
+const connectionPool = createEnhancedPool(poolConfig);
+
+/**
+ * Example: Query optimizer with caching
+ */
+async function getLeadsWithOptimization(status: string) {
+  const pool = await connectionPool.getPool();
+  const optimizer = createQueryOptimizer(pool);
+
+  // Execute query with caching (60s TTL)
+  const result = await optimizer.execute(
+    'SELECT * FROM leads WHERE status = $1 ORDER BY created_at DESC LIMIT 100',
+    [status],
+    {
+      cache: true,
+      cacheTTL: 60000,
+      explain: process.env.ENABLE_QUERY_EXPLAIN === 'true',
+    }
+  );
+
+  return result.rows;
+}
+
+/**
+ * Example: Lazy loading modules
+ */
+async function processLeadWithLazyLoading(leadId: string) {
+  // Load heavy modules only when needed
+  const { processLead } = await lazyLoad('../agents/recebimento', 'processLead');
+  const { sendNotification } = await lazyLoad('../shared/notifications', 'sendNotification');
+
+  const result = await processLead(leadId);
+  await sendNotification(result);
+
+  return result;
+}
+
+/**
+ * Example: Cold start optimization
+ */
+export async function initHandler() {
+  // Preload critical modules during cold start
+  await optimizeColdStart([
+    { path: '../shared/database' },
+    { path: '../shared/logger' },
+    { path: '../agents/recebimento', export: 'processLead' },
+  ]);
+
+  // Warm up connection pool
+  await connectionPool.warmUp();
+
+  logger.info('Handler initialized and optimized');
+}
+
+/**
+ * Example: Batch processing SQS events
+ */
+export async function handleSQSBatch(event: SQSEvent) {
+  return await processSQSBatch(
+    event,
+    async (record) => {
+      const lead = JSON.parse(record.body);
+      await processLeadWithLazyLoading(lead.id);
+    },
+    {
+      maxBatchSize: 10,
+      maxRetries: 3,
+      partialFailureEnabled: true,
+      parallelProcessing: true,
+      maxConcurrency: 5,
+    }
+  );
+}
+
+/**
+ * Example: Batch writer for efficient bulk inserts
+ */
+const leadWriter = createBatchWriter(
+  async (leads: any[]) => {
+    const pool = await connectionPool.getPool();
+    const values = leads.map((l, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3})`).join(',');
+    const params = leads.flatMap((l) => [l.name, l.email, l.phone]);
+
+    await pool.query(
+      `INSERT INTO leads (name, email, phone) VALUES ${values}`,
+      params
+    );
+  },
+  {
+    maxBatchSize: 100,
+    maxWaitMs: 5000,
+  }
+);
+
+/**
+ * Example: API handler with all optimizations
+ */
+export async function optimizedApiHandler(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    const { action } = event.pathParameters || {};
+
+    switch (action) {
+      case 'get-leads':
+        const leads = await getLeadsWithOptimization('active');
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ leads }),
+        };
+
+      case 'create-lead':
+        const lead = JSON.parse(event.body || '{}');
+        await leadWriter.add(lead);
+        return {
+          statusCode: 202,
+          body: JSON.stringify({ message: 'Lead queued for processing' }),
+        };
+
+      case 'metrics':
+        const poolMetrics = connectionPool.getMetrics();
+        const optimizer = createQueryOptimizer(await connectionPool.getPool());
+        const cacheStats = optimizer.getCacheStats();
+        const slowQueries = optimizer.getSlowQueries();
+
+        return {
+          statusCode: 200,
+          body: JSON.stringify({
+            pool: poolMetrics,
+            cache: cacheStats,
+            slowQueries: slowQueries.slice(0, 10),
+          }),
+        };
+
+      default:
+        return {
+          statusCode: 404,
+          body: JSON.stringify({ error: 'Action not found' }),
+        };
+    }
+  } catch (error) {
+    logger.error('Handler error', error as Error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal server error' }),
+    };
+  }
+}
+
+/**
+ * Example: Lazy class initialization
+ */
+@Lazy()
+class LeadProcessor {
+  private pool: EnhancedConnectionPool | null = null;
+  private optimizer: QueryOptimizer | null = null;
+
+  async init() {
+    logger.info('Initializing LeadProcessor');
+    this.pool = connectionPool;
+    this.optimizer = createQueryOptimizer(await this.pool.getPool());
+  }
+
+  async processLead(leadId: string) {
+    // Pool and optimizer are initialized on first method call
+    const result = await this.optimizer!.execute(
+      'SELECT * FROM leads WHERE id = $1',
+      [leadId],
+      { cache: true }
+    );
+
+    return result.rows[0];
+  }
+
+  async batchProcessLeads(leadIds: string[]) {
+    const results = await this.optimizer!.batchExecute(
+      leadIds.map((id) => ({
+        query: 'SELECT * FROM leads WHERE id = $1',
+        params: [id],
+      }))
+    );
+
+    return results.flatMap((r) => r.rows);
+  }
+}
+
+/**
+ * Example: Health check with pool metrics
+ */
+export async function healthCheck(): Promise<APIGatewayProxyResult> {
+  try {
+    // Test connection
+    const isHealthy = await connectionPool.testConnection();
+
+    if (!isHealthy) {
+      return {
+        statusCode: 503,
+        body: JSON.stringify({ status: 'unhealthy', message: 'Database connection failed' }),
+      };
+    }
+
+    // Get pool health
+    const poolHealth = connectionPool.getHealthStatus();
+
+    return {
+      statusCode: poolHealth.healthy ? 200 : 503,
+      body: JSON.stringify({
+        status: poolHealth.healthy ? 'healthy' : 'degraded',
+        metrics: poolHealth.metrics,
+        warnings: poolHealth.warnings,
+      }),
+    };
+  } catch (error) {
+    logger.error('Health check failed', error as Error);
+    return {
+      statusCode: 503,
+      body: JSON.stringify({ status: 'unhealthy', error: (error as Error).message }),
+    };
+  }
+}
+
+/**
+ * Cleanup on Lambda shutdown
+ */
+process.on('beforeExit', async () => {
+  logger.info('Lambda shutting down, cleaning up resources');
+
+  // Flush pending writes
+  await leadWriter.flush();
+
+  // Close connection pool
+  await connectionPool.close();
+});
