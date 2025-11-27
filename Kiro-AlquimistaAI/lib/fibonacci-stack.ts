@@ -1083,8 +1083,27 @@ export class FibonacciStack extends cdk.Stack {
     });
 
     // ========================================
-    // WAF Association (se fornecido)
+    // WAF Association (DESABILITADA TEMPORARIAMENTE)
     // ========================================
+    // PROBLEMA: AWS::WAFv2::WebACLAssociation não suporta API Gateway HTTP API (v2)
+    // - Suporta apenas: API Gateway REST (v1), ALB, CloudFront, Cognito, AppSync, AppRunner
+    // - ARN de HTTP API: arn:aws:apigateway:region::/apis/{api-id}/stages/{stage}
+    // - ARN de REST API: arn:aws:apigateway:region::/restapis/{api-id}/stages/{stage}
+    // 
+    // ERRO ATUAL: WAFInvalidParameterException - The ARN isn't valid
+    // 
+    // SOLUÇÕES FUTURAS:
+    // 1. Migrar para API Gateway REST API (v1)
+    // 2. Colocar CloudFront ou ALB na frente da HTTP API
+    // 3. Usar WAF no CloudFront/ALB em vez de diretamente na API
+    //
+    // REFERÊNCIAS:
+    // - https://stackoverflow.com/questions/67924170/
+    // - https://www.pulumi.com/registry/packages/aws/api-docs/wafv2/webaclassociation/
+    //
+    // Por enquanto, associação desabilitada para liberar deploy do AuroraMigrationsRunner.
+    
+    /*
     // Construir ARN da API Gateway HTTP API
     const apiArn = `arn:aws:apigateway:${this.region}::/apis/${this.httpApi.apiId}/stages/$default`;
     
@@ -1101,6 +1120,7 @@ export class FibonacciStack extends cdk.Stack {
         webAclArn: props.webAclProd.attrArn,
       });
     }
+    */
 
     // ========================================
     // CloudFormation Outputs
