@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "prebuild": "npm run clean"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@types/aws-lambda": "^8.10.130",
     "@types/node": "^20.10.0",
     "@types/pg": "^8.10.9",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.0"
   }
 }
