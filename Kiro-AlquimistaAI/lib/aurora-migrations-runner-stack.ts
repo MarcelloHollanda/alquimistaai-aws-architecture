@@ -112,8 +112,9 @@ export class AuroraMigrationsRunnerStack extends cdk.Stack {
     // ========================================
     // Tags
     // ========================================
-    // Nota: Tags principais já vêm via props do bin/app.ts (commonTags)
-    // Adicionando apenas tags específicas deste stack
+    cdk.Tags.of(this).add('Project', 'AlquimistaAI');
+    cdk.Tags.of(this).add('Environment', envName);
     cdk.Tags.of(this).add('Component', 'AuroraMigrationsRunner');
+    cdk.Tags.of(this).add('ManagedBy', 'CDK');
   }
 }

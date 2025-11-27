@@ -160,7 +160,8 @@ const frontendStack = new FrontendStack(app, `FrontendStack-${envName}`, {
 // Stack de Aurora Migrations Runner (Lambda dentro da VPC)
 const auroraMigrationsRunnerStack = new AuroraMigrationsRunnerStack(app, `AuroraMigrationsRunnerStack-${envName}`, {
   env,
-  tags: { ...commonTags, component: 'aurora-migrations-runner' },
+  // Nota: tags removidas daqui para evitar conflito case-insensitive com tags do stack
+  // Tags são aplicadas dentro do stack seguindo padrão PascalCase dos outros stacks
   description: 'Aurora Migrations Runner - Lambda para executar migrations SQL dentro da VPC',
   envName,
   vpc: fibonacciStack.vpc,
