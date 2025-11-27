@@ -102,7 +102,7 @@ async function connectToDatabase(credentials: DbCredentials): Promise<Client> {
  * Lê arquivo de migration
  */
 function readMigrationFile(migrationNumber: string): string {
-  const migrationsDir = path.join(__dirname, '../migrations');
+  const migrationsDir = path.join(__dirname, 'migrations');
   const files = fs.readdirSync(migrationsDir);
   
   // Procurar arquivo que começa com o número da migration
@@ -144,7 +144,7 @@ async function executeMigration(
  * Lista migrations disponíveis
  */
 function listAvailableMigrations(): string[] {
-  const migrationsDir = path.join(__dirname, '../migrations');
+  const migrationsDir = path.join(__dirname, 'migrations');
   const files = fs.readdirSync(migrationsDir);
   
   return files

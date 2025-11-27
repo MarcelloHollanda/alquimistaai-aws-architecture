@@ -44,9 +44,18 @@ export class AuroraMigrationsRunnerStack extends cdk.Stack {
       allowAllOutbound: true
     });
 
-    // Nota: A permissão de acesso ao Aurora deve ser configurada manualmente
-    // no Security Group do Aurora para permitir conexões da Lambda
-    // Isso evita dependência cíclica entre stacks
+    // Nota: Permissão de acesso ao Aurora deve ser configurada manualmente
+    // para evitar dependência cíclica. Adicione regra no Security Group do Aurora:
+    // - Source: sg-0781b8c954658939b (MigrationRunnerSG)
+    // - Port: 5432
+    // - Description: Allow migrations runner Lambda to access Aurora
+    //
+    // Ou via AWS CLI:
+    // aws ec2 authorize-security-group-ingress \
+    //   --group-id <aurora-sg-id> \
+    //   --protocol tcp \
+    //   --port 5432 \
+    //   --source-group sg-0781b8c954658939b
 
     // ========================================
     // Lambda Function
@@ -107,6 +116,12 @@ export class AuroraMigrationsRunnerStack extends cdk.Stack {
       value: this.migrationRunnerFunction.functionArn,
       description: 'ARN da Lambda para executar migrations',
       exportName: `aurora-migrations-runner-arn-${envName}`
+    });
+
+    new cdk.CfnOutput(this, 'MigrationRunnerSecurityGroupId', {
+      value: lambdaSecurityGroup.securityGroupId,
+      description: 'Security Group ID da Lambda Migrations Runner',
+      exportName: `aurora-migrations-runner-sg-${envName}`
     });
 
     // ========================================

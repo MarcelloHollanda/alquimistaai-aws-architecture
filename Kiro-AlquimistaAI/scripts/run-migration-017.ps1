@@ -79,7 +79,7 @@ try {
         Write-Host "========================================" -ForegroundColor Cyan
         Write-Host ""
         Write-Host "Tabela criada: dry_run_log" -ForegroundColor Green
-        Write-Host "Componente: Micro Agente de Disparos & Agendamentos" -ForegroundColor White
+        Write-Host "Componente: Micro Agente de Disparos e Agendamentos" -ForegroundColor White
         Write-Host ""
         Write-Host "Próximos passos:" -ForegroundColor Cyan
         Write-Host "  1. Verificar logs no CloudWatch:" -ForegroundColor White
@@ -101,7 +101,7 @@ try {
         Write-Host "  1. Verificar logs no CloudWatch:" -ForegroundColor White
         Write-Host "     aws logs tail /aws/lambda/$FunctionName --follow" -ForegroundColor Gray
         Write-Host ""
-        Write-Host "  2. Verificar conectividade Lambda → Aurora:" -ForegroundColor White
+        Write-Host "  2. Verificar conectividade Lambda para Aurora:" -ForegroundColor White
         Write-Host "     - Lambda está na mesma VPC do Aurora?" -ForegroundColor Gray
         Write-Host "     - Security Group permite porta 5432?" -ForegroundColor Gray
         Write-Host "     - Secret ARN está correto?" -ForegroundColor Gray

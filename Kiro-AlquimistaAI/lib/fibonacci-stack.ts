@@ -364,6 +364,14 @@ export class FibonacciStack extends cdk.Stack {
       ec2.Port.tcp(443),
       'Allow Lambda access to Secrets Manager endpoint'
     );
+    
+    // Permitir acesso de qualquer recurso na VPC ao Secrets Manager endpoint
+    // Isso permite que outros stacks (ex: AuroraMigrationsRunner) acessem sem dependência circular
+    secretsManagerEndpoint.connections.allowFrom(
+      ec2.Peer.ipv4(this.vpc.vpcCidrBlock),
+      ec2.Port.tcp(443),
+      'Allow VPC resources to access Secrets Manager endpoint'
+    );
 
     // EventBridge Endpoint
     eventBridgeEndpoint.connections.allowFrom(

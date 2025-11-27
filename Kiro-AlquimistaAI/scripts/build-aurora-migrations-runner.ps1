@@ -58,6 +58,16 @@ Copy-Item "migrations\*.sql" "dist\migrations\" -Force
 Write-Host "✅ Migrations copiadas" -ForegroundColor Green
 Write-Host ""
 
+# Copiar node_modules para dist (necessário para Lambda)
+Write-Host "📦 Copiando node_modules para dist..." -ForegroundColor Yellow
+if (Test-Path "node_modules") {
+    Copy-Item "node_modules" "dist\node_modules" -Recurse -Force
+    Write-Host "✅ node_modules copiado" -ForegroundColor Green
+} else {
+    Write-Host "⚠️  AVISO: node_modules não encontrado" -ForegroundColor Yellow
+}
+Write-Host ""
+
 # Voltar para raiz
 Set-Location "..\..\"
 
