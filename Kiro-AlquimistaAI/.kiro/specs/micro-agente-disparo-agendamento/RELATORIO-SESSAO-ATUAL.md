@@ -1,49 +1,55 @@
-# Relatório de Sessão · Implementação Fluxo Dry-Run
+# Relatório de Sessão · Deploy Dry-Run na AWS
 
 **Data**: 2024-11-27  
-**Sessão**: Implementação do Fluxo Mínimo Dry-Run  
-**Status**: ✅ Concluído
+**Sessão**: Preparação para Deploy do Fluxo Dry-Run na AWS  
+**Status**: ✅ Scripts Criados - Pronto para Execução
 
 ---
 
 ## 📋 Resumo Executivo
 
-Fluxo mínimo dry-run do Micro Agente de Disparos & Agendamentos implementado e documentado, sem disparos reais, pronto para testes de ponta a ponta com leads consolidados.
+Scripts automatizados criados para deploy do fluxo dry-run na AWS. Sistema pronto para:
+1. Aplicar migration 007 no Aurora DEV
+2. Build e upload da Lambda dry-run
+3. Deploy via Terraform
+4. Testes end-to-end na AWS
 
 ---
 
-## ✅ O Que Foi Feito
+## ✅ O Que Foi Feito Nesta Sessão
 
-### 1. Infraestrutura Terraform
+### 1. Scripts de Automação Criados
 
-**Arquivo criado**: `terraform/modules/agente_disparo_agenda/lambda_dry_run.tf`
+**Script 1**: `scripts/build-micro-agente-dry-run.ps1`
+- ✅ Build automatizado do TypeScript
+- ✅ Criação de pacote ZIP otimizado
+- ✅ Upload automático para S3
+- ✅ Validação de tamanho e integridade
+- ✅ Suporte a flags: `-SkipBuild`, `-SkipUpload`, `-BucketName`
 
-- ✅ Lambda `dry-run` configurada
-- ✅ Variável `MICRO_AGENT_DISPARO_ENABLED` definida (default: `"false"`)
-- ✅ Permissões para API Gateway e EventBridge
-- ✅ CloudWatch Log Group configurado
-- ✅ X-Ray tracing habilitado
+**Script 2**: `scripts/apply-migration-007-dry-run.ps1`
+- ✅ Teste de conexão com Aurora
+- ✅ Verificação de tabela existente
+- ✅ Aplicação da migration 007
+- ✅ Validação de estrutura criada (colunas e índices)
+- ✅ Suporte a variáveis de ambiente e parâmetros
 
-### 2. Outputs Terraform
+### 2. Documentação Atualizada
 
-**Arquivo atualizado**: `terraform/modules/agente_disparo_agenda/outputs.tf`
+**Arquivo atualizado**: `.kiro/specs/micro-agente-disparo-agendamento/COMANDOS-PROXIMOS-PASSOS.md`
+- ✅ Comandos reais substituindo placeholders
+- ✅ Referências aos scripts automatizados
+- ✅ Passos renumerados (1-9)
+- ✅ Instruções detalhadas de uso
 
-- ✅ Output `lambda_arns.dry_run` adicionado
-- ✅ Output `lambda_function_names.dry_run` adicionado
-- ✅ Output `cloudwatch_log_groups.dry_run` adicionado
+### 3. Análise de Infraestrutura
 
-### 3. Documentação
-
-**Arquivos atualizados**:
-
-1. **`docs/micro-agente-disparo-agendamento/IMPLEMENTATION-STATUS.md`**
-   - ✅ Seção "Status do Fluxo Dry-Run" atualizada
-   - ✅ Comparação antes/depois da sessão
-
-2. **`.kiro/specs/micro-agente-disparo-agendamento/SPEC-TECNICA.md`**
-   - ✅ Nova seção "11. Fluxo Dry-Run" adicionada
-   - ✅ Documentação completa do handler, feature flag e testes
-   - ✅ Exemplos de uso e saída
+**Verificado**:
+- ✅ Terraform DEV configurado com backend S3 + DynamoDB
+- ✅ Módulo `agente_disparo_agenda` instanciado corretamente
+- ✅ Variáveis do ambiente DEV (`terraform.tfvars`)
+- ✅ Bucket S3: `alquimista-lambda-artifacts-dev`
+- ✅ SNS Topic: `arn:aws:sns:us-east-1:207933152643:alquimista-alerts-dev`
 
 ---
 
@@ -94,35 +100,66 @@ Os seguintes arquivos já haviam sido criados em sessão anterior e foram preser
 
 ---
 
-## 🔄 Próximos Passos
+## 🔄 Próximos Passos (Para o Fundador Executar)
 
-### Imediatos
+### Passo 1: Configurar Credenciais Aurora DEV
 
-1. **Executar migration no Aurora dev**
-   ```sql
-   -- Executar: .kiro/specs/micro-agente-disparo-agendamento/migrations/007_create_dry_run_log_table.sql
-   ```
+```powershell
+# Configurar variáveis de ambiente
+$env:PGHOST = "alquimista-aurora-dev.cluster-xxxxx.us-east-1.rds.amazonaws.com"
+$env:PGUSER = "admin"
+$env:PGDATABASE = "alquimista_dev"
+$env:PGPASSWORD = "sua-senha-aqui"
+```
 
-2. **Testar handler localmente**
-   ```powershell
-   cd .kiro\specs\micro-agente-disparo-agendamento
-   .\test-dry-run-local.ps1
-   ```
+### Passo 2: Aplicar Migration 007
 
-3. **Build da Lambda**
-   ```powershell
-   cd lambda-src\agente-disparo-agenda
-   npm install
-   npm run build
-   ```
+```powershell
+.\scripts\apply-migration-007-dry-run.ps1
+```
 
-4. **Deploy via Terraform**
-   ```powershell
-   cd terraform\envs\dev
-   terraform init
-   terraform plan
-   terraform apply
-   ```
+**Resultado esperado**: Tabela `dry_run_log` criada no Aurora DEV
+
+### Passo 3: Build e Upload da Lambda
+
+```powershell
+.\scripts\build-micro-agente-dry-run.ps1
+```
+
+**Resultado esperado**: 
+- ZIP criado em `lambda-src/agente-disparo-agenda/build/dry-run.zip`
+- Upload para S3: `s3://alquimista-lambda-artifacts-dev/micro-agente-disparo-agendamento/dev/dry-run.zip`
+
+### Passo 4: Deploy via Terraform
+
+```powershell
+cd terraform\envs\dev
+terraform init
+terraform plan
+terraform apply
+```
+
+**Resultado esperado**: Lambda `micro-agente-disparo-agendamento-dev-dry-run` criada na AWS
+
+### Passo 5: Testar Lambda
+
+```powershell
+# Criar payload de teste
+$payload = @{ tenantId = "test-001"; batchSize = 1 } | ConvertTo-Json
+$payload | Out-File -FilePath test-payload.json -Encoding utf8
+
+# Invocar Lambda
+aws lambda invoke `
+  --function-name micro-agente-disparo-agendamento-dev-dry-run `
+  --payload file://test-payload.json `
+  --region us-east-1 `
+  response.json
+
+# Ver resultado
+Get-Content response.json | ConvertFrom-Json | ConvertTo-Json -Depth 10
+```
+
+**Resultado esperado**: JSON com decisões de canal para leads mock
 
 ### Curto Prazo
 

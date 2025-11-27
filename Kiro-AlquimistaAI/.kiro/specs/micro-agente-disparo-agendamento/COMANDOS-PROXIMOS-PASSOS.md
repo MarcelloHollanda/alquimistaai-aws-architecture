@@ -56,97 +56,68 @@ cd .kiro\specs\micro-agente-disparo-agendamento
 
 ---
 
-## 🏗️ Passo 3: Build da Lambda
+## 🏗️ Passo 3: Build da Lambda (SCRIPT AUTOMATIZADO)
 
 ```powershell
-# Navegar para o código da Lambda
-cd lambda-src\agente-disparo-agenda
+# Usar script automatizado de build
+.\scripts\build-micro-agente-dry-run.ps1
 
-# Instalar dependências (se ainda não instalou)
-npm install
+# OU com opções:
+# Apenas build (sem upload)
+.\scripts\build-micro-agente-dry-run.ps1 -SkipUpload
 
-# Compilar TypeScript
-npm run build
+# Apenas upload (sem build)
+.\scripts\build-micro-agente-dry-run.ps1 -SkipBuild
 
-# Verificar se compilou
-dir dist\handlers\dry-run.js
+# Especificar bucket diferente
+.\scripts\build-micro-agente-dry-run.ps1 -BucketName "meu-bucket-custom"
 ```
 
-**Resultado esperado**: Arquivo `dist/handlers/dry-run.js` criado.
+**O que o script faz**:
+1. Compila TypeScript (`npm run build`)
+2. Cria pacote ZIP com código + dependências
+3. Faz upload para S3 (se não usar `-SkipUpload`)
+4. Verifica tamanho e integridade
+
+**Resultado esperado**: 
+- ✅ Arquivo `lambda-src/agente-disparo-agenda/build/dry-run.zip` criado
+- ✅ Upload para `s3://alquimista-lambda-artifacts-dev/micro-agente-disparo-agendamento/dev/dry-run.zip`
 
 ---
 
-## 📦 Passo 4: Criar Pacote ZIP da Lambda
+## 🗄️ Passo 4: Executar Migration do Banco de Dados (SCRIPT AUTOMATIZADO)
 
 ```powershell
-# Ainda em lambda-src\agente-disparo-agenda
-
-# Criar diretório de build se não existir
-if (!(Test-Path "build")) { New-Item -ItemType Directory -Path "build" }
-
-# Copiar código compilado e node_modules
-Copy-Item -Recurse -Force dist build\
-Copy-Item -Recurse -Force node_modules build\
-
-# Criar ZIP
-Compress-Archive -Path build\* -DestinationPath build\dry-run.zip -Force
-
-# Verificar tamanho do ZIP
-(Get-Item build\dry-run.zip).Length / 1MB
-```
-
-**Resultado esperado**: Arquivo `build/dry-run.zip` criado (tamanho ~5-10 MB).
-
----
-
-## ☁️ Passo 5: Upload para S3 (Se Necessário)
-
-```powershell
-# Verificar se bucket existe
-aws s3 ls s3://alquimista-lambda-artifacts-dev --region us-east-1
-
-# Se não existir, criar
-aws s3 mb s3://alquimista-lambda-artifacts-dev --region us-east-1
-
-# Upload do ZIP
-aws s3 cp build\dry-run.zip s3://alquimista-lambda-artifacts-dev/micro-agente-disparo-agendamento/dry-run.zip --region us-east-1
-
-# Verificar upload
-aws s3 ls s3://alquimista-lambda-artifacts-dev/micro-agente-disparo-agendamento/ --region us-east-1
-```
-
-**Resultado esperado**: Arquivo `dry-run.zip` no S3.
-
----
-
-## 🗄️ Passo 6: Executar Migration do Banco de Dados
-
-```powershell
-# Navegar para migrations
-cd .kiro\specs\micro-agente-disparo-agendamento\migrations
-
-# Verificar conexão com Aurora (ajustar credenciais)
+# Configurar variáveis de ambiente (ajustar para seu Aurora DEV)
 $env:PGHOST = "alquimista-aurora-dev.cluster-xxxxx.us-east-1.rds.amazonaws.com"
 $env:PGUSER = "admin"
 $env:PGDATABASE = "alquimista_dev"
 $env:PGPASSWORD = "sua-senha-aqui"
 
-# Executar migration 007
-psql -f 007_create_dry_run_log_table.sql
+# Executar script automatizado
+.\scripts\apply-migration-007-dry-run.ps1
 
-# Verificar se tabela foi criada
-psql -c "\dt dry_run_log"
+# OU passar credenciais como parâmetros
+.\scripts\apply-migration-007-dry-run.ps1 -Host "seu-host" -User "admin" -Database "alquimista_dev" -Password "senha"
 ```
 
-**Resultado esperado**: Tabela `dry_run_log` criada no Aurora.
+**O que o script faz**:
+1. Testa conexão com Aurora
+2. Verifica se tabela já existe
+3. Aplica migration 007
+4. Valida estrutura criada (colunas e índices)
+
+**Resultado esperado**: 
+- ✅ Tabela `dry_run_log` criada no Aurora DEV
+- ✅ Índices criados: `idx_dry_run_tenant`, `idx_dry_run_canal`, `idx_dry_run_ambiente`
 
 **Alternativa (se psql não estiver instalado)**:
 - Usar AWS RDS Query Editor no console
-- Copiar conteúdo de `007_create_dry_run_log_table.sql` e executar
+- Copiar conteúdo de `.kiro/specs/micro-agente-disparo-agendamento/migrations/007_create_dry_run_log_table.sql` e executar
 
 ---
 
-## 🚀 Passo 7: Deploy via Terraform
+## 🚀 Passo 5: Deploy via Terraform
 
 ```powershell
 # Navegar para Terraform dev
@@ -177,7 +148,7 @@ Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
 
 ---
 
-## ✅ Passo 8: Testar Lambda na AWS
+## ✅ Passo 6: Testar Lambda na AWS
 
 ```powershell
 # Criar payload de teste
@@ -222,7 +193,7 @@ Get-Content response.json | ConvertFrom-Json | ConvertTo-Json -Depth 10
 
 ---
 
-## 📊 Passo 9: Verificar Logs no CloudWatch
+## 📊 Passo 7: Verificar Logs no CloudWatch
 
 ```powershell
 # Ver logs recentes
@@ -233,7 +204,7 @@ aws logs tail /aws/lambda/micro-agente-disparo-agendamento-dev-dry-run --follow 
 
 ---
 
-## 🔍 Passo 10: Verificar Tabela dry_run_log
+## 🔍 Passo 8: Verificar Tabela dry_run_log
 
 ```powershell
 # Conectar ao Aurora
@@ -256,7 +227,7 @@ LIMIT 10;
 
 ---
 
-## 🎯 Passo 11: Commit e Push
+## 🎯 Passo 9: Commit e Push (Após Testes)
 
 ```powershell
 # Voltar para raiz do repositório

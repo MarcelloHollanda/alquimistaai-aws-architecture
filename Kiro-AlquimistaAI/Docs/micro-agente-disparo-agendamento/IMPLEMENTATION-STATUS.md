@@ -284,22 +284,32 @@ LIMIT 10; -- Apenas para testes
 
 ## 4. Próximos Passos
 
-### 4.1. Imediatos (Esta Sessão)
+### 4.1. Imediatos (Sessões Anteriores - Concluído)
 
 - [x] Criar documento de status (este arquivo)
-- [ ] Criar migration `007_create_dry_run_log_table.sql`
-- [ ] Criar handler `dry-run.ts`
-- [ ] Criar módulo compartilhado `canal-decision.ts`
-- [ ] Atualizar `SPEC-TECNICA.md` com seção de dry-run
-- [ ] Documentar variável de ambiente `MICRO_AGENT_DISPARO_ENABLED`
+- [x] Criar migration `007_create_dry_run_log_table.sql`
+- [x] Criar handler `dry-run.ts`
+- [x] Criar módulo compartilhado `canal-decision.ts`
+- [x] Atualizar `SPEC-TECNICA.md` com seção de dry-run
+- [x] Documentar variável de ambiente `MICRO_AGENT_DISPARO_ENABLED`
+- [x] Configurar Lambda dry-run no Terraform
+- [x] Criar scripts de automação (build e migration)
 
-### 4.2. Curto Prazo (Próximas Sessões)
+### 4.2. Curto Prazo (Próxima Sessão - Deploy)
 
-- [ ] Executar todas as migrations de banco
-- [ ] Criar módulo Terraform completo
+- [ ] **Executar migration 007 no Aurora DEV** (script pronto: `scripts/apply-migration-007-dry-run.ps1`)
+- [ ] **Build e upload da Lambda dry-run** (script pronto: `scripts/build-micro-agente-dry-run.ps1`)
+- [ ] **Deploy via Terraform DEV** (`terraform apply` no módulo `agente_disparo_agenda`)
+- [ ] **Testar Lambda dry-run na AWS** (invocar via AWS CLI)
+- [ ] **Validar logs no CloudWatch**
+- [ ] **Validar registros na tabela `dry_run_log`**
+
+### 4.3. Médio Prazo
+
+- [ ] Executar todas as migrations de banco (001-006)
 - [ ] Implementar ingestão real de `Leads_Organizados.xlsx`
-- [ ] Testar fluxo dry-run end-to-end
 - [ ] Implementar rate limiting
+- [ ] Integrar com MCP WhatsApp/Email (disparos reais)
 
 ### 4.3. Médio Prazo
 
