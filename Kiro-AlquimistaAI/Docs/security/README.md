@@ -1,183 +1,279 @@
 # Documentação de Segurança - AlquimistaAI
 
-## Visão Geral
+## 📋 Visão Geral
 
-Esta pasta contém documentação relacionada à segurança da infraestrutura AlquimistaAI na AWS.
-
----
-
-## Documentos Disponíveis
-
-### WAF (Web Application Firewall)
-
-#### [WAF Logging - Padrão Oficial](./WAF-LOGGING-ALQUIMISTAAI.md)
-Documentação completa do padrão oficial de logging do AWS WAF para AlquimistaAI.
-
-**Conteúdo:**
-- Contexto e problema original
-- Decisão de design
-- Implementação CDK completa
-- Checklist de validação
-- Troubleshooting
-
-**Quando usar:**
-- Implementar novo WAF
-- Debugar problemas de logging
-- Entender decisões de arquitetura
-
-#### [WAF Logging - Referência Rápida](./WAF-LOGGING-QUICK-REFERENCE.md)
-Guia rápido com comandos e snippets de código para logging do WAF.
-
-**Conteúdo:**
-- Padrão de nomenclatura
-- Código CDK padrão
-- Comandos de deploy
-- Troubleshooting rápido
-
-**Quando usar:**
-- Implementação rápida
-- Consulta durante desenvolvimento
-- Referência de comandos
-
-#### [WAF Implementation Summary](./WAF-IMPLEMENTATION-SUMMARY.md)
-Resumo executivo da implementação do logging do WAF.
-
-**Conteúdo:**
-- Status da implementação
-- Problema vs Solução
-- Checklist de validação
-- Próximos passos
-
-**Quando usar:**
-- Visão geral rápida
-- Validação de implementação
-- Referência de status
-
-#### [WAF Logging - Guia Visual](./WAF-LOGGING-VISUAL-GUIDE.md)
-Guia visual com diagramas e fluxos para logging do WAF.
-
-**Conteúdo:**
-- Diagramas de arquitetura
-- Fluxo de implementação
-- Checklist visual
-- Comparação correto vs incorreto
-
-**Quando usar:**
-- Compreensão visual
-- Apresentações
-- Onboarding de novos desenvolvedores
+Esta pasta contém toda a documentação relacionada à segurança do sistema AlquimistaAI, incluindo auditorias, guias operacionais, remediações e logs de conformidade.
 
 ---
 
-## Outros Documentos de Segurança
+## 🚀 Início Rápido
 
-### Documentos na Raiz `/docs`
+### Para DevOps
+👉 **Precisa rotacionar chaves Stripe?**
+- Acesse: [STRIPE-KEY-ROTATION-GUIDE.md](./STRIPE-KEY-ROTATION-GUIDE.md)
+- Registre em: [STRIPE-ROTATION-LOG.md](./STRIPE-ROTATION-LOG.md)
 
-- **[SECURITY-GUARDRAILS-AWS.md](../SECURITY-GUARDRAILS-AWS.md)** - Guardrails de segurança gerais
-- **[SECURITY-STACK-FIX-SUMMARY.md](../SECURITY-STACK-FIX-SUMMARY.md)** - Resumo de correções na SecurityStack
-- **[SECURITY-STACK-SINGLETON-FIX.md](../SECURITY-STACK-SINGLETON-FIX.md)** - Correção de singleton da SecurityStack
-- **[WAF-DESCRIPTIONS-GUIDELINES.md](../WAF-DESCRIPTIONS-GUIDELINES.md)** - Guidelines para descrições do WAF
+### Para Segurança
+👉 **Precisa auditar conformidade?**
+- Acesse: [STRIPE-SECURITY-AUDIT-SUMMARY.md](./STRIPE-SECURITY-AUDIT-SUMMARY.md)
+- Verifique: [STRIPE-ROTATION-LOG.md](./STRIPE-ROTATION-LOG.md)
 
-### Documentos em `/docs/Deploy`
+### Para Desenvolvedores
+👉 **Precisa entender a implementação?**
+- Acesse: [STRIPE-STANDARDIZATION-COMPLETE.md](./STRIPE-STANDARDIZATION-COMPLETE.md)
+- Código: [lambda/shared/stripe-client.ts](../../lambda/shared/stripe-client.ts)
 
-- **[WAF-README.md](../Deploy/WAF-README.md)** - README geral do WAF
-- **[WAF-QUICK-REFERENCE.md](../Deploy/WAF-QUICK-REFERENCE.md)** - Referência rápida do WAF
-- **[WAF-IMPLEMENTATION.md](../Deploy/WAF-IMPLEMENTATION.md)** - Detalhes de implementação
-
----
-
-## Padrões de Segurança
-
-### Nomenclatura de Recursos
-
-#### Log Groups do WAF
-```
-aws-waf-logs-<sistema>-<ambiente>
-```
-
-Exemplos:
-- `aws-waf-logs-alquimista-dev`
-- `aws-waf-logs-alquimista-prod`
-
-#### IP Sets
-```
-alquimista-<tipo>-ips-<ambiente>
-```
-
-Exemplos:
-- `alquimista-allowed-ips-dev`
-- `alquimista-blocked-ips-prod`
-
-### Descrições de Recursos WAF
-
-**Regex obrigatório:**
-```regex
-^[\w+=:#@/\-,\.][\w+=:#@/\-,\.\s]+[\w+=:#@/\-,\.]$
-```
-
-**Caracteres permitidos:**
-- Letras: a-z, A-Z
-- Números: 0-9
-- Underscore: _
-- Símbolos: + = : # @ / - , .
-- Espaços (no meio da string)
-
-**Caracteres NÃO permitidos:**
-- Acentos: á, é, í, ó, ú, ã, õ, ç
-- Parênteses: ( )
-- Outros caracteres especiais
+### Para Emergências
+👉 **Chave Stripe foi exposta?**
+- Acesse IMEDIATAMENTE: [STRIPE-KEY-LEAK-REMEDIATION.md](./STRIPE-KEY-LEAK-REMEDIATION.md)
+- Siga o guia passo a passo
 
 ---
 
-## Specs Relacionadas
+## 📚 Documentos Disponíveis
 
-### WAF
-- [waf-edge-security](../../.kiro/specs/waf-edge-security/) - Implementação inicial do WAF
-- [waf-stack-description-logging-fix](../../.kiro/specs/waf-stack-description-logging-fix/) - Correção de logging
-- [waf-ipset-description-fix](../../.kiro/specs/waf-ipset-description-fix/) - Correção de descrições de IP Sets
+### Stripe Security
+
+| Documento | Propósito | Quando Usar |
+|-----------|-----------|-------------|
+| [STRIPE-SECURITY-INDEX.md](./STRIPE-SECURITY-INDEX.md) | Índice completo | Navegação e referência |
+| [STRIPE-SECURITY-AUDIT-SUMMARY.md](./STRIPE-SECURITY-AUDIT-SUMMARY.md) | Auditoria de conformidade | Auditorias e relatórios |
+| [STRIPE-KEY-ROTATION-GUIDE.md](./STRIPE-KEY-ROTATION-GUIDE.md) | Guia de rotação | A cada 90 dias |
+| [STRIPE-ROTATION-LOG.md](./STRIPE-ROTATION-LOG.md) | Log de rotações | Após cada rotação |
+| [STRIPE-KEY-LEAK-REMEDIATION.md](./STRIPE-KEY-LEAK-REMEDIATION.md) | Remediação de leaks | Emergências |
+| [STRIPE-STANDARDIZATION-COMPLETE.md](./STRIPE-STANDARDIZATION-COMPLETE.md) | Resumo da implementação | Referência técnica |
 
 ---
 
-## Comandos Úteis
+## 🎯 Status Atual
 
-### Deploy WAF
+### Conformidade Stripe
+- **Status**: ✅ 100% Conforme
+- **Última Auditoria**: 27/11/2024
+- **Próxima Auditoria**: 27/02/2025
+- **Chaves Hardcoded**: 0 (zero)
+- **Uso de Secrets Manager**: 100%
 
-```bash
-# Dev
-npx cdk deploy WAFStack-dev --context env=dev --require-approval never
+### Rotações
+- **Total de Rotações**: 0 (aguardando primeira rotação)
+- **Última Rotação**: N/A
+- **Próxima Rotação Programada**: A definir
+- **Frequência**: A cada 90 dias
 
-# Prod
-npx cdk deploy WAFStack-prod --context env=prod --require-approval never
+---
+
+## 🔒 Princípios de Segurança
+
+### 1. Nunca Hardcode Segredos
+❌ **Errado**:
+```typescript
+const stripeKey = 'sk_live_1234567890abcdef';
 ```
 
-### Validação
+✅ **Correto**:
+```typescript
+const stripeKey = await getSecret('/alquimista/prod/stripe/secret-key');
+```
 
-```bash
-# Build
-npm run build
+### 2. Use AWS Secrets Manager
+- ✅ Todas as chaves no Secrets Manager
+- ✅ Path padronizado: `/alquimista/${env}/stripe/*`
+- ✅ Separação por ambiente (dev/prod)
 
-# Synth
-npx cdk synth WAFStack-dev --context env=dev
+### 3. Valide Variáveis de Ambiente
+```typescript
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY is not defined');
+}
+```
 
-# Verificar logs
-aws logs describe-log-groups --log-group-name-prefix aws-waf-logs-alquimista
+### 4. Logging Seguro
+❌ **Errado**:
+```typescript
+logger.info('Stripe key:', stripeKey);
+```
+
+✅ **Correto**:
+```typescript
+logger.info('Fetching Stripe secret key', { secretName });
+```
+
+### 5. Testes com Chaves Fake
+```typescript
+// Claramente identificada como FAKE
+const fakeKey = 'sk_live_FAKE_KEY_FOR_TESTING_ONLY_123456';
 ```
 
 ---
 
-## Contato e Suporte
+## 📅 Calendário de Manutenção
 
-Para questões relacionadas à segurança da infraestrutura:
-- Consulte a documentação completa
-- Revise as specs relacionadas
-- Verifique os logs do CloudWatch
+### Trimestral (A cada 90 dias)
+- [ ] Rotação de chaves Stripe
+- [ ] Revisão de documentação
+- [ ] Atualização de logs
+
+### Anual
+- [ ] Auditoria completa de conformidade
+- [ ] Revisão de processos
+- [ ] Treinamento da equipe
+
+### Contínuo
+- [ ] Monitoramento de alertas
+- [ ] Resposta a incidentes
+- [ ] Atualização de documentação
 
 ---
 
-## Histórico de Atualizações
+## 🚨 Procedimentos de Emergência
 
-| Data | Documento | Descrição |
-|------|-----------|-----------|
-| 2024 | WAF-LOGGING-ALQUIMISTAAI.md | Padrão oficial de logging do WAF |
-| 2024 | WAF-LOGGING-QUICK-REFERENCE.md | Referência rápida de logging |
-| 2024 | README.md | Índice de documentação de segurança |
+### Chave Stripe Exposta
+
+**Ação Imediata**:
+1. Acesse: [STRIPE-KEY-LEAK-REMEDIATION.md](./STRIPE-KEY-LEAK-REMEDIATION.md)
+2. Siga o guia passo a passo
+3. Rotacione chaves imediatamente
+4. Registre incidente em [STRIPE-ROTATION-LOG.md](./STRIPE-ROTATION-LOG.md)
+
+**Contatos de Emergência**:
+- DevOps Lead: [contato]
+- Segurança: [contato]
+- On-call: [contato]
+
+### GitHub Bloqueou Push
+
+**Sintoma**: Erro `GH013: Repository rule violations found`
+
+**Ação**:
+1. NÃO force push
+2. Acesse: [STRIPE-KEY-LEAK-REMEDIATION.md](./STRIPE-KEY-LEAK-REMEDIATION.md)
+3. Siga seção "Limpeza de Histórico Git"
+4. Rotacione chave exposta
+
+---
+
+## 🔗 Links Úteis
+
+### Documentação Interna
+- [Índice Stripe Security](./STRIPE-SECURITY-INDEX.md)
+- [Código Stripe Client](../../lambda/shared/stripe-client.ts)
+- [Testes de Segurança](../../tests/unit/inventory/sanitizer.test.ts)
+
+### Documentação Externa
+- [Stripe Security Best Practices](https://stripe.com/docs/security/guide)
+- [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/)
+- [PCI-DSS Compliance](https://stripe.com/docs/security/guide#pci-dss-compliance)
+
+### Ferramentas
+- [Stripe Dashboard](https://dashboard.stripe.com/)
+- [AWS Console - Secrets Manager](https://console.aws.amazon.com/secretsmanager/)
+- [AWS Console - CloudWatch](https://console.aws.amazon.com/cloudwatch/)
+
+---
+
+## 📞 Contatos
+
+### Equipe
+- **DevOps**: Rotações e operações
+- **Segurança**: Auditorias e conformidade
+- **Desenvolvimento**: Manutenção do código
+
+### Suporte Externo
+- **Stripe Support**: support@stripe.com
+- **AWS Support**: Console AWS
+- **GitHub Support**: support@github.com
+
+---
+
+## 📝 Contribuindo
+
+### Adicionar Nova Documentação
+
+1. Criar documento em `docs/security/`
+2. Seguir padrão de nomenclatura: `STRIPE-*-*.md`
+3. Atualizar [STRIPE-SECURITY-INDEX.md](./STRIPE-SECURITY-INDEX.md)
+4. Atualizar este README
+5. Commit com mensagem descritiva
+
+### Atualizar Documentação Existente
+
+1. Fazer alterações necessárias
+2. Atualizar data de "Última Atualização"
+3. Incrementar versão se aplicável
+4. Commit com mensagem descritiva
+
+### Padrões de Documentação
+
+- **Formato**: Markdown (.md)
+- **Idioma**: Português brasileiro
+- **Estrutura**: Títulos, seções, exemplos
+- **Código**: Blocos de código com syntax highlighting
+- **Links**: Relativos quando possível
+
+---
+
+## 🎓 Treinamento
+
+### Para Novos Membros
+
+**Leitura Obrigatória**:
+1. [STRIPE-STANDARDIZATION-COMPLETE.md](./STRIPE-STANDARDIZATION-COMPLETE.md) - Entender implementação
+2. [STRIPE-SECURITY-AUDIT-SUMMARY.md](./STRIPE-SECURITY-AUDIT-SUMMARY.md) - Entender conformidade
+3. [STRIPE-KEY-ROTATION-GUIDE.md](./STRIPE-KEY-ROTATION-GUIDE.md) - Aprender rotação
+
+**Prática**:
+1. Executar rotação em ambiente dev
+2. Validar conformidade do código
+3. Simular resposta a incidente
+
+### Recursos de Aprendizado
+
+- [Stripe Documentation](https://stripe.com/docs)
+- [AWS Security Best Practices](https://aws.amazon.com/security/best-practices/)
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+
+---
+
+## ✅ Checklist de Conformidade
+
+Use este checklist para validar conformidade:
+
+### Código
+- [ ] Nenhuma chave hardcoded
+- [ ] Uso de AWS Secrets Manager
+- [ ] Validação de variáveis de ambiente
+- [ ] Logging seguro (sem expor chaves)
+- [ ] Tratamento de erros adequado
+
+### Testes
+- [ ] Chaves fake claramente identificadas
+- [ ] Testes de sanitização funcionais
+- [ ] Testes de segurança implementados
+
+### Documentação
+- [ ] Guias atualizados
+- [ ] Logs de rotação mantidos
+- [ ] Processos documentados
+
+### Operacional
+- [ ] Rotações a cada 90 dias
+- [ ] Auditorias anuais
+- [ ] Resposta a incidentes testada
+
+---
+
+**Criado em**: 27/11/2024  
+**Última Atualização**: 27/11/2024  
+**Versão**: 1.0.0  
+**Mantido por**: Equipe AlquimistaAI
+
+---
+
+## 📊 Estatísticas
+
+- **Total de Documentos**: 7
+- **Última Auditoria**: 27/11/2024
+- **Status de Conformidade**: ✅ 100%
+- **Rotações Realizadas**: 0
+- **Incidentes de Segurança**: 0
