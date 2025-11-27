@@ -44,12 +44,9 @@ export class AuroraMigrationsRunnerStack extends cdk.Stack {
       allowAllOutbound: true
     });
 
-    // Permitir que a Lambda acesse o Aurora na porta 5432
-    dbCluster.connections.allowFrom(
-      lambdaSecurityGroup,
-      ec2.Port.tcp(5432),
-      'Allow migrations runner Lambda to access Aurora'
-    );
+    // Nota: A permissão de acesso ao Aurora deve ser configurada manualmente
+    // no Security Group do Aurora para permitir conexões da Lambda
+    // Isso evita dependência cíclica entre stacks
 
     // ========================================
     // Lambda Function
@@ -58,32 +55,16 @@ export class AuroraMigrationsRunnerStack extends cdk.Stack {
       functionName: `aurora-migrations-runner-${envName}`,
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
-      code: lambda.Code.fromAsset('lambda-src/aurora-migrations-runner/dist', {
-        // Incluir migrations SQL no pacote
-        bundling: {
-          image: lambda.Runtime.NODEJS_20_X.bundlingImage,
-          command: [
-            'bash', '-c', [
-              'cp -r /asset-input/* /asset-output/',
-              'cd /asset-output',
-              'npm ci --omit=dev',
-              'npm run build',
-              'cp -r migrations dist/',
-              'rm -rf src node_modules package*.json tsconfig.json'
-            ].join(' && ')
-          ]
-        }
-      }),
+      code: lambda.Code.fromAsset('lambda-src/aurora-migrations-runner/dist'),
       vpc,
       vpcSubnets: {
-        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
+        subnetType: ec2.SubnetType.PRIVATE_ISOLATED
       },
       securityGroups: [lambdaSecurityGroup],
       timeout: cdk.Duration.minutes(5),
       memorySize: 512,
       environment: {
         DB_SECRET_ARN: dbSecret.secretArn,
-        AWS_REGION: this.region,
         NODE_OPTIONS: '--enable-source-maps'
       },
       logRetention: logs.RetentionDays.ONE_MONTH,
