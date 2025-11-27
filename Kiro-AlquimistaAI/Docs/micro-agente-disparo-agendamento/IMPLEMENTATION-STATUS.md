@@ -147,6 +147,23 @@ Criar um fluxo mínimo end-to-end que:
 3. **NÃO dispara** mensagens reais quando `MICRO_AGENT_DISPARO_ENABLED != "true"`
 4. Registra o "disparo pretendido" em log e tabela de auditoria
 
+### 3.1.1. Status do Fluxo Dry-Run
+
+**Antes desta sessão:**
+- ✅ Handler `dry-run.ts` já existia (implementado em sessão anterior)
+- ✅ Módulo `canal-decision.ts` já existia
+- ✅ Migration `007_create_dry_run_log_table.sql` já existia
+- ✅ Documentação `DRY-RUN-IMPLEMENTATION.md` já existia
+- ❌ Lambda dry-run não estava configurada no Terraform
+- ❌ Variável `MICRO_AGENT_DISPARO_ENABLED` não estava documentada na spec
+
+**Depois desta sessão:**
+- ✅ Lambda dry-run adicionada ao Terraform (`lambda_dry_run.tf`)
+- ✅ Variável `MICRO_AGENT_DISPARO_ENABLED` configurada
+- ✅ Spec atualizada com seção de fluxo dry-run
+- ✅ IMPLEMENTATION-STATUS atualizado
+- ✅ Pronto para testes locais e deploy
+
 ### 3.2. Componentes a Criar
 
 #### 3.2.1. Handler Dry-Run

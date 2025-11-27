@@ -8,28 +8,30 @@
 output "lambda_arns" {
   description = "ARNs de todas as Lambdas criadas"
   value = {
-    api_handler      = aws_lambda_function.api_handler.arn
-    ingest_contacts  = aws_lambda_function.ingest_contacts.arn
-    send_messages    = aws_lambda_function.send_messages.arn
-    handle_replies   = aws_lambda_function.handle_replies.arn
-    schedule_meeting = aws_lambda_function.schedule_meeting.arn
-    confirm_meeting  = aws_lambda_function.confirm_meeting.arn
-    send_reminders   = aws_lambda_function.send_reminders.arn
+    api_handler       = aws_lambda_function.api_handler.arn
+    ingest_contacts   = aws_lambda_function.ingest_contacts.arn
+    send_messages     = aws_lambda_function.send_messages.arn
+    handle_replies    = aws_lambda_function.handle_replies.arn
+    schedule_meeting  = aws_lambda_function.schedule_meeting.arn
+    confirm_meeting   = aws_lambda_function.confirm_meeting.arn
+    send_reminders    = aws_lambda_function.send_reminders.arn
     generate_briefing = aws_lambda_function.generate_briefing.arn
+    dry_run           = aws_lambda_function.dry_run.arn
   }
 }
 
 output "lambda_function_names" {
   description = "Nomes das funções Lambda"
   value = {
-    api_handler      = aws_lambda_function.api_handler.function_name
-    ingest_contacts  = aws_lambda_function.ingest_contacts.function_name
-    send_messages    = aws_lambda_function.send_messages.function_name
-    handle_replies   = aws_lambda_function.handle_replies.function_name
-    schedule_meeting = aws_lambda_function.schedule_meeting.function_name
-    confirm_meeting  = aws_lambda_function.confirm_meeting.function_name
-    send_reminders   = aws_lambda_function.send_reminders.function_name
+    api_handler       = aws_lambda_function.api_handler.function_name
+    ingest_contacts   = aws_lambda_function.ingest_contacts.function_name
+    send_messages     = aws_lambda_function.send_messages.function_name
+    handle_replies    = aws_lambda_function.handle_replies.function_name
+    schedule_meeting  = aws_lambda_function.schedule_meeting.function_name
+    confirm_meeting   = aws_lambda_function.confirm_meeting.function_name
+    send_reminders    = aws_lambda_function.send_reminders.function_name
     generate_briefing = aws_lambda_function.generate_briefing.function_name
+    dry_run           = aws_lambda_function.dry_run.function_name
   }
 }
 
@@ -167,6 +169,7 @@ output "cloudwatch_log_groups" {
     confirm_meeting   = aws_cloudwatch_log_group.confirm_meeting_logs.name
     send_reminders    = aws_cloudwatch_log_group.send_reminders_logs.name
     generate_briefing = aws_cloudwatch_log_group.generate_briefing_logs.name
+    dry_run           = aws_cloudwatch_log_group.dry_run_logs.name
   }
 }
 

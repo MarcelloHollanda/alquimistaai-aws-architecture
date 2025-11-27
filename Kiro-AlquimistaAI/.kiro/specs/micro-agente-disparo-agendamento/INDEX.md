@@ -26,16 +26,20 @@ Se você é novo no projeto, comece por:
 |-----------|-----------|--------|
 | [FLUXO-INGESTAO-LEADS.md](./FLUXO-INGESTAO-LEADS.md) | Fluxo oficial de ingestão de leads | ✅ Pronto |
 | [IMPLEMENTACAO-INGESTAO.md](./IMPLEMENTACAO-INGESTAO.md) | Implementação técnica da ingestão | ✅ Pronto |
+| [DRY-RUN-IMPLEMENTATION.md](./DRY-RUN-IMPLEMENTATION.md) | Implementação do fluxo dry-run | ✅ Pronto |
+| [RELATORIO-SESSAO-ATUAL.md](./RELATORIO-SESSAO-ATUAL.md) | Relatório da última sessão | ✅ Atualizado |
 
 ### Infraestrutura
 
 | Arquivo | Descrição | Status |
 |---------|-----------|--------|
 | [schema-ingestao.sql](./schema-ingestao.sql) | Schema completo do banco de dados | ✅ Pronto |
+| [migrations/007_create_dry_run_log_table.sql](./migrations/007_create_dry_run_log_table.sql) | Migration da tabela dry_run_log | ✅ Pronto |
 | [build-ingestao-lambda.ps1](./build-ingestao-lambda.ps1) | Script de build e deploy | ✅ Pronto |
 | [build-lambdas.ps1](./build-lambdas.ps1) | Script de build geral | ✅ Pronto |
 | [validate-terraform-vars.ps1](./validate-terraform-vars.ps1) | Validação de variáveis Terraform | ✅ Pronto |
 | [create-secrets.ps1](./create-secrets.ps1) | Criação de secrets no AWS | ✅ Pronto |
+| [test-dry-run-local.ps1](./test-dry-run-local.ps1) | Teste local do fluxo dry-run | ✅ Pronto |
 
 ---
 
@@ -53,6 +57,15 @@ Localização: `lambda-src/agente-disparo-agenda/ingestao/`
 | [transformer.ts](../../../lambda-src/agente-disparo-agenda/ingestao/transformer.ts) | Transformações |
 | [loader.ts](../../../lambda-src/agente-disparo-agenda/ingestao/loader.ts) | Inserção no banco |
 | [types.ts](../../../lambda-src/agente-disparo-agenda/ingestao/types.ts) | Tipos TypeScript |
+
+### Lambda Dry-Run
+
+Localização: `lambda-src/agente-disparo-agenda/src/`
+
+| Arquivo | Descrição |
+|---------|-----------|
+| [handlers/dry-run.ts](../../../lambda-src/agente-disparo-agenda/src/handlers/dry-run.ts) | Handler do fluxo dry-run |
+| [utils/canal-decision.ts](../../../lambda-src/agente-disparo-agenda/src/utils/canal-decision.ts) | Lógica de decisão de canal |
 
 ### Configuração
 
@@ -152,6 +165,19 @@ lambda-src/agente-disparo-agenda/
 - [ ] Testes unitários
 - [ ] Deploy em dev
 
+### Fase 1.5: Dry-Run ✅
+
+- [x] Handler dry-run implementado
+- [x] Lógica de decisão de canal
+- [x] Feature flag `MICRO_AGENT_DISPARO_ENABLED`
+- [x] Tabela `dry_run_log` (migration 007)
+- [x] Terraform configurado
+- [x] Script de teste local
+- [x] Documentação completa
+- [ ] Migration executada no Aurora
+- [ ] Testes end-to-end
+- [ ] Deploy em dev
+
 ### Fase 2: Disparo 🚧
 
 - [ ] Lambda de disparo
@@ -188,6 +214,6 @@ Para contribuir com este projeto:
 
 ---
 
-**Última atualização**: 2024-11-26  
-**Versão**: 1.0.0  
+**Última atualização**: 2024-11-27  
+**Versão**: 1.1.0 (Dry-Run implementado)  
 **Mantido por**: Equipe AlquimistaAI

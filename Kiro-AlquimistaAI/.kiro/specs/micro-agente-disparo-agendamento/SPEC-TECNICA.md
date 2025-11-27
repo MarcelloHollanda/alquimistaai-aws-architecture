@@ -957,7 +957,234 @@ npm run build
 
 ---
 
-## 11. Pontos em Aberto
+## 11. Fluxo Dry-Run (Testes sem Disparos Reais)
+
+### 11.1. Visão Geral
+
+O fluxo dry-run permite testar o Micro Agente end-to-end **sem enviar mensagens reais** via WhatsApp ou Email.
+
+**Objetivo**: Validar lógica de decisão de canal, rate limiting, horário comercial e outras regras de negócio sem custos ou riscos de disparos acidentais.
+
+### 11.2. Handler Dry-Run
+
+**Arquivo**: `lambda-src/agente-disparo-agenda/src/handlers/dry-run.ts`
+
+**Trigger**: 
+- Invocação manual via AWS CLI
+- API Gateway (rota `/dry-run`)
+- EventBridge (para testes agendados)
+
+**Input**:
+```typescript
+{
+  tenantId?: string;
+  leadId?: string;
+  batchSize?: number; // Quantos leads processar (default: 1)
+}
+```
+
+**Output**:
+```typescript
+{
+  success: boolean;
+  leadsProcessados: number;
+  decisoes: Array<{
+    lead: { id?: string; nome: string };
+    canal: 'whatsapp' | 'email' | 'calendar' | 'none';
+    motivo: string;
+    seria_executado: boolean;
+    razao_bloqueio?: string;
+  }>;
+  logs: string[];
+}
+```
+
+### 11.3. Feature Flag
+
+**Variável de Ambiente**: `MICRO_AGENT_DISPARO_ENABLED`
+
+**Valores**:
+- `"false"` (default): Modo dry-run - **NÃO envia** mensagens reais
+- `"true"`: Modo produção - **ENVIA** mensagens reais via MCP
+
+**Configuração no Terraform**:
+```hcl
+environment {
+  variables = {
+    MICRO_AGENT_DISPARO_ENABLED = "false" # Default: dry-run
+    # ... outras variáveis
+  }
+}
+```
+
+### 11.4. Lógica de Decisão de Canal
+
+**Módulo**: `lambda-src/agente-disparo-agenda/src/utils/canal-decision.ts`
+
+**Prioridade de Canais**:
+1. **WhatsApp** (se houver telefone válido no formato `+55 DDD NÚMERO`)
+2. **Email** (se houver email válido)
+3. **None** (sem canal disponível)
+
+**Funções Principais**:
+
+```typescript
+// Decide qual canal usar
+function decidirCanal(lead: Lead): CanalDecision
+
+// Valida telefone para WhatsApp
+function validarTelefoneWhatsApp(telefone: string): boolean
+
+// Valida email
+function validarEmail(email: string): boolean
+
+// Verifica se disparo seria executado
+function verificarSeDisparoSeriaExecutado(
+  decision: CanalDecision,
+  options: {
+    rateLimitAtingido?: boolean;
+    horarioComercial?: boolean;
+    leadEmBlacklist?: boolean;
+  }
+): DisparoCheck
+
+// Verifica horário comercial (08:00-18:00, Seg-Sex)
+function estaEmHorarioComercial(data?: Date): boolean
+```
+
+### 11.5. Tabela de Log Dry-Run
+
+**Migration**: `007_create_dry_run_log_table.sql`
+
+**Schema**:
+```sql
+CREATE TABLE dry_run_log (
+  log_id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  
+  -- Dados do lead
+  lead_id UUID,
+  lead_nome VARCHAR(500),
+  lead_telefone VARCHAR(50),
+  lead_email VARCHAR(255),
+  lead_documento VARCHAR(20),
+  
+  -- Decisão de canal
+  canal_decidido VARCHAR(20) NOT NULL,
+  motivo_decisao TEXT NOT NULL,
+  template_selecionado VARCHAR(100),
+  
+  -- Controle de execução
+  disparo_seria_executado BOOLEAN DEFAULT TRUE,
+  razao_bloqueio TEXT,
+  
+  -- Metadata
+  ambiente VARCHAR(10) DEFAULT 'dev',
+  feature_flag_enabled BOOLEAN DEFAULT FALSE,
+  
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 11.6. Como Testar
+
+#### Teste Local (Sem AWS)
+
+```powershell
+cd .kiro\specs\micro-agente-disparo-agendamento
+
+# Teste básico (1 lead)
+.\test-dry-run-local.ps1
+
+# Teste com múltiplos leads
+.\test-dry-run-local.ps1 -BatchSize 3
+
+# Teste com disparo habilitado (simulado)
+.\test-dry-run-local.ps1 -EnableDisparo
+```
+
+#### Teste na AWS (Após Deploy)
+
+```bash
+# Invocar Lambda via AWS CLI
+aws lambda invoke \
+  --function-name micro-agente-disparo-agendamento-dev-dry-run \
+  --payload '{"tenantId":"test-001","batchSize":1}' \
+  --region us-east-1 \
+  response.json
+
+# Ver resultado
+cat response.json | jq .
+```
+
+### 11.7. Exemplo de Saída
+
+**Lead com Telefone Válido**:
+```json
+{
+  "success": true,
+  "leadsProcessados": 1,
+  "decisoes": [
+    {
+      "lead": {
+        "id": "mock-lead-001",
+        "nome": "Empresa Teste Ltda"
+      },
+      "canal": "whatsapp",
+      "motivo": "Lead possui 1 telefone(s) válido(s) para WhatsApp",
+      "seria_executado": true
+    }
+  ],
+  "logs": [
+    "[DRY-RUN] Iniciando em ambiente: dev",
+    "[DRY-RUN] Feature flag DISPARO_ENABLED: false",
+    "[DRY-RUN] Canal decidido: whatsapp",
+    "[DRY-RUN] Seria executado: true",
+    "[DRY-RUN] Processamento concluído com sucesso"
+  ]
+}
+```
+
+**Lead Sem Contatos**:
+```json
+{
+  "success": true,
+  "leadsProcessados": 1,
+  "decisoes": [
+    {
+      "lead": {
+        "id": "mock-lead-003",
+        "nome": "Indústria Sem Contato SA"
+      },
+      "canal": "none",
+      "motivo": "Lead não possui telefone nem email válidos para contato",
+      "seria_executado": false,
+      "razao_bloqueio": "Nenhum canal disponível para contato"
+    }
+  ]
+}
+```
+
+### 11.8. Regras de Bloqueio
+
+Um disparo pode ser bloqueado por:
+
+1. **Canal indisponível**: Lead sem telefone nem email válidos
+2. **Rate limit atingido**: Limite de disparos por tenant/canal excedido
+3. **Horário não comercial**: Fora do horário 08:00-18:00, Seg-Sex
+4. **Lead em blacklist**: Lead marcado como não contactável
+
+### 11.9. Próximos Passos
+
+- [ ] Executar migration `007_create_dry_run_log_table.sql` no Aurora dev
+- [ ] Testar handler localmente com script PowerShell
+- [ ] Implementar busca real de leads no banco (substituir mock)
+- [ ] Deploy da Lambda dry-run via Terraform
+- [ ] Integrar com MCP WhatsApp/Email quando `DISPARO_ENABLED=true`
+
+---
+
+## 12. Pontos em Aberto
 
 ### Fase 1 (MVP)
 - [ ] Definir templates oficiais de mensagem
