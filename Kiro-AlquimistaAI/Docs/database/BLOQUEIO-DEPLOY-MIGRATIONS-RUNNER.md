@@ -13,9 +13,11 @@
 
 ## 📋 Situação Atual
 
-✅ **DESBLOQUEADO** - O ciclo de dependência foi corrigido em 2024-11-27.
+✅ **CONCLUÍDO** - Pipeline de migrations operacional e migration 017 executada com sucesso.
 
-O stack `AuroraMigrationsRunnerStack-dev` está **pronto para deploy** e o bloqueio foi removido.
+**Data:** 2024-11-27  
+**Status:** Migration 017 aplicada no Aurora DEV  
+**Tabela criada:** `dry_run_log` (auditoria do Micro Agente dry-run)
 
 ### ✅ O Que Está Pronto
 
@@ -394,3 +396,82 @@ cdk deploy AuroraMigrationsRunnerStack-dev --context env=dev
 **Status:** ✅ DEPLOY CONCLUÍDO COM SUCESSO  
 **Última Atualização:** 2024-11-27  
 **Próxima Ação:** Executar migration 017 usando `.\scripts\run-migration-017.ps1 -Environment dev`
+
+
+---
+
+## ✅ Migration 017 Executada com Sucesso
+
+### Detalhes da Execução
+
+**Data:** 2024-11-27  
+**Ambiente:** DEV  
+**Migration:** `017_create_dry_run_log_micro_agente.sql`  
+**Resultado:** ✅ Sucesso
+
+### Correções Aplicadas para Execução
+
+1. **Path de migrations corrigido**
+   - Antes: `path.join(__dirname, '../migrations')` → `/var/migrations` ❌
+   - Depois: `path.join(__dirname, 'migrations')` → `/var/task/migrations` ✅
+
+2. **Dependências incluídas no pacote**
+   - `node_modules` copiado para `dist/` durante build
+   - Módulo `pg` (PostgreSQL) agora disponível na Lambda
+
+3. **Acesso ao Secrets Manager configurado**
+   - VPC Endpoint do Secrets Manager já existia no FibonacciStack
+   - Adicionada regra permitindo acesso de qualquer IP da VPC (CIDR)
+
+4. **Acesso ao Aurora configurado**
+   - Security Group do Aurora: `sg-06b2dd114b90dc34f`
+   - Security Group da Lambda: `sg-0781b8c954658939b`
+   - Regra adicionada via AWS CLI (porta 5432)
+
+### Comando Executado
+
+```powershell
+$payload = '{"action":"run-migration","target":"017"}'
+aws lambda invoke \
+  --function-name aurora-migrations-runner-dev \
+  --payload file://payload.json \
+  --cli-binary-format raw-in-base64-out \
+  migration-017-output.json
+```
+
+### Resultado
+
+```json
+{
+  "status": "success",
+  "migration": "017",
+  "message": "Migration 017 executed successfully"
+}
+```
+
+### Tabela Criada
+
+**Nome:** `dry_run_log`  
+**Schema:** `public` (padrão)  
+**Finalidade:** Auditoria de decisões de canal e disparos em modo dry-run do Micro Agente
+
+**Colunas principais:**
+- `log_id` (UUID, PK)
+- `tenant_id` (UUID)
+- `lead_id`, `lead_nome`, `lead_telefone`, `lead_email`
+- `canal_decidido` (whatsapp | email | calendar | none)
+- `motivo_decisao` (TEXT)
+- `disparo_seria_executado` (BOOLEAN)
+- `ambiente` (dev | prod)
+- `created_at` (TIMESTAMP)
+
+### Próximos Passos
+
+1. ✅ Migration 017 aplicada
+2. 🔄 Integrar tabela `dry_run_log` no código do Micro Agente
+   - Arquivo: `lambda-src/agente-disparo-agenda/src/handlers/dry-run.ts`
+   - Inserir logs a cada decisão de canal
+3. 🔄 Testar dry-run end-to-end com logs no Aurora
+4. 🔄 Deploy do Micro Agente em DEV
+
+---

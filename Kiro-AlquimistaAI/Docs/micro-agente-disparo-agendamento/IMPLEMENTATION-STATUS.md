@@ -398,3 +398,27 @@ LIMIT 10; -- Apenas para testes
 
 **Mantido por**: Equipe AlquimistaAI  
 **Próxima Revisão**: Após implementação do dry-run
+
+
+---
+
+## Migration 017 – Tabela dry_run_log
+
+**Status:** ✅ Aplicada em Aurora DEV  
+**Data:** 2024-11-27  
+**Arquivo SQL:** `database/migrations/017_create_dry_run_log_micro_agente.sql`  
+**Pipeline:** Lambda `aurora-migrations-runner-dev` dentro da VPC  
+**Finalidade:** Tabela de log para auditoria do modo dry-run do Micro Agente de Disparos & Agendamento
+
+### Detalhes da Tabela
+
+- **Nome:** `dry_run_log`
+- **Colunas:** 15 colunas incluindo dados do lead, decisão de canal, motivo, e metadata
+- **Índices:** 3 índices para performance (tenant_id, canal_decidido, ambiente)
+- **Extensões:** `pgcrypto` para `gen_random_uuid()`
+
+### Próxima Etapa
+
+Integrar inserção de logs no handler `dry-run.ts` do Micro Agente.
+
+---
