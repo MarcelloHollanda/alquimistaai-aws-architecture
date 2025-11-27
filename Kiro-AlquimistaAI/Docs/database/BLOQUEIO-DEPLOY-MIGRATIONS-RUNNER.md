@@ -1,9 +1,13 @@
 # Bloqueio de Deploy - Aurora Migrations Runner
 
 **Data:** 2024-11-27  
-**Status:** ✅ Desbloqueado - Ciclo Removido  
+**Status:** ✅ DESBLOQUEADO E DEPLOYADO COM SUCESSO  
 **Componente:** Lambda Aurora Migrations Runner  
-**Correção:** Opção 1 implementada - Rotas removidas do OperationalDashboardStack
+**Correções Aplicadas:**
+1. ✅ Ciclo de dependência removido (OperationalDashboardStack)
+2. ✅ Associação WAF com HTTP API desabilitada (não suportado)
+3. ✅ Tags duplicadas corrigidas (IAM Roles)
+4. ✅ Stack deployado com sucesso: `CREATE_COMPLETE`
 
 ---
 
@@ -130,7 +134,14 @@ dbCluster.connections.allowFrom(
 
 ---
 
-## ✅ CORREÇÃO APLICADA - Opção 1 Implementada
+## ✅ TODAS AS CORREÇÕES APLICADAS - DEPLOY CONCLUÍDO
+
+### Resumo Final
+
+**Data:** 2024-11-27  
+**Resultado:** ✅ Stack `AuroraMigrationsRunnerStack-dev` deployado com sucesso  
+**Lambda criada:** `aurora-migrations-runner-dev`  
+**ARN:** `arn:aws:lambda:us-east-1:207933152643:function:aurora-migrations-runner-dev`
 
 ### Mudanças Realizadas
 
@@ -177,6 +188,51 @@ dbCluster.connections.allowFrom(
 2. ✅ Identificar recursos que causam o ciclo
 3. ✅ Remover adição de rotas no `platformApi` do `AlquimistaStack`
 4. ✅ Testar deploy de todos os stacks
+
+**Tempo estimado:** ~~2-4 horas~~ **Concluído em 30 minutos**
+
+---
+
+## 🔧 Correção 3: Tags Duplicadas (Case-Insensitive)
+
+### Problema Identificado
+
+**Data da correção:** 2024-11-27
+
+**Erro:**
+```
+CREATE_FAILED | AWS::IAM::Role | MigrationRunnerFunction/ServiceRole
+Resource handler returned message: "Duplicate tag keys found. 
+Please note that Tag keys are case insensitive."
+```
+
+**Causa raiz:**
+- IAM considera tags **case-insensitive** (`project` = `Project`)
+- `bin/app.ts` aplicava tags em **lowercase**: `project`, `env`, `managed-by`
+- `lib/aurora-migrations-runner-stack.ts` aplicava tags em **PascalCase**: `Project`, `Environment`, `ManagedBy`
+- Resultado: tags duplicadas nos IAM Roles
+
+### Solução Implementada
+
+1. **Removidas tags do `bin/app.ts`** para `AuroraMigrationsRunnerStack`
+2. **Mantidas apenas tags no stack** seguindo padrão PascalCase dos outros stacks:
+   - `Project = AlquimistaAI`
+   - `Environment = dev`
+   - `Component = AuroraMigrationsRunner`
+   - `ManagedBy = CDK`
+
+### Arquivos Modificados
+
+- `bin/app.ts` - Removidas tags da criação do stack
+- `lib/aurora-migrations-runner-stack.ts` - Restauradas tags em PascalCase
+
+### Padrão de Tags AlquimistaAI
+
+Todos os stacks CDK seguem o padrão **PascalCase**:
+- ✅ `Project` (não `project`)
+- ✅ `Environment` (não `env`)
+- ✅ `Component` (não `component`)
+- ✅ `ManagedBy` (não `managed-by`)
 
 **Tempo estimado:** ~~2-4 horas~~ **Concluído em 30 minutos**
 
@@ -321,19 +377,20 @@ npx cdk deploy AuroraMigrationsRunnerStack-dev --context env=dev
 - [ ] Testar `cdk synth` (próximo passo)
 - [ ] Deploy do AuroraMigrationsRunnerStack (próximo passo)
 
-**Comandos para validação:**
+**Comandos executados com sucesso:**
 
 ```powershell
-# 1. Testar synth
+# 1. Synth ✅
 cd "C:\Users\Usuário\Downloads\Marcello\AlquimistaAI\Kiro-AlquimistaAI"
 cdk synth
 
-# 2. Deploy do Migrations Runner
+# 2. Deploy do Migrations Runner ✅
 cdk deploy AuroraMigrationsRunnerStack-dev --context env=dev
+# Resultado: CREATE_COMPLETE
 ```
 
 ---
 
-**Status:** ✅ Correção Aplicada - Pronto para Teste  
+**Status:** ✅ DEPLOY CONCLUÍDO COM SUCESSO  
 **Última Atualização:** 2024-11-27  
-**Próxima Ação:** Executar `cdk synth` para validar
+**Próxima Ação:** Executar migration 017 usando `.\scripts\run-migration-017.ps1 -Environment dev`
